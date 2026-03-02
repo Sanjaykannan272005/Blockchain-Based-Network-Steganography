@@ -54,11 +54,6 @@ def page_not_found(e):
 def server_error(e):
     return jsonify({'success': False, 'error': 'Internal Server Error: ' + str(e)}), 500
 
-@app.errorhandler(Exception)
-def handle_exception(e):
-    print(f"[CRASH] Unhandled Exception: {str(e)}")
-    return jsonify({'success': False, 'error': str(e)}), 500
-
 # Load blockchain config
 config = {}
 try:
@@ -91,6 +86,10 @@ print(f"[INIT] Admin address configured: {ADMIN_ADDRESS}")
 def index():
     """Main wallet authentication page"""
     return render_template('wallet_auth.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
 
 @app.route('/verify_signature', methods=['POST'])
 def verify_signature():

@@ -83,6 +83,10 @@ def index():
     admin_addr = config.get('owner_address', config.get('wallet_address', '')).lower()
     return render_template('sender_web.html', wallet=config['wallet_address'], balance=balance, admin_address=admin_addr)
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/api/logs/stream')
 def stream_logs():
     return Response(streamer.generate(), mimetype='text/event-stream')
