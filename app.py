@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, Response
 from flask_cors import CORS
+import socket as _sock
 import os
 import subprocess
 import sys
@@ -8,6 +9,12 @@ from datetime import datetime
 from werkzeug.utils import secure_filename
 from blockchain_integration import BlockchainKeyExchange
 from log_streamer import streamer
+
+# Configure UTF-8 for Windows terminals to avoid UnicodeEncodeError
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'default-stealth-key-change-this')
@@ -125,6 +132,10 @@ def ping_check():
     if not host:
         return jsonify({'success': False, 'error': 'No host specified'})
     
+    # Strip port if present (e.g. 10.0.0.1:5000 -> 10.0.0.1)
+    if ':' in host and not ('[' in host and ']' in host): # Simple check to avoid breaking IPv6
+        host = host.split(':')[0]
+    
     import subprocess
     import platform
     import time
@@ -133,13 +144,15 @@ def ping_check():
     param = '-n' if platform.system().lower() == 'windows' else '-c'
     start = time.time()
     try:
-        # Use a single packet check
-        res = subprocess.run(['ping', param, '1', host], capture_output=True, timeout=2)
+        # Use a single packet check with a longer 5s timeout
+        res = subprocess.run(['ping', param, '1', host], capture_output=True, timeout=5)
         latency = (time.time() - start) * 1000
         if res.returncode == 0:
             return jsonify({'success': True, 'latency': latency})
         else:
-            return jsonify({'success': False, 'error': 'Host unreachable (ICMP blocked or offline)'})
+            return jsonify({'success': False, 'error': 'Host unreachable. Tip: Ensure the other laptop has ICMP (Ping) allowed in Windows Firewall.'})
+    except subprocess.TimeoutExpired:
+        return jsonify({'success': False, 'error': 'Ping timed out (5s). The target host might be offline or blocking ICMP packets.'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
@@ -480,15 +493,30 @@ def network_hide():
             # Capture output
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
             
+            # MIRROR TO TERMINAL for error visibility
+            if result.stdout:
+                print(f"\n--- [SENDER OUTPUT] ---\n{result.stdout}\n-----------------------")
+            if result.stderr:
+                print(f"\n--- [SENDER ERROR] ---\n{result.stderr}\n---------------------", file=sys.stderr)
+            
             if result.returncode == 0:
+                if request.args.get('format') == 'json':
+                    return jsonify({'success': True, 'message': result.stdout})
                 flash('Transmission successful!')
                 return render_template('network_hide.html', success=True, message=result.stdout)
             else:
+                if request.args.get('format') == 'json':
+                    return jsonify({'success': False, 'error': result.stderr})
                 flash(f'Transmission failed: {result.stderr}')
+                return render_template('network_hide.html', success=False, error=result.stderr)
                 
         except subprocess.TimeoutExpired:
+            if request.args.get('format') == 'json':
+                return jsonify({'success': False, 'error': 'Transmission timed out'})
             flash('Error: Transmission timed out')
         except Exception as e:
+            if request.args.get('format') == 'json':
+                return jsonify({'success': False, 'error': str(e)})
             flash(f'Error: {str(e)}')
             
     return render_template('network_hide.html')
@@ -523,20 +551,28 @@ def network_extract():
                     # Basic parsing to extract the message part
                     import re
                     match = re.search(r"✅ MESSAGE RECEIVED:\s*\n\s*(.*)", output)
-                    if match:
-                        extracted_data = match.group(1)
-                    else:
-                        extracted_data = output # Fallback
-                elif "✅ Data extracted" in output:
-                     extracted_data = output
-                
-                return render_template('network_extract.html', success=True, extracted_data=extracted_data)
+                if request.args.get('format') == 'json':
+                    return jsonify({'success': True, 'message': result.stdout})
+                flash('Extraction successful!')
+                # Attempt to parse a message line
+                msg = "Check logs for data"
+                for line in result.stdout.split('\n'):
+                    if "MESSAGE RECEIVED:" in line:
+                        msg = line.split("MESSAGE RECEIVED:")[1].strip()
+                return render_template('network_extract.html', success=True, message=msg)
             else:
-                flash(f'Extraction failed: {result.stderr or result.stdout}')
+                if request.args.get('format') == 'json':
+                    return jsonify({'success': False, 'error': result.stderr})
+                flash(f'Extraction failed: {result.stderr}')
+                return render_template('network_extract.html', success=False, error=result.stderr)
                 
         except subprocess.TimeoutExpired:
+            if request.args.get('format') == 'json':
+                return jsonify({'success': False, 'error': 'Extraction timed out'})
             flash('Error: Extraction timed out')
         except Exception as e:
+            if request.args.get('format') == 'json':
+                return jsonify({'success': False, 'error': str(e)})
             flash(f'Error: {str(e)}')
             
     return render_template('network_extract.html')

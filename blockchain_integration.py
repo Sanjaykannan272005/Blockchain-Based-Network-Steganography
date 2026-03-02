@@ -156,9 +156,14 @@ class BlockchainKeyExchange:
     def get_latest_block_data(self):
         try:
             block = self.w3.eth.get_block('latest')
-            return {'success': True, 'number': block['number'], 'hash': self.w3.to_hex(block['hash'])}
+            return {
+                'success': True,
+                'number': block.number,
+                'hash': block.hash.hex(),
+                'timestamp': block.timestamp
+            }
         except Exception as e:
-            return {'success': False, 'error': str(e)}
+            return {'success': False, 'error': str(e), 'number': 0, 'hash': '0x0'}
 
     # ==========================
     # Feature Methods: Registry
@@ -168,8 +173,9 @@ class BlockchainKeyExchange:
         if not hasattr(self, 'registry_contract'): return {'success': False, 'error': 'Registry not loaded'}
         try:
             status = self.registry_contract.functions.currentStatus().call()
-            return {'success': True, 'status': 'SILENCED' if status == 1 else 'NORMAL'}
-        except Exception as e: return {'success': False, 'error': str(e)}
+            return {'success': True, 'status': status}
+        except Exception as e:
+            return {'success': False, 'error': str(e), 'status': 'OFFLINE'}
 
     def toggle_emergency_status(self, private_key):
         if not hasattr(self, 'registry_contract'): return {'success': False, 'error': 'Registry not loaded'}

@@ -12,6 +12,12 @@ from datetime import datetime
 from blockchain_integration import BlockchainKeyExchange
 from log_streamer import streamer
 
+# Configure UTF-8 for Windows terminals to avoid UnicodeEncodeError
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 app = Flask(__name__)
 
 # Security & Config
@@ -99,6 +105,7 @@ def extract_stego():
     selected_iface = data.get('iface')
     
     def run_extraction():
+        print(f"[DEBUG] Starting extraction: channel={channel}, duration={duration}, iface={selected_iface}")
         add_log(f"Starting {channel.upper()} extraction (Duration: {duration}s) on {selected_iface or 'Auto-detected'} interface...")
         cmd = [sys.executable, '-u', 'network_receiver.py']
         cmd.append(channel if channel and channel != 'auto' else 'timing')
@@ -120,6 +127,11 @@ def extract_stego():
                 timeout=proc_timeout, env=env
             )
             combined = result.stdout + result.stderr
+            
+            # MIRROR TO TERMINAL for error visibility
+            if combined:
+                print(f"\n--- [RECEIVER OUTPUT] ---\n{combined}\n-------------------------")
+            
             add_log(f"Extraction complete.")
             if "MESSAGE RECEIVED:" in combined:
                 msg = combined.split("MESSAGE RECEIVED:")[1].strip().split('\n')[0].strip()

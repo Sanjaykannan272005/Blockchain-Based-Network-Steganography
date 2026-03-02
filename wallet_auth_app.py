@@ -14,6 +14,13 @@ import time
 import os
 
 from flask_cors import CORS
+import sys
+
+# Configure UTF-8 for Windows terminals to avoid UnicodeEncodeError
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 app = Flask(__name__)
 CORS(app) # Enable CORS for all routes
@@ -207,10 +214,15 @@ def register_personnel_api():
 @app.route('/api/debug_check', methods=['GET'])
 def debug_check():
     """Diagnostic endpoint to verify backend state"""
+    is_connected = False
+    try:
+        is_connected = w3.is_connected()
+    except: pass
+    
     return jsonify({
         'config_loaded': 'user_registry_contract' in config,
         'registry_address': config.get('user_registry_contract'),
-        'blockchain_connected': w3.is_connected(),
+        'blockchain_connected': is_connected,
         'registry_loaded': hasattr(blockchain, 'user_registry'),
         'admin_address': ADMIN_ADDRESS
     })
@@ -218,9 +230,14 @@ def debug_check():
 @app.route('/api/status', methods=['GET'])
 def get_service_status():
     """Basic health check"""
+    is_connected = False
+    try:
+        is_connected = w3.is_connected()
+    except: pass
+    
     return jsonify({
         'status': 'online',
-        'blockchain': w3.is_connected(),
+        'blockchain': is_connected,
         'registry_loaded': hasattr(blockchain, 'user_registry')
     })
 

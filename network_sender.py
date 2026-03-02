@@ -16,9 +16,13 @@ import hashlib
 import time
 from Crypto.Cipher import AES
 import base64
-import sys
-import os
 from quantum_utils import QuantumUtils
+
+# Configure UTF-8 for Windows terminals to avoid UnicodeEncodeError
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # Blockchain key derivation
 def get_blockchain_key(block_number=None):
@@ -67,10 +71,34 @@ def encrypt_message(message, key):
     encrypted = cipher.encrypt(padded.encode())
     return base64.b64encode(iv + encrypted).decode()
 
+import socket
+
 # Send via TIMING channel
 def send_via_timing(encrypted_data, target_ip):
     """Hide data in packet timing delays"""
+    print(f" [CHECK] Verifying reachability of {target_ip}...")
+    import subprocess
+    param = '-n' if os.name == 'nt' else '-c'
+    try:
+        ping_res = subprocess.run(['ping', param, '1', target_ip], capture_output=True, timeout=3)
+        if ping_res.returncode != 0:
+            print(f" ❌ [ERROR] Target {target_ip} is NOT reachable. Aborting send.")
+            return False
+    except Exception as e:
+        print(f" ⚠️ [WARNING] Reachability check failed: {e}. Proceeding anyway...")
+
     print(f" Sending via TIMING channel to {target_ip}")
+    
+    # Check for Scapy Pcap provider
+    try:
+        from scapy.all import conf
+        use_fallback = (not conf.use_pcap) or ("--force-fallback" in sys.argv)
+    except:
+        use_fallback = True
+
+    if use_fallback:
+        print(" ⚠️ [FALLBACK] Npcap not detected. Using UDP socket pulses instead of ICMP.")
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
     # Convert to binary
     binary = ''.join(format(ord(c), '08b') for c in encrypted_data)
@@ -79,10 +107,14 @@ def send_via_timing(encrypted_data, target_ip):
     
     # Send packets with timing delays
     for i, bit in enumerate(binary):
-        # Send ICMP ping
-        packet = IP(dst=target_ip)/ICMP(seq=i)
-        send(packet, verbose=0)
-        
+        if not use_fallback:
+            # Send ICMP ping using Scapy
+            packet = IP(dst=target_ip)/ICMP(seq=i)
+            send(packet, verbose=0)
+        else:
+            # Send UDP pulse (port 53 looks like DNS noise)
+            s.sendto(b"X", (target_ip, 53))
+            
         # Delay encodes the bit
         if bit == '0':
             time.sleep(0.1)  # 100ms = 0
@@ -92,6 +124,7 @@ def send_via_timing(encrypted_data, target_ip):
         if (i + 1) % 80 == 0:
             print(f"  Progress: {i+1}/{len(binary)} bits")
     
+    if use_fallback: s.close()
     print(f" Sent {len(binary)} bits via timing channel")
 
 # Send via SIZE channel
@@ -163,10 +196,13 @@ def main():
     SECRET_MESSAGE = sys.argv[2]
     CHANNEL = sys.argv[3] if len(sys.argv) > 3 else "timing"
     
+    FORCE_FALLBACK = "--force-fallback" in sys.argv
+    
     print(f"\n Configuration:")
     print(f"   Target IP: {TARGET_IP}")
     print(f"   Message: {SECRET_MESSAGE}")
     print(f"   Channel: {CHANNEL}")
+    if FORCE_FALLBACK: print("   Mode: FORCED FALLBACK (UDP)")
     
     # Step 1: Get key from blockchain
     print(f"\n Step 1: Getting encryption key from blockchain...")

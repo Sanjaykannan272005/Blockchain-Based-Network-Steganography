@@ -11,9 +11,16 @@ import hashlib
 import json
 import socket
 import os
+import sys
 from blockchain_integration import BlockchainKeyExchange
 import requests
 from log_streamer import streamer
+
+# Configure UTF-8 for Windows terminals
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 app = Flask(__name__)
 
@@ -67,7 +74,12 @@ def store_key_on_blockchain(message_hash, encryption_key, receiver_address, pass
 
 @app.route('/')
 def index():
-    balance = w3.from_wei(w3.eth.get_balance(config['wallet_address']), 'ether')
+    try:
+        balance = w3.from_wei(w3.eth.get_balance(config['wallet_address']), 'ether')
+    except Exception as e:
+        print(f"⚠️ [BLOCKCHAIN] Balance fetch failed: {e}")
+        balance = "0.00 (Offline)"
+    
     admin_addr = config.get('owner_address', config.get('wallet_address', '')).lower()
     return render_template('sender_web.html', wallet=config['wallet_address'], balance=balance, admin_address=admin_addr)
 
@@ -109,16 +121,18 @@ def send_message():
             'explorer_url': f"{config['explorer']}/tx/{tx_hash}"
         })
     except Exception as e:
+        print(f"\n❌ [SENDER ERROR] In /send: {e}")
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/balance')
 def get_balance():
     target_wallet = request.args.get('wallet', config['wallet_address'])
     try:
-        balance = w3.eth.get_balance(w3.to_checksum_address(target_wallet))
-        return jsonify({'balance': w3.from_wei(balance, 'ether')})
+        balance_wei = w3.eth.get_balance(w3.to_checksum_address(target_wallet))
+        return jsonify({'balance': w3.from_wei(balance_wei, 'ether')})
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        print(f"⚠️ [BLOCKCHAIN] API Balance fetch failed: {e}")
+        return jsonify({'balance': '0.00', 'error': 'Blockchain offline'})
 
 @app.route('/api/verified_nodes')
 def proxy_nodes():
@@ -137,14 +151,31 @@ def proxy_analytics():
     except Exception as e:
         return jsonify({'success': False, 'error': 'Dashboard offline'})
 
+@app.route('/api/ping')
+def proxy_ping():
+    try:
+        host = request.args.get('host')
+        res = requests.get(f'http://localhost:5000/api/ping?host={host}', timeout=5)
+        return jsonify(res.json())
+    except Exception as e:
+        print(f"\n❌ [SENDER PROXY ERROR] In /api/ping: {e}")
+        return jsonify({'success': False, 'error': 'Dashboard offline'})
+
 @app.route('/network_hide', methods=['POST'])
 def network_hide_proxy():
     # Allow local templates to call /network_hide which is actually in app.py
     try:
-        # Forward form data
-        res = requests.post('http://localhost:5000/network_hide', data=request.form, timeout=10)
+        # Forward form data - Increased timeout for long steganography transmissions
+        # Request JSON format to avoid HTML parsing errors
+        res = requests.post('http://localhost:5000/network_hide?format=json', data=request.form, timeout=120)
         return jsonify(res.json())
     except Exception as e:
+        print(f"\n❌ [SENDER PROXY ERROR] In /network_hide: {e}")
+        # Try to get text if json failed
+        try:
+            raw_text = res.text
+            print(f"   [RAW CONTENT]: {raw_text[:200]}...")
+        except: pass
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/dead_drop_check')
@@ -158,9 +189,11 @@ def proxy_dead_drop_check():
 @app.route('/dead_drop_send_hybrid', methods=['POST'])
 def proxy_dead_drop_send_hybrid():
     try:
-        res = requests.post('http://localhost:5000/dead_drop_send_hybrid', json=request.json, timeout=10)
+        # Increased timeout for complex hybrid transmissions
+        res = requests.post('http://localhost:5000/dead_drop_send_hybrid', json=request.json, timeout=120)
         return jsonify(res.json())
     except Exception as e:
+        print(f"\n❌ [SENDER PROXY ERROR] In /dead_drop_send_hybrid: {e}")
         return jsonify({'success': False, 'error': str(e)})
 
 if __name__ == '__main__':

@@ -16,10 +16,17 @@ import hashlib
 import time
 from Crypto.Cipher import AES
 import base64
-import sys
-import os
 import socket
 from quantum_utils import QuantumUtils
+
+# Configure UTF-8 for Windows terminals to avoid UnicodeEncodeError
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
+# Global configuration
+IFACE = None
 
 # Blockchain key derivation (same as sender)
 def get_blockchain_key(block_number=None):
@@ -77,40 +84,60 @@ def decrypt_message(encrypted_data, key):
 def receive_via_timing(duration=60):
     """Extract data from packet timing delays"""
     print(f" Listening for TIMING channel (duration: {duration}s)...")
-    print(f"   Waiting for packets...")
     
+    # Check for Scapy Pcap provider
+    try:
+        from scapy.all import conf
+        use_fallback = (not conf.use_pcap) or ("--force-fallback" in sys.argv)
+    except:
+        use_fallback = True
+
     last_time = None
     binary_data = ""
     packet_count = 0
-    
-    def packet_handler(packet):
-        nonlocal last_time, binary_data, packet_count
+
+    if use_fallback:
+        print(" ⚠️ [FALLBACK] Npcap not detected. Using raw UDP socket instead of Scapy sniff.")
+        # Listen for UDP pulses on port 53 (DNS)
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.bind(('0.0.0.0', 53))
+        s.settimeout(1.0) # 1 sec intervals
         
-        if packet.haslayer(ICMP):
-            current_time = time.time()
-            packet_count += 1
-            
-            if last_time is not None:
-                delay = current_time - last_time
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            try:
+                data, addr = s.recvfrom(1024)
+                current_time = time.time()
+                packet_count += 1
                 
-                # Widened windows to handle Windows scheduler jitter
-                # Bit 0: ~0.1s delay  (sender sleeps 0.1s)
-                # Bit 1: ~0.2s delay  (sender sleeps 0.2s)
-                if 0.04 < delay < 0.15:   # 40ms - 150ms = bit 0
-                    binary_data += '0'
-                elif 0.15 < delay < 0.35: # 150ms - 350ms = bit 1
-                    binary_data += '1'
-                # else: ignore noise packets
-                
-                if len(binary_data) % 80 == 0 and len(binary_data) > 0:
-                    print(f"   Received: {len(binary_data)} bits")
-            
-            last_time = current_time
+                if last_time is not None:
+                    delay = current_time - last_time
+                    if 0.04 < delay < 0.15: binary_data += '0'
+                    elif 0.15 < delay < 0.35: binary_data += '1'
+                last_time = current_time
+            except socket.timeout:
+                continue
+            except Exception as e:
+                print(f"   Socket Error: {e}")
+                break
+        s.close()
+    else:
+        print(f"   Waiting for ICMP packets via Scapy...")
+        def packet_handler(packet):
+            nonlocal last_time, binary_data, packet_count
+            if packet.haslayer(ICMP):
+                current_time = time.time()
+                packet_count += 1
+                if last_time is not None:
+                    delay = current_time - last_time
+                    if 0.04 < delay < 0.15: binary_data += '0'
+                    elif 0.15 < delay < 0.35: binary_data += '1'
+                last_time = current_time
+        
+        # Capture packets
+        sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0, iface=IFACE)
     
-    # Capture packets
-    sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0, iface=IFACE)
-    
-    print(f" Captured {packet_count} packets, extracted {len(binary_data)} bits")
+    print(f" Captured {packet_count} pulses, extracted {len(binary_data)} bits")
     
     # Convert binary to text
     chars = [binary_data[i:i+8] for i in range(0, len(binary_data), 8)]
@@ -212,6 +239,7 @@ def main():
     DURATION = int(sys.argv[2]) if len(sys.argv) > 2 else 60
     
     # Handle optional interface
+    global IFACE
     IFACE = None
     if "--iface" in sys.argv:
         try:
@@ -224,18 +252,33 @@ def main():
     if not IFACE and os.name == 'nt':
         try:
             from scapy.all import get_working_ifaces
-            # Match 10.210.59.20 specifically or any non-loopback
             ifaces = get_working_ifaces()
+            
+            # Get local IP to find the matching interface
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                s.connect(("8.8.8.8", 80))
+                local_ip = s.getsockname()[0]
+                s.close()
+            except:
+                local_ip = None
+
+            print(f" [DETECT] Local IP: {local_ip or 'unknown'}")
+            
+            # Match the interface that has the active IP
             for i in ifaces:
-                if i.ip == '10.210.59.20' or (not i.ip.startswith('127.') and not i.ip.startswith('169.254')):
+                if (local_ip and i.ip == local_ip) or (not i.ip.startswith('127.') and not i.ip.startswith('169.254')):
                     IFACE = i.name
+                    print(f" [DETECT] Auto-selected interface: {i.description} ({i.ip})")
                     break
-        except:
+        except Exception as e:
+            print(f" [ERROR] Interface detection failed: {e}")
             pass
 
     print(f"\n[CONFIG] Configuration:")
     print(f"   Channel: {CHANNEL}")
     print(f"   Duration: {DURATION} seconds")
+    if "--force-fallback" in sys.argv: print("   Mode: FORCED FALLBACK (UDP)")
     if IFACE:
         print(f"   Interface: {IFACE}")
     
@@ -380,8 +423,10 @@ def main():
         print(f"   Run as administrator/root:")
         print(f"   Windows: Run terminal as Administrator")
         print(f"   Linux: sudo python network_receiver.py ...")
+        sys.exit(1)
     except Exception as e:
         print(f"\n ERROR: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
