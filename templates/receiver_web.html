@@ -505,12 +505,12 @@
                                     <div class="small text-muted mb-1 x-small fw-bold">EVENT HASH: ${(m.tx_hash || m.hash || '').substring(0, 16)}...</div>
                                     <div class="h6 mb-2 text-info">FROM: ${m.sender}</div>
                                     <div class="p-3 bg-black rounded border border-gray small font-monospace" style="color:#4ade80!important;">
-                                        ${m.message || 'ENCRYPTED_PAYLOAD_LOCKED'}
+                                        ${m.content || 'NO_CONTENT'}
                                     </div>
                                 </div>
                                 <div class="text-end">
-                                    <span class="badge bg-success mb-2">VERIFIED</span>
-                                    <div class="x-small text-muted">TIME-LOCK: ${m.time_lock || 'NONE'}</div>
+                                    <span class="badge ${m.is_locked ? 'bg-warning' : 'bg-success'} mb-2">${m.is_locked ? 'LOCKED' : 'VERIFIED'}</span>
+                                    <div class="x-small text-muted">RELEASE: ${m.formatted_time || 'IMMEDIATE'}</div>
                                 </div>
                             </div>
                         </div>

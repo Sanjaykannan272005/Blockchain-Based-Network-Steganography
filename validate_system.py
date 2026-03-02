@@ -1,11 +1,20 @@
 import requests
 import json
 import time
+import os
+import sys
+import socket
 from web3 import Web3
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 import base64
 import hashlib
+
+# Configure UTF-8 for Windows terminals to avoid UnicodeEncodeError
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # Configuration
 BASE_URL = "http://127.0.0.1:5000"
