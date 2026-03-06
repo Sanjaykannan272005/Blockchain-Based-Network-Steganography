@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Complete Blockchain Steganography System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{background:#f8f9fa;color:#212529;font-family:Arial,sans-serif;padding:20px}
+        .container-fluid{max-width:1400px;margin:0 auto}
+        .card{background:#fff;border:2px solid #0066cc;margin-bottom:20px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
+        .card-header{background:#0066cc;color:#fff;font-weight:bold;font-size:1.1rem;padding:12px}
+        .btn-primary{background:#0066cc;border:none;padding:8px 20px}
+        .btn-success{background:#28a745;border:none;padding:8px 20px}
+        .btn-danger{background:#dc3545;border:none;padding:8px 20px}
+        .form-control{background:#fff;border:2px solid #dee2e6;color:#000;padding:8px}
+        .form-label{color:#000;font-weight:600;margin-bottom:5px}
+        .form-check-label{color:#000;font-weight:500}
+        .feature-box{border:2px solid #dee2e6;padding:10px;border-radius:5px;margin-bottom:10px}
+        .feature-box.active{border-color:#0066cc;background:#e7f3ff}
+        pre{background:#f8f9fa;padding:10px;border-radius:5px;color:#000;border:1px solid #dee2e6;font-size:0.9rem;max-height:200px;overflow:auto}
+        .status-box{padding:15px;border-radius:5px;margin:10px 0}
+        .status-success{background:#d4edda;border:2px solid #28a745;color:#155724}
+        .status-info{background:#d1ecf1;border:2px solid #17a2b8;color:#0c5460}
+        .status-warning{background:#fff3cd;border:2px solid #ffc107;color:#856404}
+        h5{color:#000;margin-top:15px}
+        .receiver-status{position:fixed;top:20px;right:20px;padding:15px;background:#fff;border:3px solid #28a745;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.2);z-index:1000;min-width:250px}
+        .receiver-status.listening{border-color:#28a745;background:#d4edda}
+        .receiver-status.stopped{border-color:#dc3545;background:#f8d7da}
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Complete Blockchain Steganography System</h2>
+        <a href="/" class="btn btn-outline-primary btn-sm">Dashboard</a>
+    </div>
+
+    <!-- Receiver Status -->
+    <div id="receiverStatus" class="receiver-status stopped">
+        <h6>Receiver Status</h6>
+        <div id="receiverStatusText">Stopped</div>
+        <button onclick="toggleReceiver()" id="receiverBtn" class="btn btn-success btn-sm mt-2">Start Listening</button>
+    </div>
+
+    <div class="row">
+        <!-- LEFT COLUMN: Sender -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">SENDER - Send Encrypted Message</div>
+                <div class="card-body">
+                    
+                    <!-- 10 Features Selection -->
+                    <h5>Select Blockchain Features to Apply:</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check feature-box" onclick="toggleFeature(1)">
+                                <input class="form-check-input" type="checkbox" id="feature1">
+                                <label class="form-check-label" for="feature1">
+                                    1. Control Rules (Time Windows)
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(2)">
+                                <input class="form-check-input" type="checkbox" id="feature2">
+                                <label class="form-check-label" for="feature2">
+                                    2. Trigger Events
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(3)">
+                                <input class="form-check-input" type="checkbox" id="feature3" checked>
+                                <label class="form-check-label" for="feature3">
+                                    3. Blockchain Keys (Auto)
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(4)">
+                                <input class="form-check-input" type="checkbox" id="feature4">
+                                <label class="form-check-label" for="feature4">
+                                    4. Authentication
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(5)">
+                                <input class="form-check-input" type="checkbox" id="feature5">
+                                <label class="form-check-label" for="feature5">
+                                    5. Reputation System
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check feature-box" onclick="toggleFeature(6)">
+                                <input class="form-check-input" type="checkbox" id="feature6">
+                                <label class="form-check-label" for="feature6">
+                                    6. Forensic Records
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(7)">
+                                <input class="form-check-input" type="checkbox" id="feature7">
+                                <label class="form-check-label" for="feature8">
+                                    7. Multi-Chain Distribution
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(8)">
+                                <input class="form-check-input" type="checkbox" id="feature8">
+                                <label class="form-check-label" for="feature8">
+                                    8. Dead Drop Coordinates
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(9)">
+                                <input class="form-check-input" type="checkbox" id="feature9">
+                                <label class="form-check-label" for="feature9">
+                                    9. Key Rotation
+                                </label>
+                            </div>
+                            <div class="form-check feature-box" onclick="toggleFeature(10)">
+                                <input class="form-check-input" type="checkbox" id="feature10">
+                                <label class="form-check-label" for="feature10">
+                                    10. Protocol Selection
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Message Input -->
+                    <div class="mb-3">
+                        <label class="form-label">Sender Address</label>
+                        <input type="text" id="senderAddress" class="form-control" value="0x627306090abaB3A6e1400e9345bC60c78a8BEf57">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Secret Message</label>
+                        <textarea id="messageText" class="form-control" rows="3" placeholder="Your secret message"></textarea>
+                    </div>
+                    
+                    <button onclick="sendMessage()" class="btn btn-primary btn-lg w-100">
+                        🚀 Encrypt & Send with Selected Features
+                    </button>
+
+                    <!-- Send Result -->
+                    <div id="sendResult" style="display:none" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Receiver -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">RECEIVER - Receive & Decrypt Messages</div>
+                <div class="card-body">
+                    <div class="status-box status-info">
+                        <strong>Receiver Mode:</strong> Built-in GUI receiver<br>
+                        Click "Start Listening" to receive messages in real-time
+                    </div>
+
+                    <h5>Received Messages:</h5>
+                    <div id="receivedMessages" style="max-height:400px;overflow:auto">
+                        <div class="text-muted">No messages received yet. Start listening to receive messages.</div>
+                    </div>
+
+                    <hr>
+
+                    <h5>Manual Decrypt:</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Paste Encrypted Message</label>
+                        <textarea id="encryptedInput" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button onclick="manualDecrypt()" class="btn btn-success w-100">Decrypt Message</button>
+                    
+                    <div id="decryptResult" style="display:none" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Details -->
+    <div class="card">
+        <div class="card-header">Applied Features Details</div>
+        <div class="card-body">
+            <div id="featureDetails" class="row">
+                <div class="col-12 text-muted">Select features above to see details</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let receiverActive = false;
+let receiverInterval = null;
+
+function toggleFeature(num) {
+    const checkbox = document.getElementById('feature' + num);
+    checkbox.checked = !checkbox.checked;
+    checkbox.parentElement.classList.toggle('active', checkbox.checked);
+    updateFeatureDetails();
+}
+
+function updateFeatureDetails() {
+    const details = [];
+    for(let i = 1; i <= 10; i++) {
+        if(document.getElementById('feature' + i).checked) {
+            details.push(getFeatureDetail(i));
+        }
+    }
+    
+    if(details.length === 0) {
+        document.getElementById('featureDetails').innerHTML = '<div class="col-12 text-muted">Select features above to see details</div>';
+    } else {
+        document.getElementById('featureDetails').innerHTML = details.join('');
+    }
+}
+
+function getFeatureDetail(num) {
+    const features = {
+        1: '<div class="col-md-4"><strong>Control Rules:</strong> Time-based access control</div>',
+        2: '<div class="col-md-4"><strong>Triggers:</strong> Blockchain event activation</div>',
+        3: '<div class="col-md-4"><strong>Blockchain Keys:</strong> Auto key derivation</div>',
+        4: '<div class="col-md-4"><strong>Authentication:</strong> Digital signatures</div>',
+        5: '<div class="col-md-4"><strong>Reputation:</strong> Trust scoring</div>',
+        6: '<div class="col-md-4"><strong>Forensics:</strong> Tamper-proof records</div>',
+        7: '<div class="col-md-4"><strong>Multi-Chain:</strong> Distributed storage</div>',
+        8: '<div class="col-md-4"><strong>Dead Drops:</strong> Timed coordination</div>',
+        9: '<div class="col-md-4"><strong>Key Rotation:</strong> Auto key changes</div>',
+        10: '<div class="col-md-4"><strong>Protocol:</strong> Adaptive selection</div>'
+    };
+    return features[num] || '';
+}
+
+async function sendMessage() {
+    const sender = document.getElementById('senderAddress').value;
+    const message = document.getElementById('messageText').value;
+    
+    if(!message) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    // Get selected features
+    const features = [];
+    for(let i = 1; i <= 10; i++) {
+        if(document.getElementById('feature' + i).checked) {
+            features.push(i);
+        }
+    }
+    
+    try {
+        const response = await fetch('/api/message/send', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                sender_address: sender,
+                message: message,
+                features: features
+            })
+        });
+        
+        const data = await response.json();
+        
+        if(data.status === 'success') {
+            let html = '<div class="status-box status-success">';
+            html += '<strong>✅ Message Sent Successfully!</strong><br>';
+            html += '<strong>Features Applied:</strong> ' + data.features_applied + ' of 10<br>';
+            html += '<strong>Encrypted Length:</strong> ' + data.encrypted_message.length + ' chars<br>';
+            
+            // Show feature results
+            if(data.feature_results) {
+                html += '<hr><strong>Feature Details:</strong><br>';
+                const fr = data.feature_results;
+                
+                if(fr.control) html += '✓ Control Rules: ' + fr.control.message + '<br>';
+                if(fr.trigger) html += '✓ Trigger Event Created<br>';
+                if(fr.blockchain_key) html += '✓ Blockchain Key: Block #' + fr.blockchain_key.block_height + '<br>';
+                if(fr.auth) html += '✓ Authentication: Verified<br>';
+                if(fr.reputation) html += '✓ Reputation Score: ' + fr.reputation.score + '<br>';
+                if(fr.forensic) html += '✓ Forensic Record: Block #' + fr.forensic.block_number + '<br>';
+                if(fr.multichain) html += '✓ Multi-Chain: ' + fr.multichain.length + ' chains<br>';
+                if(fr.dead_drop) html += '✓ Dead Drop: Created<br>';
+                if(fr.rotation) html += '✓ Key Rotation: Scheduled<br>';
+                if(fr.protocol) html += '✓ Protocol: ' + fr.protocol.toUpperCase() + '<br>';
+            }
+            
+            html += '</div>';
+            html += '<div class="mt-2"><small><strong>Encrypted Message:</strong></small><pre>' + data.encrypted_message + '</pre></div>';
+            
+            document.getElementById('sendResult').innerHTML = html;
+            document.getElementById('sendResult').style.display = 'block';
+            
+            // Clear message
+            document.getElementById('messageText').value = '';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch(error) {
+        alert('Error: ' + error);
+    }
+}
+
+function toggleReceiver() {
+    receiverActive = !receiverActive;
+    const btn = document.getElementById('receiverBtn');
+    const status = document.getElementById('receiverStatus');
+    const statusText = document.getElementById('receiverStatusText');
+    
+    if(receiverActive) {
+        btn.textContent = 'Stop Listening';
+        btn.className = 'btn btn-danger btn-sm mt-2';
+        status.className = 'receiver-status listening';
+        statusText.innerHTML = '<strong>Listening...</strong><br>Port: 9999<br>Waiting for messages';
+        startReceiver();
+    } else {
+        btn.textContent = 'Start Listening';
+        btn.className = 'btn btn-success btn-sm mt-2';
+        status.className = 'receiver-status stopped';
+        statusText.textContent = 'Stopped';
+        stopReceiver();
+    }
+}
+
+function startReceiver() {
+    // Poll for new messages every 2 seconds
+    receiverInterval = setInterval(async () => {
+        try {
+            const response = await fetch('/api/receiver/check');
+            const data = await response.json();
+            
+            if(data.messages && data.messages.length > 0) {
+                displayReceivedMessages(data.messages);
+            }
+        } catch(error) {
+            console.error('Receiver error:', error);
+        }
+    }, 2000);
+}
+
+function stopReceiver() {
+    if(receiverInterval) {
+        clearInterval(receiverInterval);
+        receiverInterval = null;
+    }
+}
+
+function displayReceivedMessages(messages) {
+    if(messages.length === 0) {
+        document.getElementById('receivedMessages').innerHTML = '<div class="text-muted">No messages received yet.</div>';
+        return;
+    }
+    
+    let html = '';
+    messages.forEach((msg, idx) => {
+        html += '<div class="status-box status-success mb-2">';
+        html += '<strong>📨 Message ' + (idx + 1) + ':</strong><br>';
+        html += '<strong>From:</strong> ' + msg.sender.substring(0, 20) + '...<br>';
+        html += '<strong>Message:</strong> ' + msg.message + '<br>';
+        html += '<strong>Time:</strong> ' + new Date(msg.timestamp * 1000).toLocaleTimeString() + '<br>';
+        html += '<strong>Features Used:</strong> ' + msg.features.length + ' of 10<br>';
+        
+        // Show which features were used
+        if(msg.features.length > 0) {
+            html += '<small><strong>Applied:</strong> ';
+            const featureNames = {
+                1: 'Control', 2: 'Triggers', 3: 'Keys', 4: 'Auth', 5: 'Reputation',
+                6: 'Forensics', 7: 'Multi-Chain', 8: 'Dead Drop', 9: 'Rotation', 10: 'Protocol'
+            };
+            html += msg.features.map(f => featureNames[f]).join(', ');
+            html += '</small>';
+        }
+        
+        html += '</div>';
+    });
+    document.getElementById('receivedMessages').innerHTML = html;
+}
+
+async function manualDecrypt() {
+    const encrypted = document.getElementById('encryptedInput').value;
+    
+    if(!encrypted) {
+        alert('Please paste encrypted message');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/message/receive', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({encrypted_message: encrypted})
+        });
+        
+        const data = await response.json();
+        
+        if(data.status === 'success') {
+            let html = '<div class="status-box status-success">';
+            html += '<strong>Decrypted Successfully!</strong><br>';
+            html += '<strong>Message:</strong> ' + data.message;
+            html += '</div>';
+            
+            document.getElementById('decryptResult').innerHTML = html;
+            document.getElementById('decryptResult').style.display = 'block';
+        } else {
+            alert('Decryption failed: ' + data.message);
+        }
+    } catch(error) {
+        alert('Error: ' + error);
+    }
+}
+
+// Initialize
+document.getElementById('feature3').parentElement.classList.add('active');
+updateFeatureDetails();
+</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <h3><i class="fas fa-envelope"></i> Secure Messages</h3>
+                <div>
+                    <a href="{{ url_for('send_message') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Send Message
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>From</th>
+                                    <th>File</th>
+                                    <th>Type</th>
+                                    <th>Received</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for msg in messages %}
+                                <tr class="{{ 'table-light' if msg[5] else 'table-warning' }}">
+                                    <td><strong>{{ msg[1] }}</strong></td>
+                                    <td>{{ msg[2] }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ msg[3] }}</span>
+                                    </td>
+                                    <td>{{ msg[4] }}</td>
+                                    <td>
+                                        {% if msg[5] %}
+                                            <span class="badge bg-success">Read</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Unread</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" 
+                                                onclick="viewMessage({{ msg[0] }}, '{{ msg[2] }}')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5>No messages yet</h5>
+                        <p class="text-muted">Start secure communication by sending your first message</p>
+                        <a href="{{ url_for('send_message') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Send First Message
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Decrypt Message</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="decryptForm">
+                    <input type="hidden" id="messageFilename">
+                    <div class="mb-3">
+                        <label for="decryptPassword" class="form-label">Enter Password to Decrypt</label>
+                        <input type="password" class="form-control" id="decryptPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-unlock"></i> Decrypt Message
+                    </button>
+                </form>
+                <div id="messageContent" class="mt-3" style="display: none;">
+                    <div class="alert alert-success">
+                        <h6>Decrypted Message:</h6>
+                        <div id="decryptedText"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewMessage(messageId, filename) {
+    document.getElementById('messageFilename').value = filename;
+    document.getElementById('messageContent').style.display = 'none';
+    document.getElementById('decryptForm').style.display = 'block';
+    new bootstrap.Modal(document.getElementById('messageModal')).show();
+}
+
+document.getElementById('decryptForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const filename = document.getElementById('messageFilename').value;
+    const password = document.getElementById('decryptPassword').value;
+    
+    fetch('/extract_message', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `filename=${filename}&password=${password}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('decryptedText').textContent = data.message;
+            document.getElementById('messageContent').style.display = 'block';
+            document.getElementById('decryptForm').style.display = 'none';
+        } else {
+            alert('Decryption failed: ' + data.error);
+        }
+    });
+});
+</script>
+{% endblock %}

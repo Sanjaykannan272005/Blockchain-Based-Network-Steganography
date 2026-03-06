@@ -1,0 +1,155 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-broadcast-tower"></i> Real-Time Network Steganography</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Sender Side -->
+                    <div class="col-md-6">
+                        <div class="card border-primary">
+                            <div class="card-header">
+                                <h5><i class="fas fa-paper-plane"></i> Sender</h5>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" action="{{ url_for('realtime_send') }}">
+                                    <div class="mb-3">
+                                        <label for="secret_data" class="form-label">Secret Message</label>
+                                        <textarea class="form-control" id="secret_data" name="secret_data" 
+                                                  rows="3" placeholder="Enter covert message..." required></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="mb-3">
+                                                <label for="target_host" class="form-label">Target Host</label>
+                                                <input type="text" class="form-control" id="target_host" name="target_host" 
+                                                       value="google.com" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="target_port" class="form-label">Port</label>
+                                                <input type="number" class="form-control" id="target_port" name="target_port" 
+                                                       value="80" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-broadcast-tower"></i> Start Transmission
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Receiver Side -->
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header">
+                                <h5><i class="fas fa-satellite-dish"></i> Receiver</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Option 1: Upload PCAP File</h6>
+                                    <form method="POST" action="{{ url_for('realtime_extract') }}" enctype="multipart/form-data">
+                                        <input type="file" class="form-control mb-2" name="pcap_file" accept=".pcap,.pcapng">
+                                        <input type="password" class="form-control mb-2" name="password" placeholder="Password" required>
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="fas fa-file-upload"></i> Analyze PCAP
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <hr>
+
+                                <div class="mb-3">
+                                    <h6>Option 2: Manual Timestamps</h6>
+                                    <form method="POST" action="{{ url_for('manual_timing_extract') }}">
+                                        <textarea class="form-control mb-2" name="timestamps" rows="4" 
+                                                  placeholder="Enter timestamps (one per line):&#10;1769176041.123&#10;1769176041.623&#10;1769176042.123"></textarea>
+                                        <input type="password" class="form-control mb-2" name="password" placeholder="Password" required>
+                                        <button type="submit" class="btn btn-success btn-sm w-100">
+                                            <i class="fas fa-clock"></i> Analyze Timing
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h5>How Real-Time Network Steganography Works:</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-paper-plane text-primary"></i> Sender Process</h6>
+                                    <ol class="small">
+                                        <li>Encrypt message with AES</li>
+                                        <li>Convert to binary data</li>
+                                        <li>Send packets with timing delays</li>
+                                        <li>0 = short delay, 1 = long delay</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-satellite-dish text-success"></i> Receiver Process</h6>
+                                    <ol class="small">
+                                        <li>Monitor network traffic</li>
+                                        <li>Capture packet timestamps</li>
+                                        <li>Calculate timing intervals</li>
+                                        <li>No log file needed!</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-unlock text-warning"></i> Extraction Process</h6>
+                                    <ol class="small">
+                                        <li>Analyze timing patterns</li>
+                                        <li>Reconstruct binary data</li>
+                                        <li>Decrypt with password</li>
+                                        <li>Reveal original message</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info mt-4">
+                    <h6><i class="fas fa-info-circle"></i> Capture Instructions:</h6>
+                    <p><strong>Using Wireshark:</strong></p>
+                    <ol>
+                        <li>Start Wireshark capture on your network interface</li>
+                        <li>Apply filter: <code>host google.com and port 80</code></li>
+                        <li>Sender starts transmission</li>
+                        <li>Stop capture after transmission completes</li>
+                        <li>Save as PCAP file and upload here</li>
+                    </ol>
+                    
+                    <p><strong>Using Command Line:</strong></p>
+                    <code>tshark -i any -f "host google.com and port 80" -a duration:300 -w capture.pcap</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

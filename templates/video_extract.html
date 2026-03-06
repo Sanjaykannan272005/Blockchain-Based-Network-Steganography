@@ -1,0 +1,73 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-video"></i> Extract Data from Video</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-unlock"></i> Message Extracted Successfully!</h5>
+                        <div class="mt-3">
+                            <label class="form-label"><strong>Decrypted Message:</strong></label>
+                            <div class="card">
+                                <div class="card-body bg-light">
+                                    <pre>{{ extracted_data }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard()" class="btn btn-outline-primary mt-2">
+                            <i class="fas fa-copy"></i> Copy Message
+                        </button>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="stego_video" class="form-label">
+                        <i class="fas fa-image"></i> Select Stego Image/Video
+                    </label>
+                    <input type="file" class="form-control" id="stego_video" name="stego_video" 
+                           accept=".avi,.mp4,.mov,.mkv" required>
+                    <div class="form-text">Upload the stego video file</div>
+                </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Decryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter the password used for encryption" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-unlock-alt"></i> Extract Data from Video
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Video Extraction Process:</h5>
+                        <ol>
+                            <li>System analyzes selected video frames</li>
+                            <li>LSB data is extracted from frame pixels</li>
+                            <li>Encrypted data is reconstructed</li>
+                            <li>AES decryption reveals the original message</li>
+                        </ol>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = document.querySelector('pre').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Message copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography Network Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'forest' });
+    </script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+
+        .bg-dark {
+            background-color: #111827 !important;
+            color: #e5e7eb !important;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        .bg-dark .form-control {
+            background: #0a0a1a !important;
+            color: #e5e7eb !important;
+            border-color: #374151 !important;
+        }
+
+        .bg-dark .form-control::placeholder {
+            color: #4b5563 !important;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .status-online {
+            background-color: #28a745;
+            box-shadow: 0 0 10px #28a745;
+        }
+
+        .status-offline {
+            background-color: #dc3545;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #log-container {
+            height: 300px;
+            overflow-y: auto;
+            background: #1e1e1e;
+            color: #0f0;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 2px;
+        }
+
+        .log-time {
+            color: #888;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-header text-center position-relative">
+        <div class="position-absolute top-0 end-0 p-3 d-flex gap-2">
+            <button id="connectWalletBtn" class="btn btn-outline-light btn-sm" onclick="connectMetaMask()">
+                <i class="fas fa-wallet me-2"></i>Connect Wallet
+            </button>
+            <button id="panicButton" class="btn btn-danger btn-lg shadow" style="display: none;"
+                onclick="triggerPanic()">
+                <i class="fas fa-skull-crossbones"></i> GLOBAL PANIC
+            </button>
+        </div>
+        <h1>🌐 Steganography Network Command Center</h1>
+        <p class="lead">Live Monitoring & Analysis System</p>
+        <div id="network-alert-bar" class="alert alert-success py-1 mt-2 d-inline-block" style="font-size: 0.8rem;">
+            <i class="fas fa-shield-alt"></i> NETWORK STATUS: <span id="net-status-text">NORMAL</span>
+        </div>
+    </div>
+
+    <div class="container-fluid px-4">
+        <!-- Service Status Row -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">🔐 Wallet Auth</h5>
+                            <span id="auth-status-text" class="text-muted">Checking...</span>
+                        </div>
+                        <div id="auth-status-dot" class="status-indicator status-offline"></div>
+                        <a href="http://localhost:5002" target="_blank" class="btn btn-sm btn-outline-primary">Open
+                            UI</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">📨 Receiver Node</h5>
+                            <span id="receiver-status-text" class="text-muted">Checking...</span>
+                        </div>
+                        <div id="receiver-status-dot" class="status-indicator status-offline"></div>
+                        <a href="http://localhost:5001" target="_blank" class="btn btn-sm btn-outline-primary">Open
+                            UI</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">📤 Sender Node</h5>
+                            <span id="sender-status-text" class="text-muted">Checking...</span>
+                        </div>
+                        <div id="sender-status-dot" class="status-indicator status-offline"></div>
+                        <a href="http://localhost:5003" target="_blank" class="btn btn-sm btn-outline-primary">Open
+                            UI</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-messages" class="metric-value text-primary">0</div>
+                    <div class="metric-label">Messages Received</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-mimicry" class="metric-value text-success">0</div>
+                    <div class="metric-label">Mimicry Score</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="currentBlock" class="metric-value text-info">#---</div>
+                    <div class="metric-label">Latest Block</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="currentBlockHash" class="metric-value text-warning"
+                        style="font-size: 1rem; line-height: 2;">---</div>
+                    <div class="metric-label">Block Hash Key</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card p-4 text-center border-primary border-2">
+                    <div id="metric-mimicry-similarity" class="metric-value text-success">98%</div>
+                    <div class="metric-label">🤖 Mimicry Similarity</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-dna" class="metric-value text-warning" style="font-size: 1.2rem;">Scanning...</div>
+                    <div class="metric-label">🧬 Traffic DNA Profile</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-uptime" class="metric-value text-secondary">0s</div>
+                    <div class="metric-label">System Uptime</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center border-info">
+                    <div id="metric-security" class="metric-value text-danger" style="font-size: 1.1rem;">WHITELISTING
+                    </div>
+                    <div class="metric-label"><i class="fas fa-lock"></i> ACCESS STATUS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Blockchain Analytics Row -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-balance" class="metric-value text-success" style="font-size: 1.5rem;">---</div>
+                    <div class="metric-label">💰 Wallet Balance (ETH)</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-protocol" class="metric-value text-primary" style="font-size: 1.4rem;">---</div>
+                    <div class="metric-label">📡 Active Protocol</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-nodes" class="metric-value text-info" style="font-size: 1.5rem;">---</div>
+                    <div class="metric-label">🕸️ Registered Nodes</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-4 text-center">
+                    <div id="metric-reputation" class="metric-value text-warning" style="font-size: 1.5rem;">---</div>
+                    <div class="metric-label">⚖️ Avg. Reputation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Center + Sender CTA Row (Admin Only) -->
+        <div class="row mb-4" id="adminRow" style="display: none;">
+            <div class="col-md-8">
+                <div class="card p-4 bg-dark text-white h-100">
+                    <h5 class="mb-3"><i class="fas fa-shield-alt text-primary me-2"></i>Security Center (C2)</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-light">Blockchain Whitelist</label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" id="whitelistWallet" class="form-control"
+                                    placeholder="Sender Wallet 0x...">
+                                <button class="btn btn-outline-primary" onclick="authorizeSender()">Authorize</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-light">Global Protocol Switch</label>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-info flex-grow-1"
+                                    onclick="switchProtocol('timing')">⏱️ Timing</button>
+                                <button class="btn btn-sm btn-outline-info flex-grow-1"
+                                    onclick="switchProtocol('size')">📦 Size</button>
+                                <button class="btn btn-sm btn-outline-info flex-grow-1"
+                                    onclick="switchProtocol('ttl')">⏳ TTL</button>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="small text-muted">Identity Registry</div>
+                            <div class="small">Organization: <span id="reg-org" class="fw-bold text-light">---</span>
+                            </div>
+                            <div class="small">Clearance: <span id="reg-clearance" class="badge bg-secondary">---</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="checkClearance()">Refresh Identity</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div
+                    class="card p-4 text-center h-100 border-success border-2 d-flex flex-column justify-content-center">
+                    <div class="fs-1 mb-2">📤</div>
+                    <h5 class="fw-bold mb-2">Covert Transmitter</h5>
+                    <p class="text-muted small">Send encrypted messages via Network Steganography, P2P Onion Routing, or
+                        Blockchain Dead Drop.</p>
+                    <a href="http://localhost:5003" target="_blank" class="btn btn-success btn-lg mt-2">
+                        <i class="fas fa-paper-plane me-2"></i>Open Sender
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts & Map Row -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Network Activity (Last Hour)</h5>
+                        <canvas id="activityChart" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">🕸️ P2P Topology Map (Circuit Visualization)</h5>
+                        <div id="network-map-container"
+                            style="background: #f8f9fa; border-radius: 8px; min-height: 200px;"
+                            class="d-flex align-items-center justify-content-center">
+                            <pre class="mermaid" id="mermaid-graph">
+                                graph LR
+                                    S((Sender)) -- timing --> R1[Relay-1]
+                                    R1 -- size --> R2[Relay-2]
+                                    R2 -- ttl --> RC((Recipient))
+                                    style S fill:#007bff,color:#fff
+                                    style RC fill:#28a745,color:#fff
+                                    style R1 fill:#17a2b8,color:#fff
+                                    style R2 fill:#17a2b8,color:#fff
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Blockchain Audit Log -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card p-4 bg-dark text-white shadow">
+                    <h5 class="mb-3 d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-history text-info me-2"></i>Global Blockchain Audit Log</span>
+                        <button class="btn btn-sm btn-outline-info" onclick="updateBlockchainHistory()">
+                            <i class="fas fa-sync-alt"></i> Refresh Log
+                        </button>
+                    </h5>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-dark table-hover mb-0" style="font-size: 0.85rem;">
+                            <thead class="sticky-top bg-dark">
+                                <tr class="text-muted border-secondary">
+                                    <th>Sender</th>
+                                    <th>Recipient</th>
+                                    <th>Tx Hash</th>
+                                    <th>Block</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blockchain-history-body">
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <div class="spinner-border spinner-border-sm text-info me-2"></div>
+                                        Fetching global audit logs...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personnel Management Row (Admin Only) -->
+        <div class="row mb-4" id="personnelRow" style="display: none;">
+            <div class="col-md-12">
+                <div class="card p-4 bg-dark text-white shadow border-primary border-top-0"
+                    style="border-top: 4px solid #007bff !important;">
+                    <h5 class="mb-3 d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-users-cog text-primary me-2"></i>Personnel Management</span>
+                        <button class="btn btn-sm btn-outline-primary" onclick="updatePersonnel()">
+                            <i class="fas fa-sync-alt"></i> Refresh Personnel
+                        </button>
+                    </h5>
+
+                    <div class="row">
+                        <!-- Pending Users -->
+                        <div class="col-md-5">
+                            <h6 class="text-warning mb-3"><i class="fas fa-user-clock me-2"></i>Pending Registration
+                            </h6>
+                            <div class="table-responsive" style="max-height: 300px;">
+                                <table class="table table-dark table-sm table-hover" style="font-size: 0.8rem;">
+                                    <thead>
+                                        <tr class="text-muted">
+                                            <th>Wallet</th>
+                                            <th>Name</th>
+                                            <th>Org</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pending-personnel-body">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">No pending users</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Verified Users -->
+                        <div class="col-md-7">
+                            <h6 class="text-success mb-3"><i class="fas fa-user-check me-2"></i>Verified Personnel</h6>
+                            <div class="table-responsive" style="max-height: 300px;">
+                                <table class="table table-dark table-sm table-hover" style="font-size: 0.8rem;">
+                                    <thead>
+                                        <tr class="text-muted">
+                                            <th>Wallet</th>
+                                            <th>Name / Org</th>
+                                            <th>Level</th>
+                                            <th>Rep</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="verified-personnel-body">
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted">No verified users</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Row -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">🛡️ Security Events & Circuit Logs</h5>
+                        <div id="log-container">
+                            <div class="log-entry"><span class="log-time">System</span> Dashboard initialized...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update function for metrics
+        async function updateDashboard() {
+            try {
+                const url = userAccount ? `/api/stats?wallet=${userAccount}` : '/api/stats';
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Update Service Status
+                updateStatus('auth', data.services.auth);
+                updateStatus('receiver', data.services.receiver);
+                updateStatus('sender', data.services.sender);
+
+                // Update Metrics
+                const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+                setEl('metric-messages', data.metrics.messages_count || 0);
+                setEl('metric-uptime', formatUptime(data.uptime));
+                setEl('metric-reputation', (data.metrics.avg_reputation || '---') + (data.metrics.avg_reputation ? '/100' : ''));
+                setEl('metric-balance', data.metrics.wallet_balance !== undefined ? data.metrics.wallet_balance + ' ETH' : '---');
+                setEl('metric-protocol', data.metrics.current_protocol || '---');
+                setEl('metric-nodes', data.metrics.node_count !== undefined ? data.metrics.node_count : '---');
+
+                // Update Security/Access Status
+                const secEl = document.getElementById('metric-security');
+                if (secEl) {
+                    secEl.innerText = data.metrics.user_role || 'WHITELISTING';
+                    if (data.metrics.user_role === 'ADMIN') {
+                        secEl.className = 'metric-value text-success';
+                    } else if (data.metrics.user_role === 'AUTHORIZED') {
+                        secEl.className = 'metric-value text-primary';
+                    } else {
+                        secEl.className = 'metric-value text-danger';
+                    }
+                }
+
+                // Update Network Status UI
+                const statusText = document.getElementById('net-status-text');
+                const alertBar = document.getElementById('network-alert-bar');
+                const panicBtn = document.getElementById('panicButton');
+
+                if (data.metrics.net_status === 'SILENCED') {
+                    statusText.innerText = 'SILENCED (HIGH SECURITY)';
+                    alertBar.className = 'alert alert-danger py-1 mt-2 d-inline-block shadow-pulse';
+                    panicBtn.className = 'btn btn-success btn-lg shadow';
+                    panicBtn.innerHTML = '<i class="fas fa-undo"></i> RESTORE NETWORK';
+                } else {
+                    statusText.innerText = 'NORMAL';
+                    alertBar.className = 'alert alert-success py-1 mt-2 d-inline-block';
+                    panicBtn.className = 'btn btn-danger btn-lg shadow';
+                    panicBtn.innerHTML = '<i class="fas fa-skull-crossbones"></i> GLOBAL PANIC';
+                }
+
+                // Add logs if new
+                if (data.logs && data.logs.length > 0) {
+                    const logContainer = document.getElementById('log-container');
+                    data.logs.forEach(log => {
+                        const entry = document.createElement('div');
+                        entry.className = 'log-entry';
+                        entry.innerHTML = `<span class="log-time">${new Date().toLocaleTimeString()}</span> ${log}`;
+                        logContainer.prepend(entry);
+                    });
+                }
+
+                // Update Chart (Mock Data for Demo)
+                updateChart(data.chart_data);
+
+            } catch (error) {
+                console.error("Dashboard update failed:", error);
+            }
+        }
+
+        function updateStatus(service, isOnline) {
+            const dot = document.getElementById(`${service}-status-dot`);
+            const text = document.getElementById(`${service}-status-text`);
+            if (isOnline) {
+                dot.className = 'status-indicator status-online';
+                text.innerText = 'Online';
+                text.className = 'text-success small';
+            } else {
+                dot.className = 'status-indicator status-offline';
+                text.innerText = 'Offline';
+                text.className = 'text-danger small';
+            }
+        }
+
+        async function updateBlockchainState() {
+            try {
+                const response = await fetch('/api/latest_block');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('currentBlock').innerText = `#${data.number}`;
+                    document.getElementById('currentBlockHash').innerText = data.hash.substring(0, 12) + '...';
+                }
+            } catch (error) {
+                console.error("Block state update failed:", error);
+            }
+        }
+        setInterval(updateBlockchainState, 15000);
+        updateBlockchainState();
+
+        async function triggerPanic() {
+            if (!userAccount) { alert("Please connect wallet first"); return; }
+            if (confirm("⚠️ WARNING: This will trigger/restore a GLOBAL network silence. Continue?")) {
+                try {
+                    const res = await fetch('/api/trigger_panic', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ admin_wallet: userAccount })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert("Panic state toggled! TX: " + data.tx_hash);
+                        updateDashboard();
+                    } else {
+                        alert("Panic Trigger Failed: " + data.error);
+                    }
+                } catch (err) {
+                    alert("Request Error: " + err);
+                }
+            }
+        }
+
+        function formatUptime(seconds) {
+            if (seconds < 60) return seconds + "s";
+            if (seconds < 3600) return Math.floor(seconds / 60) + "m";
+            return Math.floor(seconds / 3600) + "h";
+        }
+
+        // Initialize Chart
+        // RBAC Context from Backend
+        const ADMIN_ADDRESS = "0x7a2c2af27b1e4afbbabfcfc6e30dd411d432aca4".toLowerCase();
+        let userAccount = null;
+
+        async function connectMetaMask() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0].toLowerCase();
+                    document.getElementById('connectWalletBtn').innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                    document.getElementById('connectWalletBtn').classList.replace('btn-outline-light', 'btn-success');
+
+                    checkAdminAccess();
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                }
+            } else {
+                alert("MetaMask not found. Please install the extension.");
+            }
+        }
+
+        function checkAdminAccess() {
+            const adminRow = document.getElementById('adminRow');
+            const panicBtn = document.getElementById('panicButton');
+            const personnelRow = document.getElementById('personnelRow');
+
+            if (userAccount === ADMIN_ADDRESS) {
+                if (adminRow) adminRow.style.display = 'flex';
+                if (panicBtn) panicBtn.style.display = 'block';
+                if (personnelRow) personnelRow.style.display = 'flex';
+                console.log("[RBAC] Admin access granted to dashboard management.");
+                updatePersonnel();
+            } else {
+                if (adminRow) adminRow.style.display = 'none';
+                if (panicBtn) panicBtn.style.display = 'none';
+                if (personnelRow) personnelRow.style.display = 'none';
+                console.log("[RBAC] Restricted access: User is not the administrator.");
+            }
+        }
+
+        // Auto-check if already connected
+        if (window.ethereum) {
+            window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                if (accounts.length > 0) {
+                    userAccount = accounts[0].toLowerCase();
+                    document.getElementById('connectWalletBtn').innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                    document.getElementById('connectWalletBtn').classList.replace('btn-outline-light', 'btn-success');
+                    checkAdminAccess();
+                }
+            });
+
+            window.ethereum.on('accountsChanged', (accounts) => {
+                location.reload();
+            });
+        }
+
+        const ctx = document.getElementById('activityChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10m', '8m', '6m', '4m', '2m', 'Now'],
+                datasets: [{
+                    label: 'Messages',
+                    data: [0, 0, 0, 0, 0, 0],
+                    borderColor: '#2a5298',
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(42, 82, 152, 0.1)'
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        function updateChart(newData) {
+            // In a real app, we'd update chart.data.datasets[0].data based on history
+            if (newData) {
+                chart.data.datasets[0].data = newData;
+                chart.update();
+            }
+        }
+
+        // Poll every 5 seconds
+        // Drift Status Polling
+        async function updateDriftStatus() {
+            try {
+                const response = await fetch('http://localhost:5000/api/drift_status');
+                const data = await response.json();
+
+                const module = document.getElementById('driftModule');
+                if (data.active) {
+                    module.classList.remove('d-none');
+                    document.getElementById('driftPercent').innerText = Math.round(data.progress) + '%';
+                    document.getElementById('driftProgressBar').style.width = data.progress + '%';
+                    document.getElementById('driftBits').innerText = `${data.current_bit}/${data.total_bits} bits`;
+                } else if (data.progress === 100) {
+                    // Keep visible briefly when done
+                    setTimeout(() => module.classList.add('d-none'), 10000);
+                } else {
+                    module.classList.add('d-none');
+                }
+            } catch (error) {
+                console.error("Drift status error:", error);
+            }
+        }
+        setInterval(updateDriftStatus, 5000);
+
+        setInterval(updateDashboard, 5000);
+        updateDashboard();
+
+        // P2P Hop Builder Logic
+        function createHopRow() {
+            const container = document.getElementById('hopsContainer');
+            const placeholder = document.getElementById('p2pPlaceholder');
+            if (placeholder) placeholder.remove();
+
+            const hopCount = container.querySelectorAll('.hop-row').length + 1;
+            const hopRow = document.createElement('div');
+            hopRow.className = 'hop-row border-start border-2 border-info ps-2 mb-2 position-relative';
+            hopRow.innerHTML = `
+                <div class="row g-1 align-items-end">
+                    <div class="col-4">
+                        <input type="text" name="hop_ip[]" class="form-control form-control-xs" placeholder="IP" style="font-size: 0.7rem;" required>
+                    </div>
+                    <div class="col-3">
+                        <select name="hop_channel[]" class="form-select form-select-xs" style="font-size: 0.7rem;">
+                            <option value="timing">Timing</option>
+                            <option value="size">Size</option>
+                            <option value="ttl">TTL</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <input type="password" name="hop_secret[]" class="form-control form-control-xs" placeholder="Key" style="font-size: 0.7rem;" required>
+                    </div>
+                    <div class="col-1">
+                        <button type="button" class="btn btn-link btn-sm text-danger p-0 remove-hop"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(hopRow);
+
+            hopRow.querySelector('.remove-hop').addEventListener('click', function () {
+                hopRow.remove();
+                if (container.querySelectorAll('.hop-row').length === 0) {
+                    container.innerHTML = '<div class="small text-muted mb-0" id="p2pPlaceholder" style="font-size: 0.7rem;">Direct route active.</div>';
+                }
+            });
+            return hopRow;
+        }
+
+        document.getElementById('addHopBtn').addEventListener('click', createHopRow);
+
+        // Fetch Verified Nodes from Blockchain
+        document.getElementById('fetchNodesBtn').addEventListener('click', async function () {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            const nodesContainer = document.getElementById('verifiedNodes');
+            const nodesList = document.getElementById('nodesList');
+
+            try {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
+                btn.disabled = true;
+
+                const response = await fetch('http://localhost:5000/api/verified_nodes');
+                const data = await response.json();
+
+                if (data.success && data.nodes.length > 0) {
+                    nodesList.innerHTML = '';
+                    data.nodes.forEach(node => {
+                        const badge = document.createElement('span');
+                        badge.className = 'badge bg-light text-dark border p-1 cursor-pointer';
+                        badge.style.fontSize = '0.65rem';
+                        badge.style.cursor = 'pointer';
+                        badge.innerHTML = `<i class="fas fa-shield-alt text-success"></i> ${node.ip}`;
+                        badge.onclick = () => {
+                            const row = createHopRow();
+                            row.querySelector('input[name="hop_ip[]"]').value = node.ip;
+                            row.querySelector('select[name="hop_channel[]"]').value = node.channels[0] || 'timing';
+                        };
+                        nodesList.appendChild(badge);
+                    });
+                    nodesContainer.classList.remove('d-none');
+                } else {
+                    alert("No nodes found on-chain. Nodes must register first.");
+                }
+            } catch (error) {
+                console.error("Discovery error:", error);
+                alert("Discovery failed. Ensure App (Port 5000) is running.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // AJAX Form Submission Logic
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const action = form.getAttribute('action');
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+
+                try {
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> TRANSMITTING...';
+                    submitBtn.disabled = true;
+
+                    const response = await fetch(action, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        alert("🚀 Transmission Successful! Check the logs below for details.");
+                        updateDashboard(); // Refresh stats
+                    } else {
+                        alert("❌ Transmission Failed. Ensure the main steganography app (Port 5000) is running.");
+                    }
+                } catch (error) {
+                    console.error("Transmission error:", error);
+                    alert("⚠️ Error connecting to transmission node. Check console for details.");
+                } finally {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+
+        // Advanced Security Logic
+        async function authorizeSender() {
+            const wallet = document.getElementById('whitelistWallet').value;
+            if (!wallet) return;
+            try {
+                const res = await fetch('/api/security/authorize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ wallet: wallet })
+                });
+                const data = await res.json();
+                alert(data.success ? "✅ Request Sent: " + data.message : "❌ Error: " + data.error);
+                updateDashboard();
+            } catch (e) { console.error(e); }
+        }
+
+        async function checkClearance() {
+            const wallet = prompt("Enter wallet address to verify clearance:");
+            if (!wallet) return;
+            try {
+                const res = await fetch('/api/registry/status/' + wallet);
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('reg-org').innerText = data.organization;
+                    document.getElementById('reg-clearance').innerText = data.clearance;
+                    document.getElementById('reg-clearance').className = 'badge bg-primary';
+                    updateDashboard();
+                } else { alert("❌ Error: " + data.error); }
+            } catch (e) { console.error(e); }
+        }
+
+        async function switchProtocol(protocol) {
+            if (!confirm(`Switch network to ${protocol.toUpperCase()} mode?`)) return;
+            try {
+                const res = await fetch('/api/controller/protocol', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ protocol: protocol })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert("📡 Protocol switch initiated! TX: " + data.tx_hash);
+                    updateDashboard();
+                } else { alert("❌ Error: " + data.error); }
+            } catch (e) { console.error(e); }
+        }
+    </script>
+
+    <!-- Verification Modal -->
+    <div class="modal fade" id="verifyUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-primary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title"><i class="fas fa-user-shield text-primary me-2"></i>Verify Personnel</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted mb-3">Assign a clearance level to <strong id="modal-user-display"
+                            class="text-light"></strong></p>
+                    <div class="list-group">
+                        <button type="button"
+                            class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
+                            onclick="submitVerification(1)">
+                            <span class="badge bg-secondary me-2">1</span> READ_ONLY - Basic access to incoming messages
+                        </button>
+                        <button type="button"
+                            class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
+                            onclick="submitVerification(2)">
+                            <span class="badge bg-info me-2">2</span> BASIC_SENDER - Standard plaintext transmission
+                        </button>
+                        <button type="button"
+                            class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
+                            onclick="submitVerification(3)">
+                            <span class="badge bg-primary me-2">3</span> ENCRYPTED_SENDER - AES-anchored covert channels
+                        </button>
+                        <button type="button"
+                            class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
+                            onclick="submitVerification(4)">
+                            <span class="badge bg-warning text-dark me-2">4</span> TRIGGER_CREATOR - Access to global C2
+                            controls
+                        </button>
+                        <button type="button"
+                            class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
+                            onclick="submitVerification(5)">
+                            <span class="badge bg-danger me-2">5</span> FULL_ACCESS - Unrestricted systems operation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Personnel Management Logic
+        let selectedUserForVerification = null;
+        let verifyModal = null;
+
+        async function updatePersonnel() {
+            if (userAccount !== ADMIN_ADDRESS) return;
+            try {
+                const res = await fetch(`/api/admin/personnel?admin_wallet=${userAccount}`);
+                const data = await res.json();
+
+                // Update Pending
+                const pb = document.getElementById('pending-personnel-body');
+                if (pb) {
+                    pb.innerHTML = '';
+                    if (data.pending && data.pending.length > 0) {
+                        data.pending.forEach(u => {
+                            pb.innerHTML += `<tr>
+                                <td class="text-info font-monospace small">${u.address.substring(0, 10)}...</td>
+                                <td>${u.name}</td>
+                                <td>${u.organization}</td>
+                                <td><button class="btn btn-xs btn-primary py-0" style="font-size: 0.7rem;" onclick="openVerifyModal('${u.address}', '${u.name}')">Verify</button></td>
+                            </tr>`;
+                        });
+                    } else {
+                        pb.innerHTML = '<tr><td colspan="4" class="text-center text-muted small py-2">No pending requests</td></tr>';
+                    }
+                }
+
+                // Update Verified
+                const vb = document.getElementById('verified-personnel-body');
+                if (vb) {
+                    vb.innerHTML = '';
+                    const levels = ["NONE", "READ", "BASIC", "ENCR", "TRIG", "FULL"];
+                    if (data.verified && data.verified.length > 0) {
+                        data.verified.forEach(u => {
+                            const activeBadge = u.isActive ? '<span class="badge bg-success" style="font-size:0.6rem;">ACTIVE</span>' : '<span class="badge bg-danger" style="font-size:0.6rem;">BLOCKED</span>';
+                            vb.innerHTML += `<tr>
+                                <td class="text-info font-monospace small">${u.address.substring(0, 10)}...</td>
+                                <td>${u.name} <br> <span class="text-muted" style="font-size:0.7rem;">${u.organization}</span></td>
+                                <td><span class="badge bg-primary" style="font-size:0.7rem;">${levels[u.level]}</span></td>
+                                <td>${u.reputation}</td>
+                                <td>${activeBadge}</td>
+                                <td>
+                                    <button class="btn btn-xs btn-outline-danger py-0" style="font-size: 0.7rem;" onclick="blockUser('${u.address}')" ${!u.isActive ? 'disabled' : ''}>Block</button>
+                                </td>
+                            </tr>`;
+                        });
+                    } else {
+                        vb.innerHTML = '<tr><td colspan="6" class="text-center text-muted small py-2">No verified personnel</td></tr>';
+                    }
+                }
+            } catch (err) { console.error("Personnel Error:", err); }
+        }
+
+        function openVerifyModal(addr, name) {
+            selectedUserForVerification = addr;
+            document.getElementById('modal-user-display').innerText = `${name} (${addr.substring(0, 10)}...)`;
+            if (!verifyModal) verifyModal = new bootstrap.Modal(document.getElementById('verifyUserModal'));
+            verifyModal.show();
+        }
+
+        async function submitVerification(level) {
+            if (!selectedUserForVerification) return;
+            try {
+                const res = await fetch('/api/admin/verify_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        admin_wallet: userAccount,
+                        user_address: selectedUserForVerification,
+                        level: level
+                    })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert("User verified! TX: " + result.tx_hash);
+                    if (verifyModal) verifyModal.hide();
+                    updatePersonnel();
+                } else { alert("Verification failed: " + result.error); }
+            } catch (err) { alert("Request error: " + err); }
+        }
+
+        async function blockUser(addr) {
+            if (!confirm(`Are you sure you want to deactivate ${addr}?`)) return;
+            try {
+                const res = await fetch('/api/admin/block_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ admin_wallet: userAccount, user_address: addr })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert("User blocked! TX: " + result.tx_hash);
+                    updatePersonnel();
+                } else { alert("Action failed: " + result.error); }
+            } catch (err) { alert("Request error: " + err); }
+        }
+
+        // Blockchain Inbox & History Logic
+        async function updateBlockchainInbox() {
+            try {
+                const response = await fetch('http://localhost:5000/dead_drop_check');
+                const data = await response.json();
+
+                const inboxList = document.getElementById('inboxList');
+                const status = document.getElementById('inboxStatus');
+
+                if (data.success && inboxList) {
+                    if (status) {
+                        status.innerText = `Synced: ${new Date().toLocaleTimeString()}`;
+                        status.className = 'badge bg-success x-small';
+                    }
+
+                    if (data.messages && data.messages.length > 0) {
+                        let html = '';
+                        // Show newest first
+                        [...data.messages].reverse().forEach(msg => {
+                            const isLocked = msg.is_locked;
+                            html += `
+                                <div class="mb-2 p-2 border-start border-3 ${isLocked ? 'border-warning' : 'border-success'} bg-dark bg-opacity-10 rounded">
+                                    <div class="d-flex justify-content-between small mb-1">
+                                        <span class="text-info fw-bold">From: ${msg.sender.substring(0, 6)}...</span>
+                                        ${isLocked ? '<span class="text-warning"><i class="fas fa-lock"></i> LOCKED</span>' : '<span class="text-success"><i class="fas fa-unlock"></i> RELEASED</span>'}
+                                    </div>
+                                    <div class="p-1 bg-dark bg-opacity-50 rounded font-monospace x-small" style="word-break: break-all; color: ${isLocked ? '#888' : '#eee'}">
+                                        ${msg.content}
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-1" style="font-size: 0.6rem;">
+                                        <span class="text-muted">${msg.formatted_time}</span>
+                                        <span class="${isLocked ? 'text-warning' : 'text-success'}">${isLocked ? 'Schedule: ' + msg.release_date : 'Available'}</span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        inboxList.innerHTML = html;
+                    } else {
+                        inboxList.innerHTML = '<div class="text-center py-3 text-muted small">No messages found.</div>';
+                    }
+                } else if (status) {
+                    status.innerText = 'Sync Error';
+                    status.className = 'badge bg-danger x-small';
+                }
+            } catch (error) {
+                console.error("Inbox error:", error);
+            }
+        }
+
+        async function updateBlockchainHistory() {
+            const body = document.getElementById('blockchain-history-body');
+            if (!body) return;
+            try {
+                const response = await fetch('/api/blockchain/history');
+                const data = await response.json();
+                if (data.success && data.history) {
+                    if (data.history.length === 0) {
+                        body.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">No message history found in recent blocks.</td></tr>';
+                        return;
+                    }
+                    let html = '';
+                    data.history.forEach(ev => {
+                        const sShort = ev.sender.substring(0, 8) + '...';
+                        const rShort = ev.recipient.substring(0, 8) + '...';
+                        const txShort = ev.tx_hash.substring(0, 10) + '...';
+                        const explorerUrl = `https://sepolia.etherscan.io/tx/${ev.tx_hash}`;
+
+                        html += `
+                            <tr>
+                                <td title="${ev.sender}"><code class="text-primary">${sShort}</code></td>
+                                <td title="${ev.recipient}"><code class="text-success">${rShort}</code></td>
+                                <td>
+                                    <a href="${explorerUrl}" target="_blank" class="text-info text-decoration-none">
+                                        <code>${txShort}</code> <i class="fas fa-external-link-alt x-small"></i>
+                                    </a>
+                                </td>
+                                <td><span class="badge bg-secondary">#${ev.block_number}</span></td>
+                                <td class="text-muted">${ev.formatted_time}</td>
+                            </tr>
+                        `;
+                    });
+                    body.innerHTML = html;
+                } else {
+                    body.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Failed to load history</td></tr>';
+                }
+            } catch (error) {
+                console.error("History error:", error);
+                body.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Network Error</td></tr>';
+            }
+        }
+
+        // Initialize and Intervals
+        updateBlockchainHistory();
+        setInterval(updateBlockchainHistory, 30000);
+        updateBlockchainInbox();
+        setInterval(updateBlockchainInbox, 10000);
+
+        // Admin Refresh Loop
+        setInterval(() => {
+            if (userAccount === ADMIN_ADDRESS) updatePersonnel();
+        }, 15000);
+
+    </script>
+</body>
+
+</html>

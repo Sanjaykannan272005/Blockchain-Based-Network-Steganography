@@ -1,0 +1,90 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-eraser"></i> Metadata Scrubbing</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Metadata Scrubbed Successfully!</h5>
+                        <p>All identifying information has been removed from your image.</p>
+                        
+                        <div class="mt-3">
+                            <h6>Scrubbing Results:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> EXIF data removed</li>
+                                <li><i class="fas fa-check text-success"></i> GPS coordinates removed</li>
+                                <li><i class="fas fa-check text-success"></i> Camera information removed</li>
+                                <li><i class="fas fa-check text-success"></i> Software metadata removed</li>
+                                <li><i class="fas fa-check text-success"></i> Timestamps removed</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <strong>Original Size:</strong> {{ (result['original_size'] / 1024) | round(2) }} KB
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Cleaned Size:</strong> {{ (result['cleaned_size'] / 1024) | round(2) }} KB
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <a href="{{ url_for('download_file', filename=output_file) }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> Download Cleaned Image
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">
+                                <i class="fas fa-image"></i> Select Image to Clean
+                            </label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept=".png,.jpg,.jpeg,.bmp" required>
+                            <div class="form-text">Upload an image to remove all metadata and identifying information</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg w-100">
+                            <i class="fas fa-eraser"></i> Scrub Metadata
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>What Gets Removed:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><i class="fas fa-times text-danger"></i> EXIF data</li>
+                                    <li><i class="fas fa-times text-danger"></i> GPS coordinates</li>
+                                    <li><i class="fas fa-times text-danger"></i> Camera make/model</li>
+                                    <li><i class="fas fa-times text-danger"></i> Camera settings</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><i class="fas fa-times text-danger"></i> Creation timestamps</li>
+                                    <li><i class="fas fa-times text-danger"></i> Software information</li>
+                                    <li><i class="fas fa-times text-danger"></i> User comments</li>
+                                    <li><i class="fas fa-times text-danger"></i> Copyright info</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <strong><i class="fas fa-info-circle"></i> Privacy Protection:</strong>
+                            Metadata scrubbing helps protect your privacy by removing identifying information 
+                            that could reveal your location, device, or other personal details.
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receiver Node - Steganography Network</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: #000000;
+            border-bottom: 2px solid #3b82f6;
+            padding: 25px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 1);
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 25px;
+        }
+
+        .text-muted {
+            color: #cbd5e1 !important;
+            font-weight: 500;
+        }
+
+        .bg-dark {
+            background-color: #020617 !important;
+            color: #f8fafc !important;
+            border: 1px solid #334155;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        b,
+        strong,
+        span,
+        div,
+        p,
+        i,
+        button {
+            color: #ffffff !important;
+            text-shadow: 0 0 1px rgba(0, 0, 0, 1);
+        }
+
+        label {
+            color: #f1f5f9 !important;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-pills .nav-link {
+            color: #ffffff !important;
+            background: #1e293b;
+            border: 2px solid #334155;
+            margin-right: 10px;
+            border-radius: 8px;
+            font-weight: 800;
+            padding: 12px 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-pills .nav-link:hover {
+            background: #334155;
+            border-color: #475569;
+        }
+
+        .nav-pills .nav-link.active {
+            background: #3b82f6 !important;
+            border-color: #60a5fa !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .form-control,
+        .form-select {
+            background: #000000 !important;
+            border: 2px solid #334155 !important;
+            color: #ffffff !important;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: 600;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-action {
+            background: #2563eb;
+            border: none;
+            color: white !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 10px;
+            padding: 15px 30px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-action:hover {
+            background: #3b82f6;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
+        }
+
+        .stat-card {
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #60a5fa !important;
+            margin-bottom: 5px;
+        }
+
+
+        .log-box div {
+            color: #4ade80 !important;
+        }
+
+        .message-row {
+            border-bottom: 2px solid #334155;
+            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 5px;
+            border-radius: 8px;
+        }
+
+        /* Terminal Styles */
+        #log-container {
+            height: 350px;
+            overflow-y: auto;
+            background: #000000;
+            color: #4ade80;
+            font-family: 'Consolas', 'Monaco', monospace;
+            padding: 15px;
+            border-radius: 0 0 12px 12px;
+            border: 2px solid #334155;
+            border-top: none;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .terminal-header {
+            background: #0f172a;
+            border-radius: 12px 12px 0 0;
+            padding: 8px 15px;
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .log-entry {
+            margin-bottom: 2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 2px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .log-time {
+            color: #64748b;
+            margin-right: 10px;
+        }
+
+        .log-category {
+            padding: 0px 4px;
+            border-radius: 2px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-right: 8px;
+            text-transform: uppercase;
+        }
+
+        .cat-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .cat-network {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+        }
+
+        .cat-blockchain {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+
+        .cat-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(2px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-0 fw-bold">📥 Receiver Node</h2>
+                <div class="text-light opacity-75" style="font-size:0.85rem;">Hybrid Network & Blockchain Extraction
+                    Engine</div>
+            </div>
+            <a href="http://localhost:5000" class="btn btn-outline-light btn-sm px-3 rounded-pill">
+                <i class="fas fa-home me-2"></i>Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value" id="uptime">0s</div>
+                    <div class="text-muted small text-uppercase">Uptime</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value" id="net-status">NORMAL</div>
+                    <div class="text-muted small text-uppercase">Network Status</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value" id="reputation">100</div>
+                    <div class="text-muted small text-uppercase">Node Reputation</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-value text-info" id="wallet-preview">0x...</div>
+                    <div class="text-muted small text-uppercase">Wallet Active</div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills mb-4" id="receiverTabs">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-network">🛰️
+                    Network Extractor</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-inbox"
+                    onclick="loadInbox()">⛓️ Dead Drop Inbox</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-node">🕸️ P2P Node
+                    Status</button></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Network Extractor -->
+            <div class="tab-pane fade show active" id="tab-network">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="card p-4">
+                            <h5 class="mb-4 d-flex align-items-center"><i
+                                    class="fas fa-satellite-dish me-2 text-primary"></i> Extraction Control</h5>
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold">Covert Channel</label>
+                                <select class="form-select" id="channel">
+                                    <option value="timing">⏱️ Packet Timing</option>
+                                    <option value="size">📦 Packet Size</option>
+                                    <option value="ttl">⏳ TTL Field</option>
+                                    <option value="drift">💨 Infrastructure Silence (Drift)</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold">Capture Duration (seconds)</label>
+                                <input type="number" class="form-control" id="duration" value="30">
+                            </div>
+                            <div class="form-check form-switch mb-4">
+                                <input class="form-check-input" type="checkbox" id="stealth-mode">
+                                <label class="form-check-label small" for="stealth-mode">🤖 Stealth 2.0 Bayesian
+                                    Decoding</label>
+                            </div>
+                            <button class="btn btn-action w-100" id="captureBtn" onclick="startCapture()">
+                                <i class="fas fa-play me-2"></i> Start Active Capture
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="card p-4">
+                            <h5 class="mb-4 d-flex align-items-center justify-content-between">
+                                <span><i class="fas fa-terminal me-2 text-success"></i> EXTRACTION CONSOLE</span>
+                                <span id="stream-status" class="badge bg-success small"><i class="fas fa-link me-1"></i>
+                                    LIVE</span>
+                            </h5>
+                            <div class="terminal-header">
+                                <div>
+                                    <span class="terminal-dot" style="background: #ff5f56;"></span>
+                                    <span class="terminal-dot" style="background: #ffbd2e;"></span>
+                                    <span class="terminal-dot" style="background: #27c93f;"></span>
+                                </div>
+                                <button class="btn btn-sm btn-link text-muted p-0" onclick="clearTerminal()"><i
+                                        class="fas fa-trash-alt"></i></button>
+                            </div>
+                            <div id="log-container">
+                                <div class="log-entry">
+                                    <span class="log-time">${new Date().toLocaleTimeString()}</span>
+                                    <span class="log-category cat-info">SYSTEM</span>
+                                    Extraction Engine Monitoring Active...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dead Drop Inbox -->
+            <div class="tab-pane fade" id="tab-inbox">
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0"><i class="fas fa-link me-2 text-warning"></i> On-Chain Dead Drop Inbox</h5>
+                        <button class="btn btn-sm btn-outline-warning" onclick="loadInbox()"><i
+                                class="fas fa-sync me-2"></i>Refresh</button>
+                    </div>
+                    <div id="inboxList">
+                        <div class="text-center py-5 text-muted">Loading messages...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- P2P Status -->
+            <div class="tab-pane fade" id="tab-node">
+                <div class="card p-4">
+                    <h5 class="mb-4"><i class="fas fa-microchip me-2 text-info"></i> Node Registry Data</h5>
+                    <div id="node-details">
+                        <div class="text-center py-5 text-muted">Retrieving node metadata...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function updateStatus() {
+            try {
+                const res = await fetch('/api/receiver/status');
+                const data = await res.json();
+                document.getElementById('uptime').textContent = data.uptime + 's';
+                document.getElementById('net-status').textContent = data.net_status;
+                document.getElementById('reputation').textContent = data.reputation;
+                document.getElementById('wallet-preview').textContent = data.wallet ? (data.wallet.substring(0, 6) + '...' + data.wallet.substring(38)) : 'NOT SET';
+
+                if (data.node_info && data.node_info.city) {
+                    document.getElementById('node-details').innerHTML = `
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded border border-secondary">
+                                    <div class="small text-muted mb-1 text-uppercase">Registry Location</div>
+                                    <div class="fw-bold fs-5 text-info">${data.node_info.city}, ${data.node_info.country}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded border border-secondary">
+                                    <div class="small text-muted mb-1 text-uppercase">Clearance Identity</div>
+                                    <div class="fw-bold fs-5 text-success">${data.node_info.organization} CP-Level ${data.node_info.clearance}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (e) { console.error("Status update failed", e); }
+        }
+
+        async function startCapture() {
+            const channel = document.getElementById('channel').value;
+            const duration = document.getElementById('duration').value;
+            const stealth = document.getElementById('stealth-mode').checked;
+
+            const btn = document.getElementById('captureBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Capturing...';
+
+            try {
+                const res = await fetch('/api/receiver/extract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ channel, duration, stealth })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-play me-2"></i> Start Active Capture';
+                    }, duration * 1000);
+                }
+            } catch (e) { alert(e.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-play me-2"></i> Start Active Capture'; }
+        }
+
+        async function loadInbox() {
+            const container = document.getElementById('inboxList');
+            container.innerHTML = '<div class="text-center py-5 text-muted"><div class="spinner-border text-warning me-2"></div> Fetching blockchain events...</div>';
+
+            try {
+                const res = await fetch('/api/receiver/inbox');
+                const data = await res.json();
+                if (data.success && data.messages.length > 0) {
+                    container.innerHTML = data.messages.reverse().map((m, i) => `
+                        <div class="message-row">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="badge bg-dark border border-secondary text-light mb-2">SENDER: ${m.sender.substring(0, 10)}...</div>
+                                    <div class="text-info small mb-2"><i class="fas fa-clock me-1"></i> Block: ${m.block_number}</div>
+                                    <div class="bg-dark p-2 rounded text-light x-small" style="font-family:monospace; max-width: 500px; word-break: break-all; opacity: 0.8;">
+                                        ${m.message}
+                                    </div>
+                                </div>
+                                <div>
+                                    ${m.is_locked ? '<span class="badge bg-warning text-dark"><i class="fas fa-lock me-1"></i> LOCKED</span>' : '<button class="btn btn-sm btn-success" onclick="decryptDrop(\'' + m.message + '\', ' + i + ')"><i class="fas fa-unlock me-1"></i> Decrypt</button>'}
+                                </div>
+                            </div>
+                            <div id="decrypted-${i}" class="mt-2 text-success fw-bold" style="display:none;"></div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="text-center py-5 text-muted">No messages found for your wallet.</div>';
+                }
+            } catch (e) { container.innerHTML = '<div class="text-danger p-3">Error fetching inbox: ' + e.message + '</div>'; }
+        }
+
+        async function decryptDrop(encrypted, index) {
+            const div = document.getElementById('decrypted-' + index);
+            div.style.display = 'block';
+            div.textContent = 'Decrypting...';
+
+            try {
+                const res = await fetch('/api/receiver/decrypt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ encrypted_msg: encrypted })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    div.innerHTML = `<i class="fas fa-check-circle me-2"></i> DECODED: ${data.decrypted}`;
+                    div.className = "mt-2 text-success fw-bold p-2 rounded bg-success bg-opacity-10 border border-success";
+                } else {
+                    div.textContent = '❌ ' + data.error;
+                    div.className = "mt-2 text-danger small";
+                }
+            } catch (e) { div.textContent = 'Error: ' + e.message; }
+        }
+
+        // Initialize Live Terminal Streaming
+        function initTerminalStream() {
+            const logContainer = document.getElementById('log-container');
+            const streamStatus = document.getElementById('stream-status');
+            const eventSource = new EventSource('/api/logs/stream');
+
+            eventSource.onmessage = function (event) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+
+                const now = new Date().toLocaleTimeString();
+
+                let msg = event.data;
+                let category = "INFO";
+
+                if (msg.startsWith('[')) {
+                    const match = msg.match(/^\[(.*?)\] (.*)/);
+                    if (match) {
+                        category = match[1] || "INFO";
+                        msg = match[2];
+                    }
+                }
+
+                logEntry.innerHTML = `
+                    <span class="log-time">${now}</span>
+                    <span class="log-category cat-${category.toLowerCase()}">${category}</span>
+                    <span class="log-msg">${msg}</span>
+                `;
+
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+
+                if (logContainer.children.length > 50) {
+                    logContainer.removeChild(logContainer.firstChild);
+                }
+            };
+
+            eventSource.onerror = function () {
+                if (streamStatus) {
+                    streamStatus.className = 'badge bg-danger small';
+                    streamStatus.innerHTML = '<i class="fas fa-unlink me-1"></i> OFF';
+                }
+                setTimeout(initTerminalStream, 5000);
+                eventSource.close();
+            };
+        }
+
+        function clearTerminal() {
+            document.getElementById('log-container').innerHTML = '';
+        }
+
+        setInterval(updateStatus, 5000);
+        window.addEventListener('load', () => {
+            updateStatus();
+            initTerminalStream();
+        });
+    </script>
+</body>
+
+</html>

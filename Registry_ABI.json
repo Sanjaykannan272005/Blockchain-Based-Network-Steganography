@@ -1,0 +1,260 @@
+[
+    {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "wallet",
+                "type": "address"
+            }
+        ],
+        "name": "NodeDeRegistered",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "wallet",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "ip",
+                "type": "string"
+            }
+        ],
+        "name": "NodeRegistered",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "node",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newReputation",
+                "type": "uint256"
+            }
+        ],
+        "name": "ReputationUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "enum StealthRegistry.NetworkStatus",
+                "name": "newStatus",
+                "type": "uint8"
+            }
+        ],
+        "name": "StatusChanged",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "currentStatus",
+        "outputs": [
+            {
+                "internalType": "enum StealthRegistry.NetworkStatus",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "deRegisterNode",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getAllNodes",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "wallet",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "ip",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string[]",
+                        "name": "channels",
+                        "type": "string[]"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "publicKey",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "lastSeen",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isActive",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "reputation",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct StealthRegistry.Node[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "nodeAddresses",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "nodes",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "wallet",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "ip",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "publicKey",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "lastSeen",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "isActive",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint256",
+                "name": "reputation",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_ip",
+                "type": "string"
+            },
+            {
+                "internalType": "string[]",
+                "name": "_channels",
+                "type": "string[]"
+            },
+            {
+                "internalType": "string",
+                "name": "_publicKey",
+                "type": "string"
+            }
+        ],
+        "name": "registerNode",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_node",
+                "type": "address"
+            }
+        ],
+        "name": "reportNodeFailure",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "toggleEmergencyStatus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

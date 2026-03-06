@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Covert Transmitter - Steganography Network</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a1a 0%, #111827 100%);
+            color: #e5e7eb;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 60%, #0d1b3e 100%);
+            padding: 24px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .card {
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .card:hover {
+            border-color: #4b5563;
+            box-shadow: 0 6px 30px rgba(59, 130, 246, 0.15);
+        }
+
+        .nav-pills .nav-link {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #374151;
+            margin-right: 6px;
+            border-radius: 8px;
+            font-weight: 700;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+
+        .nav-pills .nav-link:hover {
+            opacity: 1;
+        }
+
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+            border-color: #2563eb !important;
+            color: #ffffff !important;
+            opacity: 1 !important;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .form-control,
+        .form-select {
+            background: #111827;
+            border: 1px solid #374151;
+            color: #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: #111827;
+            border-color: #3b82f6;
+            color: #e5e7eb;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: #6b7280;
+        }
+
+        .btn-transmit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .btn-transmit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+            color: white;
+        }
+
+        .btn-blockchain {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 12px 30px;
+        }
+
+        .btn-blockchain:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+            color: white;
+        }
+
+        .stat-card {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.72rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 2px;
+        }
+
+        .text-muted {
+            color: #d1d5db !important;
+            opacity: 0.8;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        b,
+        strong,
+        span,
+        div,
+        p,
+        i {
+            color: #ffffff !important;
+        }
+
+        label {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+
+        .result-box {
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            background: #111827;
+            border: 1px solid #374151;
+            color: #ffffff !important;
+            display: none;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .result-box.success {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .result-box.error {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .field-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .hop-item {
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .hop-item .remove-hop {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            cursor: pointer;
+            color: #ef4444;
+            font-size: 0.8rem;
+        }
+
+        a.back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 8px;
+            padding: 6px 16px;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        a.back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        label {
+            color: #d1d5db;
+        }
+
+        /* Terminal Styles */
+        #log-container {
+            height: 300px;
+            overflow-y: auto;
+            background: #0d1117;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            border-radius: 0 0 12px 12px;
+            border: 1px solid #30363d;
+            border-top: none;
+            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.05);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .terminal-header {
+            background: #161b22;
+            border-radius: 12px 12px 0 0;
+            padding: 6px 15px;
+            border: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .terminal-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .log-entry {
+            margin-bottom: 2px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding-bottom: 2px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .log-time {
+            color: #8b949e;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .log-category {
+            padding: 0px 4px;
+            border-radius: 2px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            margin-right: 8px;
+            text-transform: uppercase;
+        }
+
+        .cat-info {
+            background: rgba(88, 166, 255, 0.2);
+            color: #58a6ff;
+        }
+
+        .cat-network {
+            background: rgba(188, 142, 255, 0.2);
+            color: #bc8eff;
+        }
+
+        .cat-blockchain {
+            background: rgba(248, 232, 28, 0.2);
+            color: #f8e81c;
+        }
+
+        .cat-success {
+            background: rgba(63, 185, 80, 0.2);
+            color: #3fb950;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="page-header">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="mb-0 fw-bold">📤 Covert Transmitter</h2>
+                <div class="text-light opacity-75" style="font-size:0.85rem;">Blockchain-Verified Network Steganography
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <button id="connectWalletBtn" class="btn btn-outline-light btn-sm" onclick="connectMetaMask()">
+                    <i class="fas fa-wallet me-2"></i>Connect Wallet
+                </button>
+                <div class="stat-card" style="min-width:160px;">
+                    <div class="stat-value text-success"><span id="wallet-balance">{{ balance }}</span> <small
+                            style="font-size:0.65rem;">ETH</small></div>
+                    <div class="stat-label">💰 Wallet Balance</div>
+                </div>
+                <a href="http://localhost:5000" class="back-btn"><i class="fas fa-arrow-left me-2"></i>Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <!-- Wallet Info Strip -->
+        <div class="card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="field-label">Connected Wallet</div>
+                    <code
+                        style="color:#60a5fa; font-size:0.9rem;"><span id="connected-wallet">{{ wallet }}</span></code>
+                </div>
+                <button class="btn btn-sm btn-outline-secondary" onclick="refreshBalance()"><i
+                        class="fas fa-sync-alt me-1"></i>Refresh Balance</button>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-pills mb-4" id="senderTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="tab-network" data-bs-toggle="pill" data-bs-target="#pane-network">🌐
+                    Network Stego</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="tab-blockchain" data-bs-toggle="pill" data-bs-target="#pane-blockchain">⛓️
+                    Blockchain Dead Drop</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="tab-p2p" data-bs-toggle="pill" data-bs-target="#pane-p2p">🕸️ P2P Onion
+                    Circuit</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="tab-analytics" data-bs-toggle="pill" data-bs-target="#pane-analytics">📊
+                    Analytics</button>
+            </li>
+            <li class="nav-item" id="securityTab" style="display: none;">
+                <button class="nav-link" id="tab-security" data-bs-toggle="pill" data-bs-target="#pane-security">🛡️
+                    Security & Access</button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- ===================== Network Steganography ===================== -->
+            <div class="tab-pane fade show active" id="pane-network">
+                <div class="card p-4">
+                    <div class="section-title"><i class="fas fa-satellite-dish text-info"></i> Network Packet
+                        Steganography</div>
+                    <form id="networkForm">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <div class="field-label">Covert Channel</div>
+                                <select class="form-select" id="net-method" name="method">
+                                    <option value="timing">⏱️ Packet Timing</option>
+                                    <option value="size">📦 Packet Size Modulation</option>
+                                    <option value="ttl">⏳ TTL Field Encoding</option>
+                                    <option value="drift">💨 Infrastructure Silence (Slow-Burn)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-label">Target Host IP</div>
+                                <input type="text" class="form-control" id="net-host" name="target_host"
+                                    placeholder="127.0.0.1" required>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="field-label">Options</div>
+                                <div class="d-flex gap-3 align-items-center mt-1">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="net-stealth"
+                                            name="stealth_mode">
+                                        <label class="form-check-label small" for="net-stealth">🤖 Stealth 2.0</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="net-blockkey"
+                                            name="block_key">
+                                        <label class="form-check-label small" for="net-blockkey">🔑 Block-Hash
+                                            Key</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="field-label">Secret Message</div>
+                            <textarea class="form-control" id="net-message" rows="4"
+                                placeholder="Enter the hidden message to encode..." required></textarea>
+                        </div>
+                        <button type="button" class="btn btn-transmit w-100" onclick="sendNetworkStego()">
+                            <i class="fas fa-bolt me-2"></i>Transmit via Steganography
+                        </button>
+                    </form>
+                    <div id="net-result" class="result-box"></div>
+                </div>
+            </div>
+
+            <!-- ===================== Blockchain Dead Drop ===================== -->
+            <div class="tab-pane fade" id="pane-blockchain">
+                <div class="card p-4">
+                    <div class="section-title"><i class="fas fa-link text-warning"></i> Hybrid Blockchain Dead Drop
+                    </div>
+                    <!-- Concept Banner -->
+                    <div class="mb-4 p-3 rounded"
+                        style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3);">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="fs-4">🔀</div>
+                            <div>
+                                <div class="fw-bold text-warning mb-1" style="font-size:0.9rem;">Dual-Mode Covert
+                                    Transmission</div>
+                                <small class="text-muted">The message is encrypted once with an AES-256 key derived from
+                                    the blockchain block hash, then sent via <strong class="text-light">two parallel
+                                        channels</strong>:<br>
+                                    <span class="badge bg-warning text-dark me-1 mt-1">⛓️ Blockchain</span> Encrypted
+                                    ciphertext stored as on-chain dead drop (with optional time-lock).<br>
+                                    <span class="badge bg-info text-dark me-1 mt-1">🌐 Network Stego</span> Same
+                                    ciphertext covertly modulated into live network packets to target IP.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hybrid Send Form -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <div class="field-label">Secret Message</div>
+                            <textarea class="form-control" id="bc-message" rows="3"
+                                placeholder="Secret content to transmit covertly..." required></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="field-label">Covert Channel</div>
+                            <select class="form-select mb-2" id="bc-channel">
+                                <option value="timing">⏱️ Packet Timing</option>
+                                <option value="size">📦 Packet Size</option>
+                                <option value="ttl">⏳ TTL Field</option>
+                                <option value="drift">💨 Slow-Burn Drift</option>
+                            </select>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="bc-blockkey">
+                                <label class="form-check-label small text-light" for="bc-blockkey">🔑 Live Block-Hash
+                                    Key</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-5">
+                            <div class="field-label">🌐 Target IP Address <span class="text-info">(Network Stego)</span>
+                            </div>
+                            <input type="text" class="form-control" id="bc-target-ip"
+                                placeholder="e.g. 192.168.1.10 or 127.0.0.1" required>
+                            <small class="text-muted">Recipient's machine running the network receiver</small>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="field-label">⛓️ Recipient Wallet <span class="text-warning">(On-Chain)</span>
+                            </div>
+                            <input type="text" class="form-control" id="bc-recipient" placeholder="0x..." required>
+                            <small class="text-muted">Ethereum address for blockchain dead drop</small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="field-label">🔒 Time-Lock Release</div>
+                            <input type="datetime-local" class="form-control" id="bc-release">
+                            <small class="text-muted">Leave blank for immediate</small>
+                        </div>
+                    </div>
+
+                    <!-- Transmission Button -->
+                    <button class="btn w-100 py-3 fw-bold" id="hybridSendBtn"
+                        style="background:linear-gradient(135deg, #f59e0b, #2a5298); border:none; color:white; border-radius:12px; font-size:1.05rem;"
+                        onclick="sendHybridDrop()">
+                        <i class="fas fa-rocket me-2"></i>Launch Hybrid Dead Drop
+                        <span class="badge bg-dark ms-2" style="font-size:0.7rem;">⛓️ On-Chain + 🌐 Network Stego</span>
+                    </button>
+
+                    <!-- Status Cards (shown after send) -->
+                    <div id="bc-result" class="result-box mt-3"></div>
+                    <div id="bc-status-cards" class="row g-2 mt-3" style="display:none!important;">
+                        <div class="col-6">
+                            <div class="p-3 rounded text-center" style="background:#111827; border:1px solid #374151;">
+                                <div style="font-size:1.5rem;" id="bc-chain-icon">⏳</div>
+                                <div class="small fw-bold mt-1">Blockchain</div>
+                                <div class="x-small text-muted" id="bc-chain-msg">Pending...</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded text-center" style="background:#111827; border:1px solid #374151;">
+                                <div style="font-size:1.5rem;" id="bc-stego-icon">⏳</div>
+                                <div class="small fw-bold mt-1">Network Stego</div>
+                                <div class="x-small text-muted" id="bc-stego-msg">Pending...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inbox -->
+                    <hr class="border-secondary my-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted mb-0">📥 Dead Drop Inbox (Your Address)</h6>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadInbox()"><i
+                                class="fas fa-sync-alt me-1"></i>Refresh</button>
+                    </div>
+                    <div id="bc-inbox" style="max-height:300px; overflow-y:auto;">
+                        <div class="text-center text-muted py-3">Click Refresh to load messages</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ===================== P2P Onion Routing ===================== -->
+            <div class="tab-pane fade" id="pane-p2p">
+                <div class="card p-4">
+                    <div class="section-title"><i class="fas fa-project-diagram text-info"></i> P2P Onion Circuit
+                        Builder</div>
+                    <div class="mb-3 p-3 rounded"
+                        style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3);">
+                        <small class="text-info"><i class="fas fa-info-circle me-2"></i>Messages are wrapped in multiple
+                            encryption layers. Each hop peels a layer, preventing traffic analysis.</small>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <div class="field-label">Target Host</div>
+                            <input type="text" class="form-control" id="p2p-target" placeholder="127.0.0.1">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="field-label">Secret Message</div>
+                            <input type="text" class="form-control" id="p2p-message" placeholder="Hidden content...">
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="text-muted mb-0">Relay Hops (Circuit)</h6>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-info" onclick="discoverNodes()"><i
+                                    class="fas fa-search me-1"></i>Discover Nodes</button>
+                            <button class="btn btn-sm btn-outline-success" onclick="addHop()"><i
+                                    class="fas fa-plus me-1"></i>Add Hop</button>
+                        </div>
+                    </div>
+
+                    <div id="nodesFoundBanner" class="d-none mb-3 p-2 rounded"
+                        style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); font-size:0.8rem;">
+                        <i class="fas fa-satellite text-success me-2"></i> Found <span id="discovered-count">0</span>
+                        verified nodes on chain. Click a node to add as hop.
+                        <div id="nodeChips" class="d-flex flex-wrap gap-1 mt-2"></div>
+                    </div>
+
+                    <div id="hops-container">
+                        <div class="text-center text-muted py-3" id="no-hops-msg"><small>No hops added. Will transmit
+                                directly to target.</small></div>
+                    </div>
+
+                    <button class="btn btn-transmit w-100 mt-3" onclick="sendP2P()">
+                        <i class="fas fa-shield-alt me-2"></i>Send via Onion Circuit
+                    </button>
+                    <div id="p2p-result" class="result-box"></div>
+                </div>
+            </div>
+
+            <!-- ===================== Protocol Analytics ===================== -->
+            <div class="tab-pane fade" id="pane-analytics">
+                <!-- Recommendation Banner -->
+                <div class="card p-3 mb-4" id="recommendation-banner" style="border-left: 4px solid #22c55e;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-muted small text-uppercase fw-bold mb-1"><i class="fas fa-robot me-1"></i>
+                                AI Protocol Recommendation</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fs-4 fw-bold text-success" id="rec-protocol">TIMING</span>
+                                <span class="badge bg-success bg-opacity-25 text-success" id="rec-reason">Lowest
+                                    composite risk</span>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="text-muted small">Updated: <span id="rec-time">--:--:--</span></div>
+                            <button class="btn btn-sm btn-outline-info mt-1" onclick="fetchAnalytics()">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Radar Chart -->
+                    <div class="col-lg-6">
+                        <div class="card p-4 h-100">
+                            <h6 class="mb-3 text-center text-muted fw-bold text-uppercase" style="letter-spacing:1px;">
+                                <i class="fas fa-satellite-dish me-2"></i>Channel Capability Matrix
+                            </h6>
+                            <div style="position:relative; height:320px;">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bar Chart -->
+                    <div class="col-lg-6">
+                        <div class="card p-4 h-100">
+                            <h6 class="mb-3 text-center text-muted fw-bold text-uppercase" style="letter-spacing:1px;">
+                                <i class="fas fa-chart-bar me-2"></i>Latency vs Throughput
+                            </h6>
+                            <div style="position:relative; height:320px;">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Risk Gauges -->
+                <div class="row g-4 mt-2">
+                    <div class="col-md-4">
+                        <div class="card p-4 text-center" id="gauge-timing">
+                            <div class="text-muted small text-uppercase fw-bold mb-2"><i class="fas fa-clock me-1"></i>
+                                Timing Channel</div>
+                            <div class="position-relative mx-auto" style="width:130px; height:130px;">
+                                <canvas id="gaugeTimingCanvas" width="130" height="130"></canvas>
+                                <div class="position-absolute top-50 start-50 translate-middle">
+                                    <span class="fs-3 fw-bold" id="risk-timing-val">25</span>
+                                    <div class="text-muted" style="font-size:0.6rem;">RISK</div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge" id="risk-timing-badge">LOW RISK</span>
+                            </div>
+                            <div class="small text-muted mt-1">
+                                <span id="timing-lat">120</span>ms &middot; <span id="timing-thr">45</span>bps
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-4 text-center" id="gauge-size">
+                            <div class="text-muted small text-uppercase fw-bold mb-2"><i class="fas fa-cube me-1"></i>
+                                Size Channel</div>
+                            <div class="position-relative mx-auto" style="width:130px; height:130px;">
+                                <canvas id="gaugeSizeCanvas" width="130" height="130"></canvas>
+                                <div class="position-absolute top-50 start-50 translate-middle">
+                                    <span class="fs-3 fw-bold" id="risk-size-val">55</span>
+                                    <div class="text-muted" style="font-size:0.6rem;">RISK</div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge" id="risk-size-badge">MEDIUM RISK</span>
+                            </div>
+                            <div class="small text-muted mt-1">
+                                <span id="size-lat">80</span>ms &middot; <span id="size-thr">120</span>bps
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-4 text-center" id="gauge-ttl">
+                            <div class="text-muted small text-uppercase fw-bold mb-2"><i
+                                    class="fas fa-hourglass-half me-1"></i> TTL Channel</div>
+                            <div class="position-relative mx-auto" style="width:130px; height:130px;">
+                                <canvas id="gaugeTTLCanvas" width="130" height="130"></canvas>
+                                <div class="position-absolute top-50 start-50 translate-middle">
+                                    <span class="fs-3 fw-bold" id="risk-ttl-val">72</span>
+                                    <div class="text-muted" style="font-size:0.6rem;">RISK</div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <span class="badge" id="risk-ttl-badge">HIGH RISK</span>
+                            </div>
+                            <div class="small text-muted mt-1">
+                                <span id="ttl-lat">45</span>ms &middot; <span id="ttl-thr">200</span>bps
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Risk Trend Line -->
+                <div class="row g-4 mt-2">
+                    <div class="col-12">
+                        <div class="card p-4">
+                            <h6 class="mb-3 text-center text-muted fw-bold text-uppercase" style="letter-spacing:1px;">
+                                <i class="fas fa-wave-square me-2"></i>Detection Risk Trend
+                            </h6>
+                            <div style="position:relative; height:220px;">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===================== Security & Access ===================== -->
+            <div class="tab-pane fade" id="pane-security">
+                <div class="row g-4">
+                    <!-- Whitelist -->
+                    <div class="col-md-6">
+                        <div class="card p-4 h-100">
+                            <div class="section-title"><i class="fas fa-list-check text-success"></i> Sender Whitelist
+                            </div>
+                            <div class="field-label">Wallet Address to Authorize</div>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" id="sec-wallet" placeholder="0x...">
+                                <button class="btn btn-outline-success"
+                                    onclick="authorizeSenderWallet()">Authorize</button>
+                            </div>
+                            <div class="mb-3">
+                                <div class="field-label">Duration (seconds, 0 = permanent)</div>
+                                <input type="number" class="form-control" id="sec-duration" value="0">
+                            </div>
+                            <div class="mb-3">
+                                <div class="field-label">Reason</div>
+                                <input type="text" class="form-control" id="sec-reason"
+                                    placeholder="e.g., Authorized test user">
+                            </div>
+                            <div id="sec-result" class="result-box"></div>
+                        </div>
+                    </div>
+                    <!-- Identity Check -->
+                    <div class="col-md-6">
+                        <div class="card p-4 h-100">
+                            <div class="section-title"><i class="fas fa-id-card text-primary"></i> Identity Clearance
+                                Check</div>
+                            <div class="field-label">Wallet Address</div>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" id="id-wallet" placeholder="0x...">
+                                <button class="btn btn-outline-primary" onclick="checkIdentity()">Verify</button>
+                            </div>
+                            <div id="id-result" class="result-box mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Protocol Switch -->
+                <div class="card p-4 mt-4">
+                    <div class="section-title"><i class="fas fa-broadcast-tower text-warning"></i> Global Protocol
+                        Switch</div>
+                    <p class="text-muted small">Changes the active stealth encoding protocol for the entire network via
+                        a blockchain transaction.</p>
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-outline-info flex-grow-1 py-3" onclick="switchProto('timing')">
+                            <div class="fs-4">⏱️</div>
+                            <div class="small fw-bold mt-1">TIMING</div>
+                        </button>
+                        <button class="btn btn-outline-info flex-grow-1 py-3" onclick="switchProto('size')">
+                            <div class="fs-4">📦</div>
+                            <div class="small fw-bold mt-1">SIZE</div>
+                        </button>
+                        <button class="btn btn-outline-info flex-grow-1 py-3" onclick="switchProto('ttl')">
+                            <div class="fs-4">⏳</div>
+                            <div class="small fw-bold mt-1">TTL</div>
+                        </button>
+                        <button class="btn btn-outline-secondary flex-grow-1 py-3" onclick="switchProto('drift')">
+                            <div class="fs-4">💨</div>
+                            <div class="small fw-bold mt-1">DRIFT</div>
+                        </button>
+                    </div>
+                    <div class="proto-result" class="result-box mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Terminal -->
+        <div class="terminal-header mt-4">
+            <div>
+                <span class="terminal-dot" style="background: #ff5f56;"></span>
+                <span class="terminal-dot" style="background: #ffbd2e;"></span>
+                <span class="terminal-dot" style="background: #27c93f;"></span>
+                <span class="ms-2 text-muted small fw-bold"><i class="fas fa-terminal me-1"></i> TRANSMITTER
+                    CONSOLE</span>
+            </div>
+            <div>
+                <span id="stream-status" class="badge bg-success" style="font-size: 0.65rem;"><i
+                        class="fas fa-link me-1"></i> CONNECTED</span>
+                <button class="btn btn-sm btn-link text-muted p-0 ms-2" onclick="clearTerminal()"><i
+                        class="fas fa-trash-alt" style="font-size: 0.7rem;"></i></button>
+            </div>
+        </div>
+        <div id="log-container">
+            <div class="log-entry">
+                <span class="log-time">${new Date().toLocaleTimeString()}</span>
+                <span class="log-category cat-info">SYSTEM</span>
+                Transmitter Console Online...
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let hopCount = 0;
+
+        function showResult(elId, success, message) {
+            const el = document.getElementById(elId);
+            el.style.display = 'block';
+            el.className = 'result-box ' + (success ? 'success' : 'error');
+            el.innerHTML = (success ? '✅ ' : '❌ ') + message;
+        }
+
+        async function refreshBalance() {
+            try {
+                const url = userAccount ? `/balance?wallet=${userAccount}` : '/balance';
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.balance !== undefined) {
+                    document.getElementById('wallet-balance').textContent = parseFloat(data.balance).toFixed(4);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function sendNetworkStego() {
+            const method = document.getElementById('net-method').value;
+            const host = document.getElementById('net-host').value;
+            const message = document.getElementById('net-message').value;
+            const stealth = document.getElementById('net-stealth').checked;
+            const blockKey = document.getElementById('net-blockkey').checked;
+            if (!host || !message) { showResult('net-result', false, 'Please fill in all fields'); return; }
+
+            const form = new FormData();
+            form.append('method', method); form.append('target_host', host);
+            form.append('secret_data', message);
+            if (stealth) form.append('stealth_mode', 'on');
+            if (blockKey) form.append('block_key', 'on');
+
+            document.getElementById('net-result').style.display = 'block';
+            document.getElementById('net-result').className = 'result-box';
+            document.getElementById('net-result').textContent = '⏳ Transmitting...';
+
+            try {
+                const res = await fetch('http://localhost:5000/network_hide', { method: 'POST', body: form });
+                const text = await res.text();
+                if (res.ok) { showResult('net-result', true, 'Transmission sent successfully!'); }
+                else { showResult('net-result', false, 'Server error: ' + res.status); }
+            } catch (e) { showResult('net-result', false, e.message); }
+        }
+
+        async function loadInbox() {
+            document.getElementById('bc-inbox').innerHTML = '<div class="text-center text-muted py-3">Loading...</div>';
+            try {
+                const res = await fetch('http://localhost:5000/dead_drop_check');
+                const data = await res.json();
+                if (!data.success || !data.messages.length) {
+                    document.getElementById('bc-inbox').innerHTML = '<div class="text-center text-muted py-3">No messages found</div>';
+                    return;
+                }
+                document.getElementById('bc-inbox').innerHTML = data.messages.map(m => `
+                    <div class="p-3 mb-2 rounded" style="background:#111827; border:1px solid ${m.is_locked ? '#f59e0b' : '#10b981'}33;">
+                        <div class="d-flex justify-content-between">
+                            <small class="fw-bold text-light">${m.sender.slice(0, 10)}...${m.sender.slice(-6)}</small>
+                            <span class="badge ${m.is_locked ? 'bg-warning text-dark' : 'bg-success'}">${m.is_locked ? '🔒 LOCKED' : '✅ AVAILABLE'}</span>
+                        </div>
+                        <div class="small text-muted mt-1">${m.message ? m.message.slice(0, 80) + '...' : 'Encrypted'}</div>
+                    </div>`).join('');
+            } catch (e) { document.getElementById('bc-inbox').innerHTML = '<div class="text-danger small p-2">Error: ' + e.message + '</div>'; }
+        }
+
+        async function discoverNodes() {
+            try {
+                const res = await fetch('http://localhost:5000/api/verified_nodes');
+                const data = await res.json();
+                const nodes = data.nodes || [];
+                document.getElementById('discovered-count').textContent = nodes.length;
+                document.getElementById('nodeChips').innerHTML = nodes.map(n =>
+                    `<button class="btn btn-sm btn-outline-success" style="font-size:0.7rem;" onclick="addHopFromNode('${n.ip}', '${n.channels[0] || 'timing'}')">
+                        ${n.ip} (${n.channels[0] || 'timing'})
+                    </button>`).join('');
+                document.getElementById('nodesFoundBanner').classList.remove('d-none');
+            } catch (e) { alert('Error discovering nodes: ' + e.message); }
+        }
+
+        function addHopFromNode(ip, channel) { addHop(ip, channel); }
+
+        function addHop(ip = '', channel = 'timing') {
+            document.getElementById('no-hops-msg').style.display = 'none';
+            const idx = ++hopCount;
+            const div = document.createElement('div');
+            div.className = 'hop-item'; div.id = 'hop-' + idx;
+            div.innerHTML = `<span class="remove-hop" onclick="document.getElementById('hop-${idx}').remove()">✕</span>
+                <div class="field-label mb-2">Hop ${idx} Relay</div>
+                <div class="row g-2">
+                    <div class="col-5"><input type="text" class="form-control form-control-sm" id="hop-ip-${idx}" placeholder="IP Address" value="${ip}"></div>
+                    <div class="col-4">
+                        <select class="form-select form-select-sm" id="hop-ch-${idx}">
+                            <option value="timing" ${channel == 'timing' ? 'selected' : ''}>⏱️ Timing</option>
+                            <option value="size" ${channel == 'size' ? 'selected' : ''}>📦 Size</option>
+                            <option value="ttl" ${channel == 'ttl' ? 'selected' : ''}>⏳ TTL</option>
+                        </select>
+                    </div>
+                    <div class="col-3"><input type="password" class="form-control form-control-sm" id="hop-sec-${idx}" placeholder="Secret"></div>
+                </div>`;
+            document.getElementById('hops-container').appendChild(div);
+        }
+
+        async function sendP2P() {
+            const target = document.getElementById('p2p-target').value;
+            const message = document.getElementById('p2p-message').value;
+            if (!target || !message) { showResult('p2p-result', false, 'Target and message required'); return; }
+            const hops = [];
+            document.querySelectorAll('.hop-item').forEach((el, i) => {
+                const idx = el.id.replace('hop-', '');
+                hops.push({ ip: document.getElementById('hop-ip-' + idx).value, channel: document.getElementById('hop-ch-' + idx).value, secret: document.getElementById('hop-sec-' + idx).value });
+            });
+
+            const form = new FormData();
+            form.append('method', 'timing'); form.append('target_host', target);
+            form.append('secret_data', message);
+            if (hops.length) form.append('hops', JSON.stringify(hops));
+
+            showResult('p2p-result', true, 'Sending via P2P circuit...');
+            try {
+                const res = await fetch('http://localhost:5000/network_hide', { method: 'POST', body: form });
+                if (res.ok) { showResult('p2p-result', true, 'Multi-hop transmission complete! Hops: ' + hops.length); }
+                else { showResult('p2p-result', false, 'Transmission failed'); }
+            } catch (e) { showResult('p2p-result', false, e.message); }
+        }
+
+        // RBAC Context
+        const ADMIN_ADDRESS = "{{ admin_address }}".toLowerCase();
+        let userAccount = null;
+
+        function updateWalletUI(address) {
+            userAccount = address.toLowerCase();
+            console.log("[RBAC] Updating UI for wallet:", userAccount);
+
+            // Update Connect Button
+            const btn = document.getElementById('connectWalletBtn');
+            if (btn) {
+                btn.innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                btn.classList.replace('btn-outline-light', 'btn-success');
+            }
+
+            // Update Connected Wallet Display
+            const walletDisplay = document.getElementById('connected-wallet');
+            if (walletDisplay) {
+                walletDisplay.textContent = userAccount;
+            }
+
+            checkAdminAccess();
+            refreshBalance();
+        }
+
+        async function connectMetaMask() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    updateWalletUI(accounts[0]);
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                }
+            } else {
+                alert("MetaMask not found. Please install the extension.");
+            }
+        }
+
+        function checkAdminAccess() {
+            const securityTab = document.getElementById('securityTab');
+            if (userAccount === ADMIN_ADDRESS) {
+                securityTab.style.display = 'block';
+                console.log("[RBAC] Admin access granted to security management.");
+            } else {
+                securityTab.style.display = 'none';
+                console.log("[RBAC] Restricted access: User is not the administrator.");
+            }
+        }
+
+        // Auto-check on load
+        if (window.ethereum) {
+            window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                if (accounts.length > 0) {
+                    updateWalletUI(accounts[0]);
+                }
+            });
+
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length > 0) {
+                    updateWalletUI(accounts[0]);
+                } else {
+                    location.reload();
+                }
+            });
+        }
+
+        async function authorizeSenderWallet() { // Renamed to avoid collision or confusion
+            const wallet = document.getElementById('sec-wallet').value;
+            const duration = document.getElementById('sec-duration').value;
+            const reason = document.getElementById('sec-reason').value;
+            if (!wallet) { showResult('sec-result', false, 'Wallet address required'); return; }
+            try {
+                const res = await fetch('http://localhost:5000/api/security/authorize', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        wallet: wallet,
+                        duration: parseInt(duration),
+                        reason: reason,
+                        admin_wallet: userAccount // Pass current wallet for backend check
+                    })
+                });
+                const data = await res.json();
+                showResult('sec-result', data.success, data.success ? data.message : data.error);
+            } catch (e) { showResult('sec-result', false, e.message); }
+        }
+
+        async function checkIdentity() {
+            const wallet = document.getElementById('id-wallet').value;
+            if (!wallet) { showResult('id-result', false, 'Wallet address required'); return; }
+            try {
+                const res = await fetch('http://localhost:5000/api/registry/status/' + wallet);
+                const data = await res.json();
+                if (data.success) {
+                    showResult('id-result', true, `Org: ${data.organization} | Clearance: ${data.clearance} | Level: ${data.level}`);
+                } else { showResult('id-result', false, data.error); }
+            } catch (e) { showResult('id-result', false, e.message); }
+        }
+
+        async function switchProto(proto) {
+            if (!confirm('Switch global network protocol to ' + proto.toUpperCase() + '?')) return;
+            try {
+                const res = await fetch('http://localhost:5000/api/controller/protocol', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        protocol: proto,
+                        admin_wallet: userAccount // Pass current wallet for backend check
+                    })
+                });
+                const data = await res.json();
+                showResult('proto-result', data.success, data.success ? 'Protocol switched! TX: ' + data.tx_hash : data.error);
+            } catch (e) { showResult('proto-result', false, e.message); }
+        }
+
+        async function sendHybridDrop() {
+            const targetIp = document.getElementById('bc-target-ip').value.trim();
+            const wallet = document.getElementById('bc-recipient').value.trim();
+            const message = document.getElementById('bc-message').value.trim();
+            const channel = document.getElementById('bc-channel').value;
+            const blockKey = document.getElementById('bc-blockkey').checked;
+            const releaseTime = document.getElementById('bc-release').value;
+
+            if (!targetIp || !wallet || !message) {
+                showResult('bc-result', false, 'Please fill in Target IP, Recipient Wallet, and Message.');
+                return;
+            }
+
+            // Show sending state
+            const btn = document.getElementById('hybridSendBtn');
+            const origHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Launching Hybrid Drop...';
+            document.getElementById('bc-result').style.display = 'none';
+            document.getElementById('bc-status-cards').style.cssText = 'display:flex!important;';
+            document.getElementById('bc-chain-icon').textContent = '⏳';
+            document.getElementById('bc-chain-msg').textContent = 'Sending to blockchain...';
+            document.getElementById('bc-stego-icon').textContent = '⏳';
+            document.getElementById('bc-stego-msg').textContent = 'Launching stego sender...';
+
+            try {
+                const res = await fetch('http://localhost:5000/dead_drop_send_hybrid', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_ip: targetIp,
+                        recipient_wallet: wallet,
+                        message: message,
+                        channel: channel,
+                        block_key: blockKey,
+                        release_time: releaseTime || ''
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    // Blockchain Status
+                    if (data.blockchain.success) {
+                        document.getElementById('bc-chain-icon').textContent = '✅';
+                        document.getElementById('bc-chain-msg').textContent = 'TX: ' + (data.blockchain.tx_hash || '').slice(0, 16) + '...';
+                        document.getElementById('bc-chain-icon').parentElement.style.borderColor = '#10b981';
+                    } else {
+                        document.getElementById('bc-chain-icon').textContent = '⚠️';
+                        document.getElementById('bc-chain-msg').textContent = data.blockchain.error || 'Failed';
+                        document.getElementById('bc-chain-icon').parentElement.style.borderColor = '#f59e0b';
+                    }
+                    // Network Stego Status
+                    if (data.network_stego.launched) {
+                        document.getElementById('bc-stego-icon').textContent = '🚀';
+                        document.getElementById('bc-stego-msg').textContent = channel.toUpperCase() + ' packets → ' + targetIp;
+                        document.getElementById('bc-stego-icon').parentElement.style.borderColor = '#3b82f6';
+                    } else {
+                        document.getElementById('bc-stego-icon').textContent = '❌';
+                        document.getElementById('bc-stego-msg').textContent = data.network_stego.error || 'Failed to launch';
+                        document.getElementById('bc-stego-icon').parentElement.style.borderColor = '#ef4444';
+                    }
+                    showResult('bc-result', true,
+                        `Hybrid Drop Launched!\n` +
+                        `📍 Msg Hash: ${data.msg_hash}\n` +
+                        `🔑 Key Ref: ${data.key_ref}\n` +
+                        `📡 Channel: ${data.channel.toUpperCase()} → ${data.target_ip}`
+                    );
+                } else {
+                    document.getElementById('bc-chain-icon').textContent = '❌';
+                    document.getElementById('bc-chain-msg').textContent = data.error || 'Error';
+                    document.getElementById('bc-stego-icon').textContent = '❌';
+                    document.getElementById('bc-stego-msg').textContent = 'Not attempted';
+                    showResult('bc-result', false, data.error || 'Hybrid drop failed');
+                }
+            } catch (e) {
+                showResult('bc-result', false, 'Request error: ' + e.message);
+                document.getElementById('bc-chain-icon').textContent = '❌';
+                document.getElementById('bc-stego-icon').textContent = '❌';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origHtml;
+            }
+        }
+
+        // Initialize Live Terminal Streaming
+        function initTerminalStream() {
+            const logContainer = document.getElementById('log-container');
+            const streamStatus = document.getElementById('stream-status');
+            const eventSource = new EventSource('/api/logs/stream');
+
+            eventSource.onmessage = function (event) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+
+                const now = new Date().toLocaleTimeString();
+
+                let msg = event.data;
+                let category = "INFO";
+
+                if (msg.startsWith('[')) {
+                    const match = msg.match(/^\[(.*?)\] (.*)/);
+                    if (match) {
+                        category = match[1] || "INFO";
+                        msg = match[2];
+                    }
+                }
+
+                logEntry.innerHTML = `
+                    <span class="log-time">${now}</span>
+                    <span class="log-category cat-${category.toLowerCase()}">${category}</span>
+                    <span class="log-msg">${msg}</span>
+                `;
+
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+
+                if (logContainer.children.length > 50) {
+                    logContainer.removeChild(logContainer.firstChild);
+                }
+            };
+
+            eventSource.onerror = function () {
+                if (streamStatus) {
+                    streamStatus.className = 'badge bg-danger';
+                    streamStatus.innerHTML = '<i class="fas fa-unlink me-1"></i> DISCONNECTED';
+                }
+                setTimeout(initTerminalStream, 5000);
+                eventSource.close();
+            };
+        }
+
+        function clearTerminal() {
+            document.getElementById('log-container').innerHTML = '';
+        }
+
+        // ===================== PROTOCOL ANALYTICS =====================
+        let radarChart = null, barChart = null, trendChart = null;
+
+        const CHART_COLORS = {
+            timing: { bg: 'rgba(34, 197, 94, 0.2)', border: '#22c55e' },
+            size: { bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6' },
+            ttl: { bg: 'rgba(249, 115, 22, 0.2)', border: '#f97316' },
+        };
+
+        const CHART_DEFAULTS = {
+            color: '#9ca3af',
+            font: { family: 'Inter' },
+        };
+
+        function drawGauge(canvasId, value, maxVal = 100) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const cx = w / 2, cy = h / 2, r = 50;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Background arc
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0.75 * Math.PI, 2.25 * Math.PI);
+            ctx.strokeStyle = '#374151';
+            ctx.lineWidth = 12;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // Value arc
+            const ratio = Math.min(value / maxVal, 1);
+            const endAngle = 0.75 * Math.PI + ratio * 1.5 * Math.PI;
+            let color = '#22c55e'; // green
+            if (value > 60) color = '#ef4444'; // red
+            else if (value > 35) color = '#f59e0b'; // yellow
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0.75 * Math.PI, endAngle);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 12;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        function getRiskLabel(value) {
+            if (value <= 30) return { text: 'LOW RISK', class: 'bg-success' };
+            if (value <= 60) return { text: 'MEDIUM RISK', class: 'bg-warning text-dark' };
+            return { text: 'HIGH RISK', class: 'bg-danger' };
+        }
+
+        function initCharts() {
+            const radarCtx = document.getElementById('radarChart');
+            if (!radarCtx) return;
+
+            // Radar Chart
+            radarChart = new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Stealth\n(inv. Risk)', 'Speed\n(inv. Latency)', 'Throughput'],
+                    datasets: [
+                        { label: 'TIMING', data: [75, 30, 22], ...CHART_COLORS.timing, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#22c55e' },
+                        { label: 'SIZE', data: [45, 55, 60], ...CHART_COLORS.size, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#3b82f6' },
+                        { label: 'TTL', data: [28, 82, 100], ...CHART_COLORS.ttl, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#f97316' },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true, max: 100,
+                            grid: { color: 'rgba(255,255,255,0.08)' },
+                            angleLines: { color: 'rgba(255,255,255,0.08)' },
+                            pointLabels: { color: '#9ca3af', font: { size: 11, family: 'Inter' } },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#d1d5db', font: { family: 'Inter' }, usePointStyle: true, pointStyle: 'circle' } }
+                    }
+                }
+            });
+
+            // Bar Chart
+            barChart = new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['TIMING', 'SIZE', 'TTL'],
+                    datasets: [
+                        { label: 'Latency (ms)', data: [120, 80, 45], backgroundColor: ['rgba(34,197,94,0.6)', 'rgba(59,130,246,0.6)', 'rgba(249,115,22,0.6)'], borderRadius: 6 },
+                        { label: 'Throughput (bps)', data: [45, 120, 200], backgroundColor: ['rgba(34,197,94,0.25)', 'rgba(59,130,246,0.25)', 'rgba(249,115,22,0.25)'], borderColor: ['#22c55e', '#3b82f6', '#f97316'], borderWidth: 2, borderRadius: 6 },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#9ca3af', font: { family: 'Inter' } }, grid: { display: false } },
+                        y: { ticks: { color: '#6b7280', font: { family: 'Inter' } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#d1d5db', font: { family: 'Inter' } } }
+                    }
+                }
+            });
+
+            // Trend Chart
+            trendChart = new Chart(document.getElementById('trendChart'), {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 10 }, (_, i) => `T-${9 - i}`),
+                    datasets: [
+                        { label: 'Timing Risk', data: Array(10).fill(25), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
+                        { label: 'Size Risk', data: Array(10).fill(55), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
+                        { label: 'TTL Risk', data: Array(10).fill(72), borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#6b7280' }, grid: { display: false } },
+                        y: { min: 0, max: 100, ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#d1d5db', font: { family: 'Inter' }, usePointStyle: true } }
+                    }
+                }
+            });
+
+            // Initial gauges
+            drawGauge('gaugeTimingCanvas', 25);
+            drawGauge('gaugeSizeCanvas', 55);
+            drawGauge('gaugeTTLCanvas', 72);
+        }
+
+        async function fetchAnalytics() {
+            try {
+                const res = await fetch('http://localhost:5000/api/protocol/analytics?live=true');
+                const data = await res.json();
+                if (!data.success) return;
+
+                const p = data.protocols;
+
+                // Normalize for radar: stealth = 100 - risk, speed = 100 - (lat/1.5), thr = (thr/2.5)*100
+                if (radarChart) {
+                    radarChart.data.datasets[0].data = [100 - p.timing.detection_risk, Math.max(0, 100 - p.timing.latency_ms / 1.5), (p.timing.throughput_bps / 2.5)];
+                    radarChart.data.datasets[1].data = [100 - p.size.detection_risk, Math.max(0, 100 - p.size.latency_ms / 1.5), (p.size.throughput_bps / 2.5)];
+                    radarChart.data.datasets[2].data = [100 - p.ttl.detection_risk, Math.max(0, 100 - p.ttl.latency_ms / 1.5), (p.ttl.throughput_bps / 2.5)];
+                    radarChart.update('none');
+                }
+
+                // Bar chart
+                if (barChart) {
+                    barChart.data.datasets[0].data = [p.timing.latency_ms, p.size.latency_ms, p.ttl.latency_ms];
+                    barChart.data.datasets[1].data = [p.timing.throughput_bps, p.size.throughput_bps, p.ttl.throughput_bps];
+                    barChart.update('none');
+                }
+
+                // Gauges
+                ['timing', 'size', 'ttl'].forEach(ch => {
+                    const risk = p[ch].detection_risk;
+                    const canvasId = ch === 'ttl' ? 'gaugeTTLCanvas' : `gauge${ch.charAt(0).toUpperCase() + ch.slice(1)}Canvas`;
+                    drawGauge(canvasId, risk);
+                    document.getElementById(`risk-${ch}-val`).textContent = Math.round(risk);
+                    const label = getRiskLabel(risk);
+                    const badge = document.getElementById(`risk-${ch}-badge`);
+                    badge.textContent = label.text;
+                    badge.className = `badge ${label.class}`;
+                    document.getElementById(`${ch}-lat`).textContent = Math.round(p[ch].latency_ms);
+                    document.getElementById(`${ch}-thr`).textContent = Math.round(p[ch].throughput_bps);
+                });
+
+                // Trend chart from history
+                if (trendChart && data.history) {
+                    trendChart.data.datasets[0].data = data.history.map(h => h.timing.risk);
+                    trendChart.data.datasets[1].data = data.history.map(h => h.size.risk);
+                    trendChart.data.datasets[2].data = data.history.map(h => h.ttl.risk);
+                    trendChart.update('none');
+                }
+
+                // Recommendation
+                document.getElementById('rec-protocol').textContent = data.recommendation;
+                document.getElementById('rec-time').textContent = data.timestamp;
+                const recColors = { TIMING: '#22c55e', SIZE: '#3b82f6', TTL: '#f97316' };
+                document.getElementById('rec-protocol').style.color = recColors[data.recommendation] || '#22c55e';
+                document.getElementById('recommendation-banner').style.borderLeftColor = recColors[data.recommendation] || '#22c55e';
+
+                // Score detail
+                const scoreText = Object.entries(data.scores).map(([k, v]) => `${k.toUpperCase()}: ${(v * 100).toFixed(0)}%`).join(' | ');
+                document.getElementById('rec-reason').textContent = `Scores: ${scoreText}`;
+
+            } catch (e) {
+                console.error('Analytics fetch error:', e);
+            }
+        }
+
+        // Auto-refresh analytics every 8 seconds
+        let analyticsInterval = null;
+        document.getElementById('tab-analytics')?.addEventListener('shown.bs.tab', () => {
+            if (!radarChart) initCharts();
+            fetchAnalytics();
+            if (!analyticsInterval) analyticsInterval = setInterval(fetchAnalytics, 8000);
+        });
+        document.querySelectorAll('#senderTabs .nav-link').forEach(tab => {
+            if (tab.id !== 'tab-analytics') {
+                tab.addEventListener('shown.bs.tab', () => {
+                    if (analyticsInterval) { clearInterval(analyticsInterval); analyticsInterval = null; }
+                });
+            }
+        });
+
+        window.addEventListener('load', () => {
+            refreshBalance();
+            initTerminalStream();
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,130 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-music"></i> Hide Data in Audio</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Success!</h5>
+                        <p>Your secret data has been hidden in the audio file.</p>
+                        <a href="{{ url_for('download_file', filename=output_file) }}" class="btn btn-success">
+                            <i class="fas fa-download"></i> Download Stego Audio
+                        </a>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="audio" class="form-label">
+                                <i class="fas fa-music"></i> Select Audio File
+                            </label>
+                            <input type="file" class="form-control" id="audio" name="audio" 
+                                   accept=".wav,.mp3" required>
+                            <div class="form-text">Supported formats: WAV, MP3</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="secret_data" class="form-label">
+                                <i class="fas fa-lock"></i> Secret Message
+                            </label>
+                            <textarea class="form-control" id="secret_data" name="secret_data" 
+                                      rows="4" placeholder="Enter your secret message..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Encryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter a strong password" required>
+                            
+                            <!-- Password Strength Meter -->
+                            <div class="mt-2">
+                                <div class="progress" style="height: 8px;">
+                                    <div id="password-strength-bar" class="progress-bar" role="progressbar" 
+                                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <small id="password-strength-text" class="text-muted">Password strength will appear here</small>
+                                <div id="password-feedback" class="mt-1"></div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-info btn-lg w-100">
+                            <i class="fas fa-music"></i> Hide Data in Audio
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Audio Steganography Process:</h5>
+                        <ol>
+                            <li>Message is encrypted using AES</li>
+                            <li>Data is hidden in audio samples using LSB</li>
+                            <li>Audio quality remains unchanged</li>
+                            <li>Output is a WAV file with hidden data</li>
+                        </ol>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Password strength checker
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+    const feedbackDiv = document.getElementById('password-feedback');
+    
+    if (password.length === 0) {
+        strengthBar.style.width = '0%';
+        strengthBar.className = 'progress-bar';
+        strengthText.textContent = 'Password strength will appear here';
+        feedbackDiv.innerHTML = '';
+        return;
+    }
+    
+    fetch('/check_password_strength', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const score = data.score;
+        const strength = data.strength;
+        const feedback = data.feedback;
+        
+        strengthBar.style.width = score + '%';
+        strengthText.textContent = `${strength} (${score}/100)`;
+        
+        strengthBar.className = 'progress-bar';
+        if (score >= 80) {
+            strengthBar.classList.add('bg-success');
+        } else if (score >= 60) {
+            strengthBar.classList.add('bg-info');
+        } else if (score >= 40) {
+            strengthBar.classList.add('bg-warning');
+        } else {
+            strengthBar.classList.add('bg-danger');
+        }
+        
+        if (feedback.length > 0) {
+            feedbackDiv.innerHTML = '<small class="text-muted">Tips: ' + feedback.join(', ') + '</small>';
+        } else {
+            feedbackDiv.innerHTML = '';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+</script>
+{% endblock %}

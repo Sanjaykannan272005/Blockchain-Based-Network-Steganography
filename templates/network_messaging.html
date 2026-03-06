@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Network Messaging - Blockchain Steganography</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body{background:#f8f9fa;color:#212529;font-family:Arial,sans-serif;padding:20px}
+        .container{max-width:1000px;margin:0 auto}
+        .card{background:#fff;border:2px solid #0066cc;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
+        .card-header{background:#0066cc;color:#fff;font-weight:bold;font-size:1.2rem;padding:15px}
+        .btn-primary{background:#0066cc;border:none;padding:10px 30px;font-size:1.1rem}
+        .btn-success{background:#28a745;border:none;padding:10px 30px;font-size:1.1rem}
+        .form-control{background:#fff;border:2px solid #dee2e6;color:#000;font-size:1rem;padding:10px}
+        .form-label{color:#000;font-weight:600;font-size:1.1rem;margin-bottom:8px}
+        .alert{border-radius:8px;font-size:1rem;padding:15px}
+        pre{background:#f8f9fa;padding:15px;border-radius:5px;color:#000;border:1px solid #dee2e6;font-size:0.95rem}
+        .text-muted{color:#6c757d!important;font-size:0.95rem}
+        h2,h4{color:#000}
+        code{background:#e9ecef;padding:3px 6px;border-radius:3px;color:#d63384}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Network Messaging</h2>
+        <a href="/" class="btn btn-outline-primary btn-sm">Dashboard</a>
+    </div>
+
+    <!-- Send Message -->
+    <div class="card">
+        <div class="card-header">Send Message Over Network</div>
+        <div class="card-body">
+            <p class="text-muted">Send encrypted messages via blockchain-controlled network steganography</p>
+            
+            <div class="mb-3">
+                <label class="form-label">Sender Address</label>
+                <input type="text" id="senderAddress" class="form-control" placeholder="0x..." value="0x627306090abaB3A6e1400e9345bC60c78a8BEf57">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Target IP (optional)</label>
+                <input type="text" id="targetIp" class="form-control" placeholder="127.0.0.1 or leave empty">
+                <small class="text-muted">If provided, message will be sent over network. Receiver must be listening on port 9999.</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Message</label>
+                <textarea id="messageText" class="form-control" rows="4" placeholder="Your secret message"></textarea>
+            </div>
+            
+            <button onclick="sendMessage()" class="btn btn-primary">Encrypt & Send</button>
+        </div>
+    </div>
+
+    <!-- Result -->
+    <div id="resultCard" class="card" style="display:none">
+        <div class="card-header">Result</div>
+        <div class="card-body">
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- Receive Message -->
+    <div class="card">
+        <div class="card-header">Receive Message</div>
+        <div class="card-body">
+            <p class="text-muted">Decrypt received encrypted message</p>
+            
+            <div class="mb-3">
+                <label class="form-label">Encrypted Message</label>
+                <textarea id="encryptedMessage" class="form-control" rows="3" placeholder="Paste encrypted message here"></textarea>
+            </div>
+            
+            <button onclick="receiveMessage()" class="btn btn-success">Decrypt</button>
+        </div>
+    </div>
+
+    <!-- Decrypted Result -->
+    <div id="decryptedCard" class="card" style="display:none">
+        <div class="card-header">Decrypted Message</div>
+        <div class="card-body">
+            <div id="decryptedContent"></div>
+        </div>
+    </div>
+
+    <!-- Network Receiver -->
+    <div class="card">
+        <div class="card-header">Network Receiver Instructions</div>
+        <div class="card-body">
+            <p class="text-muted">Listen for incoming network messages</p>
+            
+            <div class="alert alert-info">
+                <strong>To receive network messages:</strong><br>
+                Run in terminal: <code>python working_network.py receive</code><br>
+                Then send from this page with Target IP filled in.
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Or use command line:</label>
+                <pre>Terminal 1: python working_network.py receive
+Terminal 2: python working_network.py send 127.0.0.1 "Message"</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function sendMessage() {
+    const sender = document.getElementById('senderAddress').value;
+    const message = document.getElementById('messageText').value;
+    const targetIp = document.getElementById('targetIp').value;
+    
+    if (!sender || !message) {
+        alert('Please fill in sender address and message');
+        return;
+    }
+    
+    try {
+        const payload = {
+            sender_address: sender,
+            message: message
+        };
+        
+        if (targetIp) {
+            payload.target_ip = targetIp;
+        }
+        
+        const response = await fetch('/api/message/send', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            let html = '<div class="alert alert-success"><strong>Message sent successfully!</strong></div>';
+            html += '<p><strong>Encrypted Message:</strong></p>';
+            html += '<pre>' + data.encrypted_message + '</pre>';
+            html += '<p><strong>Forensic Hash:</strong> <code>' + data.forensic_hash + '</code></p>';
+            html += '<p><strong>Reputation Score:</strong> ' + data.reputation.score + '</p>';
+            
+            if (data.network_status === 'sent') {
+                html += '<div class="alert alert-success mt-3"><strong>Message sent over network to ' + targetIp + '</strong></div>';
+            } else if (data.network_status === 'failed') {
+                html += '<div class="alert alert-warning mt-3"><strong>Network send failed.</strong> Make sure receiver is running.</div>';
+            }
+            
+            document.getElementById('resultContent').innerHTML = html;
+            document.getElementById('resultCard').style.display = 'block';
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        alert('Error: ' + error);
+    }
+}
+
+async function receiveMessage() {
+    const encrypted = document.getElementById('encryptedMessage').value;
+    
+    if (!encrypted) {
+        alert('Please paste encrypted message');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/message/receive', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({encrypted_message: encrypted})
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            let html = '<div class="alert alert-success"><strong>Message decrypted successfully!</strong></div>';
+            html += '<p><strong>Original Message:</strong></p>';
+            html += '<pre style="font-size:1.2rem;font-weight:bold;color:#28a745">' + data.message + '</pre>';
+            
+            document.getElementById('decryptedContent').innerHTML = html;
+            document.getElementById('decryptedCard').style.display = 'block';
+        } else {
+            alert('Decryption failed: ' + data.message);
+        }
+    } catch (error) {
+        alert('Error: ' + error);
+    }
+}
+</script>
+</body>
+</html>

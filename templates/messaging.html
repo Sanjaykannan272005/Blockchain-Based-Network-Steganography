@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaging - Blockchain Steganography</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --secondary: #0099cc;
+            --dark: #0a0e27;
+            --darker: #050812;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .navbar {
+            background: rgba(10, 14, 39, 0.95) !important;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .card {
+            background: rgba(15, 20, 50, 0.8);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-bottom: none;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .form-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .form-control {
+            background: rgba(30, 40, 70, 0.8);
+            border: 1px solid var(--primary);
+            color: #fff;
+        }
+        
+        .form-control:focus {
+            background: rgba(30, 40, 70, 0.8);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+        
+        .message-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .status-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .status-success {
+            background: rgba(0, 170, 0, 0.2);
+            border: 1px solid #00aa00;
+            color: #00ff00;
+        }
+        
+        .status-error {
+            background: rgba(170, 0, 0, 0.2);
+            border: 1px solid #aa0000;
+            color: #ff0000;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .tab-content {
+            background: rgba(15, 20, 50, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .message-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-envelope"></i> Secure Messaging
+            </span>
+            <a href="/" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-5" style="max-width: 1000px;">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-comments"></i> Encrypted Message Exchange
+            </div>
+            <div class="card-body">
+                <!-- TABS -->
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#send">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#receive">
+                            <i class="fas fa-download"></i> Receive Message
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- TAB CONTENT -->
+                <div class="tab-content">
+                    <!-- SEND TAB -->
+                    <div class="tab-pane fade show active" id="send">
+                        <h5 class="mb-4">Send Encrypted Message</h5>
+                        <form id="sendForm">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label class="form-label">Your Address</label>
+                                    <input type="text" class="form-control" id="senderAddress" 
+                                           placeholder="0x..." value="0x627306090abaB3A6e1400e9345bC60c78a8BEf57" required>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <label class="form-label">Message</label>
+                                    <textarea class="form-control" id="messageText" rows="6" 
+                                              placeholder="Enter your secret message here..." required></textarea>
+                                    <small class="text-muted">Max 1000 characters</small>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg mt-4">
+                                <i class="fas fa-lock"></i> Encrypt & Send Message
+                            </button>
+                        </form>
+
+                        <!-- SEND RESULTS -->
+                        <div id="sendStatus" class="status-message"></div>
+
+                        <div id="sendResults" class="mt-4" style="display: none;">
+                            <h6>Message Details:</h6>
+                            <div class="message-box">
+                                <strong>Encrypted Message:</strong><br>
+                                <div id="encryptedOutput"></div>
+                            </div>
+                            <div class="message-box">
+                                <strong>Message Hash (Forensic Proof):</strong><br>
+                                <div id="hashOutput"></div>
+                            </div>
+                            <div class="message-box">
+                                <strong>Sender Reputation:</strong><br>
+                                <div id="reputationOutput"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RECEIVE TAB -->
+                    <div class="tab-pane fade" id="receive">
+                        <h5 class="mb-4">Decrypt Message</h5>
+                        <form id="receiveForm">
+                            <div class="row">
+                                <div class="col-12">
+                                    <label class="form-label">Encrypted Message</label>
+                                    <textarea class="form-control" id="encryptedInput" rows="6" 
+                                              placeholder="Paste the encrypted message here..." required></textarea>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg mt-4">
+                                <i class="fas fa-unlock"></i> Decrypt Message
+                            </button>
+                        </form>
+
+                        <!-- RECEIVE RESULTS -->
+                        <div id="receiveStatus" class="status-message"></div>
+
+                        <div id="receiveResults" class="mt-4" style="display: none;">
+                            <h6>Decrypted Message:</h6>
+                            <div class="message-box">
+                                <div id="decryptedOutput"></div>
+                            </div>
+                            <button class="btn btn-outline-primary mt-2" onclick="copyToClipboard('#decryptedOutput')">
+                                <i class="fas fa-copy"></i> Copy Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECURITY INFORMATION -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <i class="fas fa-shield"></i> Security Information
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-lock"></i> Encryption</h6>
+                        <ul>
+                            <li>Algorithm: AES-256-CBC</li>
+                            <li>Key Derivation: SHA-256</li>
+                            <li>Mode: Cipher Block Chaining</li>
+                            <li>Padding: PKCS7</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check"></i> Features Used</h6>
+                        <ul>
+                            <li>✅ Feature 3: Blockchain-Derived Keys</li>
+                            <li>✅ Feature 4: Authentication</li>
+                            <li>✅ Feature 5: Reputation System</li>
+                            <li>✅ Feature 6: Forensic Records</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Send message
+        document.getElementById('sendForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const senderAddress = document.getElementById('senderAddress').value;
+            const message = document.getElementById('messageText').value;
+            
+            try {
+                const response = await fetch('/api/message/send', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        sender_address: senderAddress,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showStatus('sendStatus', 'success', '✓ Message encrypted and sent successfully!');
+                    document.getElementById('encryptedOutput').textContent = data.encrypted_message;
+                    document.getElementById('hashOutput').textContent = data.forensic_hash;
+                    document.getElementById('reputationOutput').textContent = 
+                        `Score: ${data.reputation.score}/100 (${data.reputation.clean_communications} clean communications)`;
+                    document.getElementById('sendResults').style.display = 'block';
+                    document.getElementById('sendForm').reset();
+                } else {
+                    showStatus('sendStatus', 'error', '✗ Error: ' + data.message);
+                }
+            } catch (error) {
+                showStatus('sendStatus', 'error', '✗ Error: ' + error.message);
+            }
+        });
+        
+        // Receive message
+        document.getElementById('receiveForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const encryptedMessage = document.getElementById('encryptedInput').value;
+            
+            try {
+                const response = await fetch('/api/message/receive', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        encrypted_message: encryptedMessage
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showStatus('receiveStatus', 'success', '✓ Message decrypted successfully!');
+                    document.getElementById('decryptedOutput').textContent = data.message;
+                    document.getElementById('receiveResults').style.display = 'block';
+                    document.getElementById('receiveForm').reset();
+                } else {
+                    showStatus('receiveStatus', 'error', '✗ Error: ' + data.message);
+                }
+            } catch (error) {
+                showStatus('receiveStatus', 'error', '✗ Error: ' + error.message);
+            }
+        });
+        
+        function showStatus(elementId, type, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status-message show status-${type}`;
+            setTimeout(() => {
+                element.classList.remove('show');
+            }, 5000);
+        }
+        
+        function copyToClipboard(selector) {
+            const text = document.querySelector(selector).textContent;
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard!');
+        }
+    </script>
+</body>
+</html>

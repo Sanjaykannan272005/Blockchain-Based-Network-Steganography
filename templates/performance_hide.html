@@ -1,0 +1,242 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-rocket"></i> High-Performance Steganography</h3>
+                <div class="row mt-2">
+                    <div class="col-md-3">
+                        <small>CPU: <span id="cpu-usage" class="badge bg-info">--</span></small>
+                    </div>
+                    <div class="col-md-3">
+                        <small>Memory: <span id="memory-usage" class="badge bg-info">--</span></small>
+                    </div>
+                    <div class="col-md-3">
+                        <small>Queue: <span id="queue-size" class="badge bg-info">--</span></small>
+                    </div>
+                    <div class="col-md-3">
+                        <small>GPU: <span id="gpu-status" class="badge bg-secondary">--</span></small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if task_submitted %}
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-clock"></i> Task Submitted Successfully!</h5>
+                        <p>Your high-performance steganography task has been queued for processing.</p>
+                        <p><strong>Task ID:</strong> <code>{{ task_id }}</code></p>
+                        
+                        <div class="mt-3">
+                            <h6>Processing Status:</h6>
+                            <div class="progress mb-3">
+                                <div id="task-progress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div id="task-status" class="alert alert-secondary">
+                                <i class="fas fa-spinner fa-spin"></i> Initializing...
+                            </div>
+                        </div>
+                        
+                        <div id="download-section" style="display: none;">
+                            <a href="{{ url_for('download_file', filename=output_file) }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> Download Result
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data" id="performance-form">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">
+                                <i class="fas fa-image"></i> Select Cover Image
+                            </label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept=".png,.jpg,.jpeg,.bmp" required>
+                            <div class="form-text">Large files will be processed using stream processing</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="secret_data" class="form-label">
+                                <i class="fas fa-lock"></i> Secret Message
+                            </label>
+                            <textarea class="form-control" id="secret_data" name="secret_data" 
+                                      rows="4" placeholder="Enter your secret message..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Encryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter a strong password" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-cogs"></i> Performance Options</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="use_gpu" name="use_gpu" checked>
+                                        <label class="form-check-label" for="use_gpu">
+                                            <strong>GPU Acceleration</strong>
+                                            <br><small class="text-muted">Use CUDA/OpenCL for faster processing (if available)</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <span class="badge bg-success">✓ Multi-threading</span>
+                                        <span class="badge bg-success">✓ Memory Optimization</span>
+                                        <span class="badge bg-success">✓ Load Balancing</span>
+                                        <span class="badge bg-success">✓ Caching</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-rocket"></i> Process with High Performance
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Performance Features:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>Parallel Processing:</strong> Multi-threaded encoding/decoding</li>
+                                    <li><strong>GPU Acceleration:</strong> CUDA/OpenCL support for large files</li>
+                                    <li><strong>Stream Processing:</strong> Handle huge files efficiently</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>Load Balancing:</strong> Intelligent task distribution</li>
+                                    <li><strong>Caching:</strong> Redis-based result caching</li>
+                                    <li><strong>Rate Limiting:</strong> Prevent system overload</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// System monitoring
+function updateSystemStats() {
+    fetch('/system_stats')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('cpu-usage').textContent = data.cpu_usage.toFixed(1) + '%';
+            document.getElementById('memory-usage').textContent = data.memory_usage.toFixed(1) + '%';
+            document.getElementById('queue-size').textContent = data.queue_size;
+            
+            // Update GPU status
+            const gpuStatus = document.getElementById('gpu-status');
+            if (data.gpu_available && data.gpu_enabled) {
+                if (data.gpu_type === 'CUDA') {
+                    gpuStatus.textContent = 'CUDA Enabled';
+                    gpuStatus.className = 'badge bg-success';
+                } else if (data.gpu_type === 'JIT') {
+                    gpuStatus.textContent = 'JIT Enabled';
+                    gpuStatus.className = 'badge bg-info';
+                } else {
+                    gpuStatus.textContent = 'Enabled';
+                    gpuStatus.className = 'badge bg-success';
+                }
+            } else if (data.gpu_available) {
+                gpuStatus.textContent = 'Available';
+                gpuStatus.className = 'badge bg-warning';
+            } else {
+                gpuStatus.textContent = 'Not Available';
+                gpuStatus.className = 'badge bg-secondary';
+            }
+            
+            // Update progress bar colors based on system load
+            const cpuUsage = data.cpu_usage;
+            const memoryUsage = data.memory_usage;
+            
+            if (cpuUsage > 80 || memoryUsage > 80) {
+                document.getElementById('cpu-usage').className = 'badge bg-danger';
+                document.getElementById('memory-usage').className = 'badge bg-danger';
+            } else if (cpuUsage > 60 || memoryUsage > 60) {
+                document.getElementById('cpu-usage').className = 'badge bg-warning';
+                document.getElementById('memory-usage').className = 'badge bg-warning';
+            } else {
+                document.getElementById('cpu-usage').className = 'badge bg-success';
+                document.getElementById('memory-usage').className = 'badge bg-success';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching system stats:', error);
+        });
+}
+
+// Task status monitoring
+{% if task_submitted %}
+function checkTaskStatus() {
+    fetch('/task_status/{{ task_id }}')
+        .then(response => response.json())
+        .then(data => {
+            const statusDiv = document.getElementById('task-status');
+            const progressBar = document.getElementById('task-progress');
+            const downloadSection = document.getElementById('download-section');
+            
+            if (data.status === 'completed') {
+                statusDiv.innerHTML = '<i class="fas fa-check-circle text-success"></i> Task completed successfully!';
+                statusDiv.className = 'alert alert-success';
+                progressBar.style.width = '100%';
+                progressBar.className = 'progress-bar bg-success';
+                downloadSection.style.display = 'block';
+                clearInterval(statusInterval);
+            } else if (data.status === 'failed') {
+                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Task failed: ' + data.error;
+                statusDiv.className = 'alert alert-danger';
+                progressBar.className = 'progress-bar bg-danger';
+                clearInterval(statusInterval);
+            } else if (data.status === 'processing') {
+                statusDiv.innerHTML = '<i class="fas fa-cog fa-spin text-primary"></i> Processing your request...';
+                statusDiv.className = 'alert alert-info';
+                
+                // Simulate progress (in real implementation, you'd get actual progress)
+                const elapsed = Date.now() - (data.created_at * 1000);
+                const estimatedProgress = Math.min(90, (elapsed / 30000) * 100); // Estimate based on time
+                progressBar.style.width = estimatedProgress + '%';
+            } else {
+                statusDiv.innerHTML = '<i class="fas fa-question-circle text-warning"></i> Task not found';
+                statusDiv.className = 'alert alert-warning';
+                clearInterval(statusInterval);
+            }
+        })
+        .catch(error => {
+            console.error('Error checking task status:', error);
+        });
+}
+
+// Start monitoring
+const statusInterval = setInterval(checkTaskStatus, 2000); // Check every 2 seconds
+checkTaskStatus(); // Initial check
+{% endif %}
+
+// Update system stats every 5 seconds
+setInterval(updateSystemStats, 5000);
+updateSystemStats(); // Initial update
+
+// Form validation
+document.getElementById('performance-form')?.addEventListener('submit', function(e) {
+    const fileInput = document.getElementById('image');
+    const file = fileInput.files[0];
+    
+    if (file && file.size > 50 * 1024 * 1024) { // 50MB
+        if (!confirm('Large file detected (' + (file.size / 1024 / 1024).toFixed(1) + 'MB). This may take several minutes to process. Continue?')) {
+            e.preventDefault();
+        }
+    }
+});
+</script>
+{% endblock %}

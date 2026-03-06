@@ -1,0 +1,89 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-search-plus"></i> Advanced Extract</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-unlock"></i> Data Extracted Successfully!</h5>
+                        <p><strong>Technique:</strong> {{ technique.upper() }}</p>
+                        
+                        <div class="mt-3">
+                            <label class="form-label"><strong>Extracted Message:</strong></label>
+                            <div class="card">
+                                <div class="card-body bg-light">
+                                    <pre>{{ extracted_data }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard()" class="btn btn-outline-primary mt-2">
+                            <i class="fas fa-copy"></i> Copy Message
+                        </button>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="technique" class="form-label">
+                                <i class="fas fa-cogs"></i> Extraction Technique
+                            </label>
+                            <select class="form-select" id="technique" name="technique" required>
+                                <option value="dct">DCT (Discrete Cosine Transform)</option>
+                                <option value="adaptive_lsb">Adaptive LSB (Content-Aware)</option>
+                            </select>
+                            <div class="form-text">Only DCT and Adaptive LSB extraction are currently implemented</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="stego_file" class="form-label">
+                                <i class="fas fa-file"></i> Select Stego File
+                            </label>
+                            <input type="file" class="form-control" id="stego_file" name="stego_file" 
+                                   accept=".png,.jpg,.jpeg,.bmp" required>
+                            <div class="form-text">Upload the file containing hidden data</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Decryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter the password used for encryption" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-search-plus"></i> Extract with Advanced Technique
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Available Extraction Methods:</h5>
+                        <ul>
+                            <li><strong>DCT:</strong> Extracts data from frequency domain coefficients</li>
+                            <li><strong>Adaptive LSB:</strong> Extracts data from edge areas only</li>
+                        </ul>
+                        
+                        <div class="alert alert-info mt-3">
+                            <strong><i class="fas fa-info-circle"></i> Note:</strong>
+                            Make sure to use the same technique that was used for hiding the data.
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = document.querySelector('pre').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Message copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

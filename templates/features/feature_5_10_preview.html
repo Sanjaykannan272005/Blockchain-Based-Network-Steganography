@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features 5-10 - Blockchain Steganography</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --secondary: #0099cc;
+            --dark: #0a0e27;
+            --darker: #050812;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            background: rgba(15, 20, 50, 0.8);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-bottom: none;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .form-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .form-control {
+            background: rgba(30, 40, 70, 0.8);
+            border: 1px solid var(--primary);
+            color: #fff;
+        }
+        
+        .form-control:focus {
+            background: rgba(30, 40, 70, 0.8);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .feature-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid var(--primary);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #ffffff;
+        }
+        
+        .feature-box:hover {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .text-muted, .text-secondary, .text-sm, .small {
+            color: #cccccc !important;
+        }
+        
+        .card-body, table {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark" style="background: rgba(10, 14, 39, 0.95) !important; border-bottom: 2px solid var(--primary);">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-cogs"></i> Features 5-10 (Coming Soon)
+            </span>
+            <a href="/" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-5" style="max-width: 1000px;">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-tasks"></i> Remaining Features (Under Development)
+            </div>
+            <div class="card-body">
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <div class="feature-icon">📊</div>
+                        <h6>Feature 5<br>Reputation System</h6>
+                        <p class="text-muted text-sm">Track user behavior</p>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon">🕵️</div>
+                        <h6>Feature 6<br>Forensic Records</h6>
+                        <p class="text-muted text-sm">Tamper-proof evidence</p>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon">⛓️</div>
+                        <h6>Feature 7<br>Multi-Chain</h6>
+                        <p class="text-muted text-sm">Distribute across chains</p>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon">📍</div>
+                        <h6>Feature 8<br>Dead Drops</h6>
+                        <p class="text-muted text-sm">Time-based windows</p>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon">🔄</div>
+                        <h6>Feature 9<br>Key Rotation</h6>
+                        <p class="text-muted text-sm">Automatic renewal</p>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <div class="feature-icon">🎭</div>
+                        <h6>Feature 10<br>Protocol Select</h6>
+                        <p class="text-muted text-sm">Adaptive methods</p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-4">
+                    <i class="fas fa-info-circle"></i> <strong>Full Features 5-10 pages coming soon!</strong>
+                    <p class="mb-0">The core system (Features 1-4) is fully implemented. All features are functional in the backend.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-code"></i> Feature Backend Status
+            </div>
+            <div class="card-body">
+                <table class="table table-dark">
+                    <thead style="border-bottom: 2px solid var(--primary);">
+                        <tr>
+                            <th>Feature</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Feature 1: Smart Contract Control</strong></td>
+                            <td><span class="badge bg-success">✓ Done</span></td>
+                            <td>Access control and rules management</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 2: Trigger Events</strong></td>
+                            <td><span class="badge bg-success">✓ Done</span></td>
+                            <td>Blockchain-triggered activation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 3: Blockchain Keys</strong></td>
+                            <td><span class="badge bg-success">✓ Done</span></td>
+                            <td>Automatic key derivation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 4: Authentication</strong></td>
+                            <td><span class="badge bg-success">✓ Done</span></td>
+                            <td>Digital signatures</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 5: Reputation System</strong></td>
+                            <td><span class="badge bg-warning">⟳ Backend Ready</span></td>
+                            <td>User trust scoring</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 6: Forensic Records</strong></td>
+                            <td><span class="badge bg-warning">⟳ Backend Ready</span></td>
+                            <td>Message verification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 7: Multi-Chain Distribution</strong></td>
+                            <td><span class="badge bg-warning">⟳ Backend Ready</span></td>
+                            <td>Cross-blockchain distribution</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 8: Dead Drop Coordinates</strong></td>
+                            <td><span class="badge bg-warning">⟳ Backend Ready</span></td>
+                            <td>Time-based message windows</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 9: Key Rotation</strong></td>
+                            <td><span class="badge bg-warning">⟳ Backend Ready</span></td>
+                            <td>Automatic key updates</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Feature 10: Protocol Selection</strong></td>
+                            <td><span class="badge bg-warning">⟳ Backend Ready</span></td>
+                            <td>Adaptive steganography</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

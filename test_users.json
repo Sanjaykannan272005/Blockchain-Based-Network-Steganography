@@ -1,0 +1,12 @@
+[
+    {
+        "name": "Test-User-1",
+        "address": "0x043E10615e58cf6135FA8CF525d6e7Dd0D8029C4",
+        "private_key": "73073992a9e22fe47efee69291904b06407681e713a00139cc7956d807ae18bf"
+    },
+    {
+        "name": "Test-User-2",
+        "address": "0x5C9Adc47500544F0cb678F7b99D03ec3932385CC",
+        "private_key": "93b074932550ae6dd0366ede7dfda5d6557419ddc5188b31fe5d0be217a32cb6"
+    }
+]

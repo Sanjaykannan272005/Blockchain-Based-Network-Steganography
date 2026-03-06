@@ -1,0 +1,62 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-calculator"></i> Check Image Capacity</h3>
+            </div>
+            <div class="card-body">
+                {% if capacity is defined %}
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle"></i> Capacity Analysis</h5>
+                        <p><strong>Image:</strong> {{ filename }}</p>
+                        <p><strong>Maximum Data Capacity:</strong> {{ capacity }} characters</p>
+                        <p><strong>Equivalent to:</strong> ~{{ (capacity / 1024) | round(2) }} KB of text</p>
+                        
+                        {% if capacity > 1000 %}
+                            <div class="text-success">
+                                <i class="fas fa-check-circle"></i> This image can hold substantial amounts of data
+                            </div>
+                        {% elif capacity > 100 %}
+                            <div class="text-warning">
+                                <i class="fas fa-exclamation-triangle"></i> This image has moderate capacity
+                            </div>
+                        {% else %}
+                            <div class="text-danger">
+                                <i class="fas fa-times-circle"></i> This image has limited capacity
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="image" class="form-label">
+                            <i class="fas fa-image"></i> Select Image to Analyze
+                        </label>
+                        <input type="file" class="form-control" id="image" name="image" 
+                               accept=".png,.jpg,.jpeg,.bmp" required>
+                        <div class="form-text">Upload any image to check its steganographic capacity</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning btn-lg w-100">
+                        <i class="fas fa-calculator"></i> Calculate Capacity
+                    </button>
+                </form>
+
+                <div class="mt-4">
+                    <h5>Understanding Capacity:</h5>
+                    <ul>
+                        <li><strong>LSB Method:</strong> Uses 1 bit per color channel (RGB = 3 bits per pixel)</li>
+                        <li><strong>Formula:</strong> Width × Height × 3 ÷ 8 = Maximum characters</li>
+                        <li><strong>Recommendation:</strong> Use images larger than 500×500 for substantial data</li>
+                        <li><strong>Quality:</strong> PNG format preserves hidden data better than JPEG</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

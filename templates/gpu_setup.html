@@ -1,0 +1,186 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-microchip"></i> GPU Acceleration Setup</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Current GPU Status</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li>
+                                        <strong>CuPy (CUDA):</strong> 
+                                        {% if gpu_info.cupy_available %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Not Installed</span>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <strong>Numba (JIT):</strong> 
+                                        {% if gpu_info.numba_available %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Not Installed</span>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <strong>GPU Enabled:</strong> 
+                                        {% if gpu_info.gpu_enabled %}
+                                            <span class="badge bg-success">Yes</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No</span>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <strong>Acceleration Method:</strong> 
+                                        <span class="badge bg-info">{{ gpu_info.acceleration_method }}</span>
+                                    </li>
+                                </ul>
+                                
+                                {% if gpu_info.cuda_devices %}
+                                    <div class="mt-3">
+                                        <strong>CUDA Devices:</strong> {{ gpu_info.cuda_devices }}<br>
+                                        <strong>Device Name:</strong> {{ gpu_info.cuda_device_name }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if not gpu_info.gpu_enabled %}
+                            <div class="mt-3">
+                                <form method="POST" action="{{ url_for('install_gpu') }}">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Auto-Install GPU Acceleration
+                                    </button>
+                                </form>
+                                <small class="text-muted">This will install Numba and attempt CuPy installation</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Performance Comparison</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Method</th>
+                                            <th>Speed</th>
+                                            <th>Requirements</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>CPU Only</td>
+                                            <td>1x</td>
+                                            <td>None</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Numba JIT</td>
+                                            <td>3-5x</td>
+                                            <td>pip install numba</td>
+                                        </tr>
+                                        <tr>
+                                            <td>CUDA (CuPy)</td>
+                                            <td>10-50x</td>
+                                            <td>NVIDIA GPU + CUDA</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h5>Manual Installation Guide</h5>
+                    <div class="accordion" id="installAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#numba-install">
+                                    Install Numba (JIT Acceleration)
+                                </button>
+                            </h2>
+                            <div id="numba-install" class="accordion-collapse collapse" data-bs-parent="#installAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Numba provides 3-5x speedup through Just-In-Time compilation:</strong></p>
+                                    <pre><code>pip install numba</code></pre>
+                                    <p>Works on any system (CPU acceleration)</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#cupy-install">
+                                    Install CuPy (CUDA Acceleration)
+                                </button>
+                            </h2>
+                            <div id="cupy-install" class="accordion-collapse collapse" data-bs-parent="#installAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>CuPy provides 10-50x speedup with NVIDIA GPUs:</strong></p>
+                                    
+                                    <p>1. Check CUDA version:</p>
+                                    <pre><code>nvcc --version</code></pre>
+                                    
+                                    <p>2. Install CuPy for your CUDA version:</p>
+                                    <pre><code># For CUDA 11.x
+pip install cupy-cuda11x
+
+# For CUDA 12.x
+pip install cupy-cuda12x</code></pre>
+                                    
+                                    <p><strong>Requirements:</strong></p>
+                                    <ul>
+                                        <li>NVIDIA GPU with CUDA support</li>
+                                        <li>CUDA Toolkit installed</li>
+                                        <li>Compatible GPU drivers</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#troubleshoot">
+                                    Troubleshooting
+                                </button>
+                            </h2>
+                            <div id="troubleshoot" class="accordion-collapse collapse" data-bs-parent="#installAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Common Issues:</strong></p>
+                                    <ul>
+                                        <li><strong>CUDA not found:</strong> Install CUDA Toolkit from NVIDIA</li>
+                                        <li><strong>CuPy installation fails:</strong> Check CUDA version compatibility</li>
+                                        <li><strong>GPU not detected:</strong> Update GPU drivers</li>
+                                        <li><strong>Memory errors:</strong> Reduce batch size or use CPU fallback</li>
+                                    </ul>
+                                    
+                                    <p><strong>Check GPU availability:</strong></p>
+                                    <pre><code>python -c "import cupy; print('CuPy works!')"</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-info-circle"></i> Note:</strong>
+                        After installing GPU acceleration packages, restart the application to see the changes.
+                        The system will automatically detect and use the best available acceleration method.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-music"></i> Extract Data from Audio</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-unlock"></i> Message Extracted Successfully!</h5>
+                        <div class="mt-3">
+                            <label class="form-label"><strong>Decrypted Message:</strong></label>
+                            <div class="card">
+                                <div class="card-body bg-light">
+                                    <pre>{{ extracted_data }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard()" class="btn btn-outline-primary mt-2">
+                            <i class="fas fa-copy"></i> Copy Message
+                        </button>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="stego_audio" class="form-label">
+                                <i class="fas fa-music"></i> Select Stego Audio
+                            </label>
+                            <input type="file" class="form-control" id="stego_audio" name="stego_audio" 
+                                   accept=".wav" required>
+                            <div class="form-text">Upload the audio file containing hidden data</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Decryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter the password used for encryption" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-unlock-alt"></i> Extract Data from Audio
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Audio Extraction Process:</h5>
+                        <ol>
+                            <li>LSB data is extracted from audio samples</li>
+                            <li>Encrypted data is reconstructed</li>
+                            <li>AES decryption reveals the message</li>
+                        </ol>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = document.querySelector('pre').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Message copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-shield-alt"></i> Enhanced Hide - Military Grade Security</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Success!</h5>
+                        <p>Your data has been hidden with enhanced security features:</p>
+                        <ul>
+                            <li>✓ Multi-layer AES+RSA encryption</li>
+                            <li>✓ Randomized embedding pattern</li>
+                            <li>✓ Noise injection for detection resistance</li>
+                            {% if has_signature %}
+                            <li>✓ Digital signature for authenticity</li>
+                            {% endif %}
+                        </ul>
+                        
+                        <div class="mt-3">
+                            <a href="{{ url_for('download_file', filename=output_file) }}" class="btn btn-success me-2">
+                                <i class="fas fa-download"></i> Download Stego Image
+                            </a>
+                            
+                            {% if has_signature %}
+                            <a href="{{ url_for('download_file', filename=private_key) }}" class="btn btn-warning me-2">
+                                <i class="fas fa-key"></i> Download Private Key
+                            </a>
+                            <a href="{{ url_for('download_file', filename=public_key) }}" class="btn btn-info">
+                                <i class="fas fa-key"></i> Download Public Key
+                            </a>
+                            <div class="alert alert-warning mt-3">
+                                <strong>Important:</strong> Keep your private key secure! You'll need it for extraction and signature verification.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">
+                                <i class="fas fa-image"></i> Select Cover Image
+                            </label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept=".png,.jpg,.jpeg,.bmp" required>
+                            <div class="form-text">Supported formats: PNG, JPG, JPEG, BMP</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="secret_data" class="form-label">
+                                <i class="fas fa-lock"></i> Secret Message
+                            </label>
+                            <textarea class="form-control" id="secret_data" name="secret_data" 
+                                      rows="4" placeholder="Enter your secret message here..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Encryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter a strong password (minimum 40/100 strength)" required>
+                            
+                            <!-- Password Strength Meter -->
+                            <div class="mt-2">
+                                <div class="progress" style="height: 8px;">
+                                    <div id="password-strength-bar" class="progress-bar" role="progressbar" 
+                                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <small id="password-strength-text" class="text-muted">Password strength will appear here</small>
+                                <div id="password-feedback" class="mt-1"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-cog"></i> Enhanced Security Options</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="use_signature" name="use_signature" checked>
+                                        <label class="form-check-label" for="use_signature">
+                                            <strong>Digital Signature</strong>
+                                            <br><small class="text-muted">Generate RSA keys for message authenticity verification</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="mt-2">
+                                        <span class="badge bg-success">✓ Detection Resistance</span>
+                                        <span class="badge bg-success">✓ Randomized Embedding</span>
+                                        <span class="badge bg-success">✓ Noise Injection</span>
+                                        <span class="badge bg-success">✓ Multi-layer Encryption</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100" id="submit-btn" disabled>
+                            <i class="fas fa-shield-alt"></i> Hide with Enhanced Security
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Enhanced Security Features:</h5>
+                        <ul>
+                            <li><strong>Multi-layer Encryption:</strong> AES-256 + RSA-2048</li>
+                            <li><strong>Digital Signatures:</strong> RSA-based authenticity verification</li>
+                            <li><strong>Detection Resistance:</strong> Randomized patterns + noise injection</li>
+                            <li><strong>Password Validation:</strong> Minimum 40/100 strength required</li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Password strength checker
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+    const feedbackDiv = document.getElementById('password-feedback');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    if (password.length === 0) {
+        strengthBar.style.width = '0%';
+        strengthBar.className = 'progress-bar';
+        strengthText.textContent = 'Password strength will appear here';
+        feedbackDiv.innerHTML = '';
+        submitBtn.disabled = true;
+        return;
+    }
+    
+    fetch('/check_password_strength', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const score = data.score;
+        const strength = data.strength;
+        const feedback = data.feedback;
+        
+        // Update progress bar
+        strengthBar.style.width = score + '%';
+        strengthText.textContent = `${strength} (${score}/100)`;
+        
+        // Set color based on strength
+        strengthBar.className = 'progress-bar';
+        if (score >= 80) {
+            strengthBar.classList.add('bg-success');
+        } else if (score >= 60) {
+            strengthBar.classList.add('bg-info');
+        } else if (score >= 40) {
+            strengthBar.classList.add('bg-warning');
+        } else {
+            strengthBar.classList.add('bg-danger');
+        }
+        
+        // Enable/disable submit button based on strength
+        submitBtn.disabled = score < 40;
+        
+        // Show feedback
+        if (feedback.length > 0) {
+            feedbackDiv.innerHTML = '<small class="text-muted">Recommendations: ' + feedback.join(', ') + '</small>';
+        } else {
+            feedbackDiv.innerHTML = '<small class="text-success">✓ Strong password!</small>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+</script>
+{% endblock %}

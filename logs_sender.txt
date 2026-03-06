@@ -1,0 +1,8 @@
+Sender Web Interface
+Open: http://localhost:5003
+ * Serving Flask app 'sender_web'
+ * Debug mode: on
+Sender Web Interface
+Open: http://localhost:5003
+Sender Web Interface
+Open: http://localhost:5003

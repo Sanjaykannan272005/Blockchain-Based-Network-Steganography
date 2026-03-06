@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # C2 Dashboard - Central monitoring and control
+  dashboard:
+    build: .
+    command: python app.py
+    ports:
+      - "5000:5000"
+    env_file: .env
+    restart: always
+    volumes:
+      - ./logs:/app/logs
+
+  # Wallet Auth - Identity and Registration terminal
+  wallet-auth:
+    build: .
+    command: python wallet_auth_app.py
+    ports:
+      - "5002:5002"
+    env_file: .env
+    restart: always
+
+  # Target Receiver - Web interface for message extraction
+  receiver:
+    build: .
+    command: python receiver_web.py
+    ports:
+      - "5001:5001"
+    env_file: .env
+    restart: always
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+  # Covert Sender - Web interface for signal modulation
+  sender:
+    build: .
+    command: python sender_web.py
+    ports:
+      - "5003:5003"
+    env_file: .env
+    restart: always
+
+  # P2P Node - Background relay (Alpha Node)
+  p2p-node:
+    build: .
+    command: python p2p_node.py --id Node-Alpha --secret production_secret --channel timing
+    env_file: .env
+    restart: always
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN

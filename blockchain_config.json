@@ -1,0 +1,17 @@
+{
+    "alchemy_api_key": "hcC8M5lofoxitZX5Nh-6",
+    "infura_api_key": "b9fc4ab7927e41fdb20bf3f50dd6afad",
+    "network": "sepolia",
+    "rpc_url": "https://sepolia.infura.io/v3/b9fc4ab7927e41fdb20bf3f50dd6afad",
+    "chain_id": 11155111,
+    "explorer": "https://sepolia.etherscan.io",
+    "wallet_address": "0x7A2C2AF27b1E4afBBaBfcfc6e30Dd411D432AcA4",
+    "private_key": "6287f413a5386328980c2ca2ee5ee2f0d11859fc4830cb8aa77ee8eb01fd9a3c",
+    "contract_address": "0x2409229bE606164e06DECe01800A5Bd264A99b29",
+    "owner_address": "0x7A2C2AF27b1E4afBBaBfcfc6e30Dd411D432AcA4",
+    "dead_drop_contract": "0xAe39AC41FdF56F26bf051026878b8fb70C61341f",
+    "registry_contract": "0x1cc901Bd15355314BbAc729005e0a1b33A078DfE",
+    "access_control_contract": "0x1fE68Aaa2562D60e666be91D43DA68736eA9c2B4",
+    "user_registry_contract": "0x100f386E79fCBce9fAC0a61a7264715BbB17b478",
+    "controller_contract": "0x2733432221F74025c5657CE76E8E2E55e92f47cb"
+}

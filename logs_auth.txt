@@ -1,0 +1,4 @@
+[INIT] Connected to blockchain: True
+[INIT] Admin address configured: 0x7a2c2af27b1e4afbbabfcfc6e30dd411d432aca4
+
+============================================================

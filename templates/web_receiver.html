@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Network Receiver</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;display:flex;align-items:center;justify-content:center}
+        .container{max-width:800px;width:100%;background:#fff;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+        .header{text-align:center;margin-bottom:30px}
+        .header h1{font-size:32px;color:#333;margin-bottom:10px}
+        .header p{color:#666;font-size:16px}
+        .status{padding:20px;border-radius:12px;margin-bottom:30px;text-align:center;font-size:18px;font-weight:600}
+        .status.stopped{background:#fee;border:2px solid #f44;color:#c00}
+        .status.listening{background:#efe;border:2px solid#4c4;color:#060;animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+        .btn{padding:16px 32px;border:none;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer;width:100%;transition:all 0.3s}
+        .btn-start{background:linear-gradient(135deg,#11998e,#38ef7d);color:#fff}
+        .btn-start:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(17,153,142,0.4)}
+        .btn-stop{background:linear-gradient(135deg,#eb3349,#f45c43);color:#fff}
+        .btn-stop:hover{transform:translateY(-2px)}
+        .info{background:#f8f9ff;padding:20px;border-radius:12px;margin-bottom:20px}
+        .info-item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e0e0e0}
+        .info-item:last-child{border:none}
+        .info-label{font-weight:600;color:#666}
+        .info-value{color:#333;font-family:monospace}
+        .messages{max-height:400px;overflow-y:auto;margin-top:30px}
+        .message{background:#f8f9ff;padding:20px;border-radius:12px;margin-bottom:15px;border-left:4px solid #667eea}
+        .message-header{font-weight:700;color:#333;margin-bottom:10px;display:flex;justify-content:space-between}
+        .message-body{color:#666;font-size:16px;margin:10px 0;padding:10px;background:#fff;border-radius:8px}
+        .message-meta{font-size:13px;color:#999;margin-top:10px}
+        .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;background:#667eea;color:#fff}
+        .empty{text-align:center;padding:60px 20px;color:#999}
+        .empty-icon{font-size:64px;margin-bottom:16px;opacity:0.5}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔐 Network Receiver</h1>
+        <p>Receive encrypted messages from network</p>
+    </div>
+
+    <div class="status stopped" id="status">
+        ⭕ Receiver Stopped
+    </div>
+
+    <div class="info">
+        <div class="info-item">
+            <span class="info-label">Port:</span>
+            <span class="info-value">9999</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Encryption:</span>
+            <span class="info-value">AES-256-CBC</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Messages Received:</span>
+            <span class="info-value" id="msgCount">0</span>
+        </div>
+    </div>
+
+    <button class="btn btn-start" id="toggleBtn" onclick="toggleReceiver()">
+        🚀 Start Listening
+    </button>
+
+    <div class="messages" id="messages">
+        <div class="empty">
+            <div class="empty-icon">📭</div>
+            <div>No messages received yet</div>
+            <div style="font-size:13px;margin-top:8px">Click "Start Listening" to begin</div>
+        </div>
+    </div>
+</div>
+
+<script>
+let isListening = false;
+let checkInterval = null;
+let messageCount = 0;
+
+function toggleReceiver() {
+    isListening = !isListening;
+    const btn = document.getElementById('toggleBtn');
+    const status = document.getElementById('status');
+    
+    if(isListening) {
+        btn.textContent = '⏹️ Stop Listening';
+        btn.className = 'btn btn-stop';
+        status.textContent = '✅ Listening for Messages...';
+        status.className = 'status listening';
+        startListening();
+    } else {
+        btn.textContent = '🚀 Start Listening';
+        btn.className = 'btn btn-start';
+        status.textContent = '⭕ Receiver Stopped';
+        status.className = 'status stopped';
+        stopListening();
+    }
+}
+
+function startListening() {
+    checkMessages();
+    checkInterval = setInterval(checkMessages, 2000);
+}
+
+function stopListening() {
+    if(checkInterval) {
+        clearInterval(checkInterval);
+        checkInterval = null;
+    }
+}
+
+async function checkMessages() {
+    try {
+        const response = await fetch('/api/receiver/check');
+        const data = await response.json();
+        
+        if(data.messages && data.messages.length > 0) {
+            messageCount = data.messages.length;
+            document.getElementById('msgCount').textContent = messageCount;
+            displayMessages(data.messages);
+        }
+    } catch(error) {
+        console.error('Error checking messages:', error);
+    }
+}
+
+function displayMessages(messages) {
+    let html = '';
+    messages.forEach((msg, idx) => {
+        html += '<div class="message">';
+        html += '<div class="message-header">';
+        html += '<span>📨 Message ' + (idx + 1) + '</span>';
+        html += '<span class="badge">' + msg.features.length + ' features</span>';
+        html += '</div>';
+        html += '<div class="message-body">' + escapeHtml(msg.message) + '</div>';
+        html += '<div class="message-meta">';
+        html += '<strong>From:</strong> ' + msg.sender.substring(0, 30) + '...<br>';
+        html += '<strong>Time:</strong> ' + new Date(msg.timestamp * 1000).toLocaleString();
+        html += '</div>';
+        html += '</div>';
+    });
+    document.getElementById('messages').innerHTML = html;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+</body>
+</html>

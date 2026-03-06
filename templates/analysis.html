@@ -1,0 +1,219 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-search"></i> Image Analysis & Intelligence</h3>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-chart-line"></i> Analysis Results for: {{ filename }}</h5>
+                    </div>
+                    
+                    {% if results.steganalysis %}
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6><i class="fas fa-eye"></i> Steganalysis Detection</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if results.steganalysis.error %}
+                                    <div class="alert alert-danger">{{ results.steganalysis.error }}</div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Detection Result:</h6>
+                                            {% if results.steganalysis.is_stego %}
+                                                <span class="badge bg-danger">SUSPICIOUS - Hidden data likely present</span>
+                                            {% else %}
+                                                <span class="badge bg-success">CLEAN - No hidden data detected</span>
+                                            {% endif %}
+                                            <p class="mt-2">Confidence: {{ results.steganalysis.confidence }}%</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Technical Details:</h6>
+                                            <ul class="list-unstyled">
+                                                <li>LSB Anomaly: {{ results.steganalysis.lsb_anomaly }}%</li>
+                                                <li>Chi-Square: {{ results.steganalysis.chi_square }}%</li>
+                                                <li>Confidence: {{ results.steganalysis.confidence }}%</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if results.forensic %}
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6><i class="fas fa-shield-alt"></i> Forensic Analysis</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if results.forensic.error %}
+                                    <div class="alert alert-danger">{{ results.forensic.error }}</div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Tampering Detection:</h6>
+                                            {% if results.forensic.tampering_detected %}
+                                                <span class="badge bg-warning">TAMPERING DETECTED</span>
+                                            {% else %}
+                                                <span class="badge bg-success">NO TAMPERING</span>
+                                            {% endif %}
+                                            <p class="mt-2">Integrity Score: {{ results.forensic.integrity_score }}%</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Anomalies Found:</h6>
+                                            {% if results.forensic.anomalies %}
+                                                <ul>
+                                                    {% for anomaly in results.forensic.anomalies %}
+                                                        <li>{{ anomaly }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% else %}
+                                                <p class="text-success">No anomalies detected</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if results.statistical %}
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6><i class="fas fa-chart-bar"></i> Statistical Analysis</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if results.statistical.error %}
+                                    <div class="alert alert-danger">{{ results.statistical.error }}</div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Image Properties:</h6>
+                                            <ul class="list-unstyled">
+                                                <li>Size: {{ results.statistical.image_size }}</li>
+                                                <li>Total Pixels: {{ results.statistical.total_pixels }}</li>
+                                                <li>Unique Colors: {{ results.statistical.unique_colors }}</li>
+                                                <li>Color Diversity: {{ "%.4f"|format(results.statistical.color_diversity) }}</li>
+                                                <li>Texture Complexity: {{ "%.4f"|format(results.statistical.texture_complexity) }}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Channel Entropy:</h6>
+                                            <ul class="list-unstyled">
+                                                <li>Red: {{ "%.4f"|format(results.statistical.Red_entropy) }}</li>
+                                                <li>Green: {{ "%.4f"|format(results.statistical.Green_entropy) }}</li>
+                                                <li>Blue: {{ "%.4f"|format(results.statistical.Blue_entropy) }}</li>
+                                                <li>Overall: {{ "%.4f"|format(results.statistical.overall_entropy) }}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if results.statistical.histogram_plot %}
+                                        <div class="mt-3">
+                                            <h6>Histogram Analysis:</h6>
+                                            <img src="data:image/png;base64,{{ results.statistical.histogram_plot }}" 
+                                                 class="img-fluid" alt="Histogram">
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if results.ml_detection %}
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6><i class="fas fa-robot"></i> Machine Learning Detection</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if results.ml_detection.error %}
+                                    <div class="alert alert-danger">{{ results.ml_detection.error }}</div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>AI Analysis:</h6>
+                                            {% if results.ml_detection.anomaly_detected %}
+                                                <span class="badge bg-warning">ANOMALY DETECTED</span>
+                                            {% else %}
+                                                <span class="badge bg-success">NORMAL PATTERN</span>
+                                            {% endif %}
+                                            <p class="mt-2">Confidence: {{ results.ml_detection.confidence }}%</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Model Details:</h6>
+                                            <ul class="list-unstyled">
+                                                <li>Features Analyzed: {{ results.ml_detection.features_analyzed }}</li>
+                                                <li>Anomaly Score: {{ "%.4f"|format(results.ml_detection.anomaly_score) }}</li>
+                                                <li>Model Trained: {{ "Yes" if results.ml_detection.model_trained else "No" }}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('analysis') }}" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> Analyze Another Image
+                    </a>
+                    
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">
+                                <i class="fas fa-image"></i> Select Image for Analysis
+                            </label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept=".png,.jpg,.jpeg,.bmp" required>
+                            <div class="form-text">Upload any image to analyze for hidden data, tampering, or statistical properties</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="analysis_type" class="form-label">
+                                <i class="fas fa-cog"></i> Analysis Type
+                            </label>
+                            <select class="form-select" id="analysis_type" name="analysis_type" required>
+                                <option value="all">Complete Analysis (All Methods)</option>
+                                <option value="steganalysis">Steganalysis Detection</option>
+                                <option value="forensic">Forensic Analysis</option>
+                                <option value="statistical">Statistical Analysis</option>
+                                <option value="ml_detection">Machine Learning Detection</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-info btn-lg w-100">
+                            <i class="fas fa-search"></i> Analyze Image
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Analysis Capabilities:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>Steganalysis Detection:</strong> Detect hidden data using statistical tests</li>
+                                    <li><strong>Forensic Analysis:</strong> Identify tampering and modifications</li>
+                                    <li><strong>Statistical Analysis:</strong> Entropy, histogram, and texture analysis</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li><strong>ML Detection:</strong> AI-based anomaly detection</li>
+                                    <li><strong>Metadata Analysis:</strong> Check for suspicious metadata</li>
+                                    <li><strong>Noise Analysis:</strong> Detect artificial noise patterns</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

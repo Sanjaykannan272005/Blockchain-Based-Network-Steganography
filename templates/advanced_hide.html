@@ -1,0 +1,215 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-magic"></i> Advanced Steganography Techniques</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Success!</h5>
+                        <p><strong>Technique:</strong> {{ technique.upper() }}</p>
+                        <p><strong>Result:</strong> {{ message }}</p>
+                        
+                        <div class="mt-3">
+                            <a href="{{ url_for('download_file', filename=output_file) }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> Download Result
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data" id="advanced-form">
+                        <div class="mb-3">
+                            <label for="technique" class="form-label">
+                                <i class="fas fa-cogs"></i> Steganography Technique
+                            </label>
+                            <select class="form-select" id="technique" name="technique" required onchange="updateForm()">
+                                <option value="dct">DCT (Discrete Cosine Transform)</option>
+                                <option value="dwt">DWT (Discrete Wavelet Transform)</option>
+                                <option value="adaptive_lsb">Adaptive LSB (Content-Aware)</option>
+                                <option value="palette">Palette-Based Hiding</option>
+                                <option value="text">Text Steganography (DOCX)</option>
+                                <option value="network">Network Timing Steganography</option>
+                            </select>
+                        </div>
+
+                        <!-- Image input (for most techniques) -->
+                        <div class="mb-3" id="image-input">
+                            <label for="image" class="form-label">
+                                <i class="fas fa-image"></i> Select Cover Image
+                            </label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept=".png,.jpg,.jpeg,.bmp">
+                            <div class="form-text">For DCT, DWT, Adaptive LSB, and Palette techniques</div>
+                        </div>
+
+                        <!-- Document input (for text steganography) -->
+                        <div class="mb-3" id="document-input" style="display: none;">
+                            <label for="document" class="form-label">
+                                <i class="fas fa-file-word"></i> Select DOCX Document
+                            </label>
+                            <input type="file" class="form-control" id="document" name="document" 
+                                   accept=".docx">
+                            <div class="form-text">For text steganography in document formatting</div>
+                        </div>
+
+                        <!-- Network parameters (for network steganography) -->
+                        <div id="network-params" style="display: none;">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="target_host" class="form-label">Target Host</label>
+                                    <input type="text" class="form-control" id="target_host" name="target_host" 
+                                           value="127.0.0.1" placeholder="IP Address">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="target_port" class="form-label">Target Port</label>
+                                    <input type="number" class="form-control" id="target_port" name="target_port" 
+                                           value="80" min="1" max="65535">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="secret_data" class="form-label">
+                                <i class="fas fa-lock"></i> Secret Message
+                            </label>
+                            <textarea class="form-control" id="secret_data" name="secret_data" 
+                                      rows="4" placeholder="Enter your secret message..." required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Encryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter a strong password" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-magic"></i> Apply Advanced Technique
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Technique Descriptions:</h5>
+                        <div class="accordion" id="techniqueAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dct-desc">
+                                        DCT (Discrete Cosine Transform)
+                                    </button>
+                                </h2>
+                                <div id="dct-desc" class="accordion-collapse collapse" data-bs-parent="#techniqueAccordion">
+                                    <div class="accordion-body">
+                                        Hides data in frequency domain coefficients. More robust against compression and filtering.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#dwt-desc">
+                                        DWT (Discrete Wavelet Transform)
+                                    </button>
+                                </h2>
+                                <div id="dwt-desc" class="accordion-collapse collapse" data-bs-parent="#techniqueAccordion">
+                                    <div class="accordion-body">
+                                        Uses wavelet coefficients for hiding. Excellent for multi-resolution analysis.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#adaptive-desc">
+                                        Adaptive LSB
+                                    </button>
+                                </h2>
+                                <div id="adaptive-desc" class="accordion-collapse collapse" data-bs-parent="#techniqueAccordion">
+                                    <div class="accordion-body">
+                                        Content-aware bit selection based on image complexity. Hides data only in edge areas.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#palette-desc">
+                                        Palette-Based
+                                    </button>
+                                </h2>
+                                <div id="palette-desc" class="accordion-collapse collapse" data-bs-parent="#techniqueAccordion">
+                                    <div class="accordion-body">
+                                        Hides data in color palette indices. Effective for images with limited colors.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#text-desc">
+                                        Text Steganography
+                                    </button>
+                                </h2>
+                                <div id="text-desc" class="accordion-collapse collapse" data-bs-parent="#techniqueAccordion">
+                                    <div class="accordion-body">
+                                        Hides data in document formatting (font sizes, spacing). Invisible to casual inspection.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#network-desc">
+                                        Network Timing
+                                    </button>
+                                </h2>
+                                <div id="network-desc" class="accordion-collapse collapse" data-bs-parent="#techniqueAccordion">
+                                    <div class="accordion-body">
+                                        Hides data in network packet timing patterns. Covert channel communication.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateForm() {
+    const technique = document.getElementById('technique').value;
+    const imageInput = document.getElementById('image-input');
+    const documentInput = document.getElementById('document-input');
+    const networkParams = document.getElementById('network-params');
+    
+    // Hide all inputs first
+    imageInput.style.display = 'none';
+    documentInput.style.display = 'none';
+    networkParams.style.display = 'none';
+    
+    // Show relevant inputs
+    if (technique === 'text') {
+        documentInput.style.display = 'block';
+        document.getElementById('document').required = true;
+        document.getElementById('image').required = false;
+    } else if (technique === 'network') {
+        networkParams.style.display = 'block';
+        document.getElementById('image').required = false;
+        document.getElementById('document').required = false;
+    } else {
+        imageInput.style.display = 'block';
+        document.getElementById('image').required = true;
+        document.getElementById('document').required = false;
+    }
+}
+
+// Initialize form
+updateForm();
+</script>
+{% endblock %}

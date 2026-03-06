@@ -1,0 +1,126 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-search"></i> Extract Hidden Data</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-unlock"></i> Message Extracted Successfully!</h5>
+                        <div class="mt-3">
+                            <label class="form-label"><strong>Decrypted Message:</strong></label>
+                            <div class="card">
+                                <div class="card-body bg-light">
+                                    <pre>{{ extracted_data }}</pre>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="copyToClipboard()" class="btn btn-outline-primary mt-2">
+                            <i class="fas fa-copy"></i> Copy Message
+                        </button>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="stego_image" class="form-label">
+                                <i class="fas fa-image"></i> Select Stego Image
+                            </label>
+                            <input type="file" class="form-control" id="stego_image" name="stego_image" 
+                                   accept=".png,.jpg,.jpeg,.bmp" required>
+                            <div class="form-text">Upload the image containing hidden data</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-key"></i> Decryption Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter the password used for encryption" required>
+                            
+                            <!-- Password Strength Meter -->
+                            <div class="mt-2">
+                                <div class="progress" style="height: 8px;">
+                                    <div id="password-strength-bar" class="progress-bar" role="progressbar" 
+                                         style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <small id="password-strength-text" class="text-muted">Password strength will appear here</small>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-unlock-alt"></i> Extract & Decrypt Data
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>Extraction Process:</h5>
+                        <ol>
+                            <li>The system reads the LSB data from the image</li>
+                            <li>Encrypted data is extracted and validated</li>
+                            <li>AES decryption is performed using your password</li>
+                            <li>The original secret message is revealed</li>
+                        </ol>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = document.querySelector('pre').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Message copied to clipboard!');
+    });
+}
+
+// Password strength checker
+document.getElementById('password').addEventListener('input', function() {
+    const password = this.value;
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+    
+    if (password.length === 0) {
+        strengthBar.style.width = '0%';
+        strengthBar.className = 'progress-bar';
+        strengthText.textContent = 'Password strength will appear here';
+        return;
+    }
+    
+    fetch('/check_password_strength', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({password: password})
+    })
+    .then(response => response.json())
+    .then(data => {
+        const score = data.score;
+        const strength = data.strength;
+        
+        strengthBar.style.width = score + '%';
+        strengthText.textContent = `${strength} (${score}/100)`;
+        
+        strengthBar.className = 'progress-bar';
+        if (score >= 80) {
+            strengthBar.classList.add('bg-success');
+        } else if (score >= 60) {
+            strengthBar.classList.add('bg-info');
+        } else if (score >= 40) {
+            strengthBar.classList.add('bg-warning');
+        } else {
+            strengthBar.classList.add('bg-danger');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+</script>
+{% endblock %}

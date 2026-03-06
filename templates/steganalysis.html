@@ -1,0 +1,139 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-search-plus"></i> AI-Based Steganalysis Detection</h3>
+            </div>
+            <div class="card-body">
+                {% if success %}
+                    <div class="alert alert-{{ 'danger' if result.is_stego else 'success' }}">
+                        <h5><i class="fas fa-{{ 'exclamation-triangle' if result.is_stego else 'check-circle' }}"></i> Analysis Complete</h5>
+                        <p><strong>{{ result.verdict }}</strong></p>
+                        <p><strong>Confidence:</strong> {{ result.confidence }}%</p>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-chart-bar"></i> Detection Metrics</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        <strong>LSB Anomaly Score:</strong>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-{{ 'danger' if result.lsb_anomaly > 15 else 'warning' if result.lsb_anomaly > 8 else 'success' }}" 
+                                                 style="width: {{ result.lsb_anomaly }}%">{{ result.lsb_anomaly }}%</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Chi-Square Test:</strong>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-{{ 'danger' if result.chi_square > 20 else 'warning' if result.chi_square > 10 else 'success' }}" 
+                                                 style="width: {{ result.chi_square }}%">{{ result.chi_square }}%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="fas fa-info-circle"></i> Analysis Details</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Image:</strong> {{ filename }}</p>
+                                    <p><strong>Detection Method:</strong> Statistical Analysis</p>
+                                    <p><strong>Algorithm:</strong> LSB Pattern + Chi-Square</p>
+                                    {% if result.is_stego %}
+                                        <div class="alert alert-warning">
+                                            <small><i class="fas fa-exclamation-triangle"></i> This image shows statistical patterns consistent with steganographic embedding.</small>
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-info">
+                                            <small><i class="fas fa-info-circle"></i> No significant steganographic patterns detected.</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="image" class="form-label">
+                                <i class="fas fa-image"></i> Select Image for Analysis
+                            </label>
+                            <input type="file" class="form-control" id="image" name="image" 
+                                   accept=".png,.jpg,.jpeg,.bmp" required>
+                            <div class="form-text">Upload any image to detect hidden steganographic data</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-search-plus"></i> Analyze Image for Hidden Data
+                        </button>
+                    </form>
+
+                    <div class="mt-4">
+                        <h5>AI Detection Methods:</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-chart-line"></i> LSB Pattern Analysis</h6>
+                                <ul>
+                                    <li>Analyzes least significant bit patterns</li>
+                                    <li>Detects statistical anomalies</li>
+                                    <li>Identifies non-random LSB distributions</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-calculator"></i> Chi-Square Attack</h6>
+                                <ul>
+                                    <li>Statistical test for LSB embedding</li>
+                                    <li>Analyzes pairs of values (PoVs)</li>
+                                    <li>Detects embedding artifacts</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5>Use Cases:</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-gavel fa-2x text-primary mb-2"></i>
+                                        <h6>Digital Forensics</h6>
+                                        <small>Investigate suspicious images</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                                        <h6>Cybersecurity</h6>
+                                        <small>Detect covert channels</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-search fa-2x text-warning mb-2"></i>
+                                        <h6>Investigation</h6>
+                                        <small>Analyze evidence images</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
