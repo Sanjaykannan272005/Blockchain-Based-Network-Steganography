@@ -49,7 +49,8 @@ def stream_logs():
 
 @app.route('/')
 def index():
-    return render_template('receiver_web.html')
+    admin_addr = config.get('owner_address', config.get('wallet_address', '')).lower()
+    return render_template('receiver_web.html', wallet=config.get('wallet_address'), admin_address=admin_addr)
 
 @app.route('/api/receiver/status')
 def get_status():

@@ -2,25 +2,27 @@
 echo ======================================================================
 echo STEALTH NETWORK - FULL ECOSYSTEM STARTUP
 echo ======================================================================
-echo.
+echo [0/4] Setting Environment (Unicode Support)...
+SET PYTHONUTF8=1
+CHCP 65001 > NUL
 
 echo [1/4] Starting Dashboard (Port 5000)...
-start "Dashboard" cmd /k "python app.py"
+start "Dashboard" cmd /k "CHCP 65001 > NUL && python app.py"
 
 timeout /t 2 /nobreak
 
 echo [2/4] Starting Receiver Node (Port 5001)...
-start "Receiver" cmd /k "python receiver_web.py"
+start "Receiver" cmd /k "CHCP 65001 > NUL && python receiver_web.py"
 
 timeout /t 2 /nobreak
 
 echo [3/4] Starting Wallet Auth Service (Port 5002)...
-start "WalletAuth" cmd /k "python wallet_auth_app.py"
+start "WalletAuth" cmd /k "CHCP 65001 > NUL && python wallet_auth_app.py"
 
 timeout /t 2 /nobreak
 
 echo [4/4] Starting Sender Node (Port 5003)...
-start "Sender" cmd /k "python sender_web.py"
+start "Sender" cmd /k "CHCP 65001 > NUL && python sender_web.py"
 
 echo.
 echo ======================================================================

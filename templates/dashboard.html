@@ -3,61 +3,118 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steganography Network Dashboard</title>
+    <title>Stealth Network | Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ startOnLoad: true, theme: 'forest' });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --accent: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
         body {
-            background-color: #f4f6f9;
-        }
-
-        .bg-dark {
-            background-color: #111827 !important;
-            color: #e5e7eb !important;
-        }
-
-        .text-muted {
-            color: #6c757d !important;
-        }
-
-        .bg-dark .form-control {
-            background: #0a0a1a !important;
-            color: #e5e7eb !important;
-            border-color: #374151 !important;
-        }
-
-        .bg-dark .form-control::placeholder {
-            color: #4b5563 !important;
-        }
-
-        .dashboard-header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
         }
 
         .card {
-            border: none;
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
+            color: var(--text-main);
+            transition: all 0.3s ease;
         }
 
         .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-online {
+            background-color: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+        }
+
+        .status-offline {
+            background-color: #ef4444;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #log-container {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid #333;
+        }
+
+        .log-time {
+            color: #888;
+            font-size: 0.75rem;
+        }
+
+        .log-category {
+            font-weight: bold;
+            margin: 0 5px;
+        }
+
+        .cat-info {
+            color: #0df;
+        }
+
+        .cat-warning {
+            color: #ff0;
+        }
+
+        .cat-error {
+            color: #f00;
+        }
+
+        .cat-auth {
+            color: #f0f;
+        }
+
+        .terminal-header {
+            background: #2d3748;
+            padding: 5px 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .terminal-dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
@@ -65,142 +122,61 @@
             margin-right: 5px;
         }
 
-        .status-online {
-            background-color: #28a745;
-            box-shadow: 0 0 10px #28a745;
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
         }
 
-        .status-offline {
-            background-color: #dc3545;
+        .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .metric-value {
-            font-size: 2rem;
-            font-weight: bold;
+        .shadow-pulse {
+            animation: shadow-pulse 2s infinite;
         }
 
-        .metric-label {
-            font-size: 0.9rem;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        @keyframes shadow-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
         }
 
-        #log-container {
-            height: 400px;
-            overflow-y: auto;
-            background: #0d1117;
-            color: #00ff41;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #30363d;
-            box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.05);
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
-        .log-entry {
-            margin-bottom: 4px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 4px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .log-time {
-            color: #8b949e;
-            margin-right: 12px;
-            font-weight: bold;
-        }
-
-        .log-category {
-            padding: 1px 6px;
-            border-radius: 3px;
+        .x-small {
             font-size: 0.7rem;
-            font-weight: bold;
-            margin-right: 10px;
-            text-transform: uppercase;
         }
 
-        .cat-info {
-            background: rgba(88, 166, 255, 0.2);
-            color: #58a6ff;
-        }
-
-        .cat-network {
-            background: rgba(188, 142, 255, 0.2);
-            color: #bc8eff;
-        }
-
-        .cat-blockchain {
-            background: rgba(248, 232, 28, 0.2);
-            color: #f8e81c;
-        }
-
-        .cat-critical {
-            background: rgba(255, 123, 114, 0.2);
-            color: #ff7b72;
-            border: 1px solid #ff7b72;
-        }
-
-        .cat-success {
-            background: rgba(63, 185, 80, 0.2);
-            color: #3fb950;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(-5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .terminal-header {
-            background: #161b22;
-            border-radius: 12px 12px 0 0;
-            padding: 8px 15px;
-            border: 1px solid #30363d;
-            border-bottom: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .terminal-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
+        .cursor-pointer {
+            cursor: pointer;
         }
     </style>
 </head>
 
 <body>
-
-    <div class="dashboard-header text-center position-relative">
-        <div class="position-absolute top-0 end-0 p-3 d-flex gap-2">
-            <button id="connectWalletBtn" class="btn btn-outline-light btn-sm" onclick="connectMetaMask()">
-                <i class="fas fa-wallet me-2"></i>Connect Wallet
-            </button>
-            <button id="panicButton" class="btn btn-danger btn-lg shadow" style="display: none;"
-                onclick="triggerPanic()">
-                <i class="fas fa-skull-crossbones"></i> GLOBAL PANIC
-            </button>
+    <nav class="navbar navbar-expand-lg border-bottom border-secondary mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="#">
+                <i class="fas fa-user-secret me-2"></i>STEALTH DASHBOARD
+            </a>
+            <div class="d-flex align-items-center">
+                <span id="currentBlock"
+                    class="badge bg-dark border border-secondary text-muted me-2 small">#Syncing...</span>
+                <button id="connectWalletBtn" class="btn btn-outline-light btn-sm rounded-pill px-3"
+                    onclick="connectMetaMask()">
+                    <i class="fas fa-wallet me-2"></i>Connect Wallet
+                </button>
+            </div>
         </div>
-        <h1>🌐 Steganography Network Command Center</h1>
-        <p class="lead">Live Monitoring & Analysis System</p>
-        <div id="network-alert-bar" class="alert alert-success py-1 mt-2 d-inline-block" style="font-size: 0.8rem;">
-            <i class="fas fa-shield-alt"></i> NETWORK STATUS: <span id="net-status-text">NORMAL</span>
-        </div>
-    </div>
+    </nav>
 
-    <div class="container-fluid px-4">
+    <div class="container">
         <!-- Service Status Row -->
         <div class="row mb-4">
             <div class="col-md-4">
@@ -211,8 +187,8 @@
                             <span id="auth-status-text" class="text-muted">Checking...</span>
                         </div>
                         <div id="auth-status-dot" class="status-indicator status-offline"></div>
-                        <a href="http://localhost:5002" target="_blank" class="btn btn-sm btn-outline-primary">Open
-                            UI</a>
+                        <a href="http://${window.location.hostname}:5002" target="_blank"
+                            class="btn btn-sm btn-outline-primary">Open UI</a>
                     </div>
                 </div>
             </div>
@@ -224,8 +200,8 @@
                             <span id="receiver-status-text" class="text-muted">Checking...</span>
                         </div>
                         <div id="receiver-status-dot" class="status-indicator status-offline"></div>
-                        <a href="http://localhost:5001" target="_blank" class="btn btn-sm btn-outline-primary">Open
-                            UI</a>
+                        <a href="http://${window.location.hostname}:5001" target="_blank"
+                            class="btn btn-sm btn-outline-primary">Open UI</a>
                     </div>
                 </div>
             </div>
@@ -237,1844 +213,407 @@
                             <span id="sender-status-text" class="text-muted">Checking...</span>
                         </div>
                         <div id="sender-status-dot" class="status-indicator status-offline"></div>
-                        <a href="http://localhost:5003" target="_blank" class="btn btn-sm btn-outline-primary">Open
-                            UI</a>
+                        <a href="http://${window.location.hostname}:5003" target="_blank"
+                            class="btn btn-sm btn-outline-primary">Open UI</a>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Metrics Row -->
         <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-messages" class="metric-value text-primary">0</div>
-                    <div class="metric-label">Messages Received</div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div id="metric-messages" class="metric-value">0</div>
+                    <div class="metric-label">Messages</div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-mimicry" class="metric-value text-success">0</div>
-                    <div class="metric-label">Mimicry Score</div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div id="metric-uptime" class="metric-value">0s</div>
+                    <div class="metric-label">Uptime</div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="currentBlock" class="metric-value text-info">#---</div>
-                    <div class="metric-label">Latest Block</div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div id="metric-reputation" class="metric-value">---</div>
+                    <div class="metric-label">Reputation</div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="currentBlockHash" class="metric-value text-warning"
-                        style="font-size: 1rem; line-height: 2;">---</div>
-                    <div class="metric-label">Block Hash Key</div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div id="metric-balance" class="metric-value x-small">---</div>
+                    <div class="metric-label">Account</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div id="metric-protocol" class="metric-value">---</div>
+                    <div class="metric-label">Protocol</div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card metric-card">
+                    <div id="metric-security" class="metric-value">LIMITED</div>
+                    <div class="metric-label">Clearance</div>
                 </div>
             </div>
         </div>
 
         <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card p-4 text-center border-primary border-2">
-                    <div id="metric-mimicry-similarity" class="metric-value text-success">98%</div>
-                    <div class="metric-label">🤖 Mimicry Similarity</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-dna" class="metric-value text-warning" style="font-size: 1.2rem;">Scanning...</div>
-                    <div class="metric-label">🧬 Traffic DNA Profile</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-uptime" class="metric-value text-secondary">0s</div>
-                    <div class="metric-label">System Uptime</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center border-info">
-                    <div id="metric-security" class="metric-value text-danger" style="font-size: 1.1rem;">WHITELISTING
-                    </div>
-                    <div class="metric-label"><i class="fas fa-lock"></i> ACCESS STATUS</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Live Blockchain Analytics Row -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-balance" class="metric-value text-success" style="font-size: 1.5rem;">---</div>
-                    <div class="metric-label">💰 Wallet Balance (ETH)</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-protocol" class="metric-value text-primary" style="font-size: 1.4rem;">---</div>
-                    <div class="metric-label">📡 Active Protocol</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-nodes" class="metric-value text-info" style="font-size: 1.5rem;">---</div>
-                    <div class="metric-label">🕸️ Registered Nodes</div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-4 text-center">
-                    <div id="metric-reputation" class="metric-value text-warning" style="font-size: 1.5rem;">---</div>
-                    <div class="metric-label">⚖️ Avg. Reputation</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Security Center + Sender CTA Row (Admin Only) -->
-        <div class="row mb-4" id="adminRow" style="display: none;">
+            <!-- Left Side: Analytics & Map -->
             <div class="col-md-8">
-                <div class="card p-4 bg-dark text-white h-100">
-                    <h5 class="mb-3"><i class="fas fa-shield-alt text-primary me-2"></i>Security Center (C2)</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold text-light">Blockchain Whitelist</label>
-                            <div class="input-group input-group-sm">
-                                <input type="text" id="whitelistWallet" class="form-control"
-                                    placeholder="Sender Wallet 0x...">
-                                <button class="btn btn-outline-primary" onclick="authorizeSender()">Authorize</button>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold text-light">Global Protocol Switch</label>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-info flex-grow-1"
-                                    onclick="switchProtocol('timing')">⏱️ Timing</button>
-                                <button class="btn btn-sm btn-outline-info flex-grow-1"
-                                    onclick="switchProtocol('size')">📦 Size</button>
-                                <button class="btn btn-sm btn-outline-info flex-grow-1"
-                                    onclick="switchProtocol('ttl')">⏳ TTL</button>
-                            </div>
-                        </div>
+                <div class="card p-3 mb-4" style="height: 400px;">
+                    <h5 class="border-bottom border-secondary pb-2 mb-3">📡 Active Messages Chart</h5>
+                    <canvas id="activityChart"></canvas>
+                </div>
+
+                <div class="card p-3 mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">🌍 Network Topology Map</h5>
+                        <button class="btn btn-xs btn-outline-info" onclick="updateNetworkNodes()">
+                            <i class="fas fa-sync me-1"></i> Refresh Map
+                        </button>
                     </div>
-                    <hr class="border-secondary">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <div class="small text-muted">Identity Registry</div>
-                            <div class="small">Organization: <span id="reg-org" class="fw-bold text-light">---</span>
-                            </div>
-                            <div class="small">Clearance: <span id="reg-clearance" class="badge bg-secondary">---</span>
-                            </div>
-                        </div>
-                        <button class="btn btn-sm btn-primary" onclick="checkClearance()">Refresh Identity</button>
+                    <div id="mermaid-parent" class="bg-dark bg-opacity-50 rounded p-4 text-center">
+                        <pre
+                            class="mermaid">graph LR\n    S((Sender)) -- encrypted --> M[Mesh Registry]\n    M -- search --> RC((Recipient))</pre>
                     </div>
                 </div>
             </div>
+
+            <!-- Right Side: Dead Drops & Quick Actions -->
             <div class="col-md-4">
-                <div
-                    class="card p-4 text-center h-100 border-success border-2 d-flex flex-column justify-content-center">
-                    <div class="fs-1 mb-2">📤</div>
-                    <h5 class="fw-bold mb-2">Covert Transmitter</h5>
-                    <p class="text-muted small">Send encrypted messages via Network Steganography, P2P Onion Routing, or
-                        Blockchain Dead Drop.</p>
-                    <a href="http://localhost:5003" target="_blank" class="btn btn-success btn-lg mt-2">
-                        <i class="fas fa-paper-plane me-2"></i>Open Sender
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts & Map Row -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">📊 Network Activity (Last Hour)</h5>
-                        <canvas id="activityChart" height="150"></canvas>
+                <div class="card p-3 mb-4">
+                    <div
+                        class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-2 mb-3">
+                        <h5 class="mb-0 text-warning">🏚️ Dead Drops</h5>
+                        <span id="inboxStatus" class="badge bg-secondary x-small">Syncing...</span>
+                    </div>
+                    <div id="inboxList" style="height: 250px; overflow-y: auto;">
+                        <div class="text-center py-3 text-muted x-small">Checking block mesh...</div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title d-flex justify-content-between">
-                            <span><i class="fas fa-project-diagram me-2 text-info"></i>P2P Topology Map</span>
-                            <span id="node-count-badge" class="badge bg-info">0 Nodes</span>
-                        </h5>
-                        <div id="network-map-container"
-                            style="background: #1a1a1a; border-radius: 8px; min-height: 250px; border: 1px solid #333;"
-                            class="d-flex align-items-center justify-content-center overflow-hidden">
-                            <div id="mermaid-parent">
-                                <!-- Mermaid graph injected here -->
-                                <div class="text-muted small">Initializing dynamic map...</div>
-                            </div>
+
+                <div class="card p-3">
+                    <h5 class="border-bottom border-secondary pb-2 mb-3"><i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                    <div class="d-grid gap-2">
+                        <button id="panicButton" class="btn btn-danger btn-lg shadow" onclick="triggerPanic()">
+                            <i class="fas fa-skull-crossbones me-2"></i>GLOBAL PANIC
+                        </button>
+                        <div id="network-alert-bar"
+                            class="alert alert-success py-1 mt-2 d-inline-block text-center x-small">
+                            Status: <span id="net-status-text">NORMAL</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 border-top border-secondary pt-3">
+                        <div class="stat-item d-flex justify-content-between x-small text-muted mb-2">
+                            <span>Block Hash:</span>
+                            <span id="currentBlockHash" class="font-monospace">---</span>
+                        </div>
+                        <div class="stat-item d-flex justify-content-between x-small text-muted">
+                            <span>Admin Address:</span>
+                            <span class="font-monospace text-info">{{ admin_address[:10] }}...</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- P2P Node Identity Matrix -->
+        <!-- Live Terminal -->
         <div class="row mb-4">
             <div class="col-md-12">
-                <div class="card p-4 bg-dark text-white shadow border-info border-top-0"
-                    style="border-top: 4px solid #0dcaf0 !important;">
-                    <h5 class="mb-3 d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-network-wired text-info me-2"></i>P2P Node Identity Matrix (Decentralized
-                            Registry)</span>
-                        <button class="btn btn-sm btn-outline-info" onclick="updateNetworkNodes()">
-                            <i class="fas fa-sync-alt"></i> Refresh Nodes
-                        </button>
-                    </h5>
-                    <div class="table-responsive">
-                        <table class="table table-dark table-hover mb-0" style="font-size: 0.85rem;">
-                            <thead>
-                                <tr class="text-muted border-secondary">
-                                    <th>Status</th>
-                                    <th>Wallet Address</th>
-                                    <th>IP Endpoint</th>
-                                    <th>Supported Channels</th>
-                                    <th>Reputation</th>
-                                    <th>Last Seen</th>
-                                    <th>Identity</th>
-                                </tr>
-                            </thead>
-                            <tbody id="p2p-nodes-body">
-                                <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
-                                        <div class="spinner-border spinner-border-sm text-info me-2"></div>
-                                        Discovering mesh nodes...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="terminal-header">
+                    <div>
+                        <span class="terminal-dot" style="background: #ff5f56;"></span>
+                        <span class="terminal-dot" style="background: #ffbd2e;"></span>
+                        <span class="terminal-dot" style="background: #27c93f;"></span>
+                        <span class="ms-2 text-muted small fw-bold"><i class="fas fa-terminal me-1"></i> LIVE SYSTEM
+                            CONSOLE</span>
+                    </div>
+                    <div>
+                        <span id="stream-status" class="badge bg-success small"><i class="fas fa-link me-1"></i>
+                            CONNECTED</span>
+                        <button class="btn btn-sm btn-link text-muted p-0 ms-2" onclick="clearTerminal()"><i
+                                class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+                <div id="log-container">
+                    <div class="log-entry">
+                        <span class="log-time">${new Date().toLocaleTimeString()}</span>
+                        <span class="log-category cat-info">SYSTEM</span>
+                        Initializing Live Console Link...
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Protocol Performance Analytics -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card bg-dark text-white shadow p-4" style="border-top: 4px solid #22c55e !important;">
-                    <h5 class="mb-3 d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-chart-radar text-success me-2"></i>Protocol Performance Analytics</span>
-                        <button class="btn btn-sm btn-outline-success" onclick="fetchDashAnalytics()">
-                            <i class="fas fa-sync-alt me-1"></i>Refresh
-                        </button>
-                    </h5>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // --- Global State ---
+        const ADMIN_ADDRESS = "{{ admin_address }}".toLowerCase();
+        let userAccount = null;
+        let chart = null;
 
-                    <!-- AI Recommendation Banner -->
-                    <div class="p-3 mb-3 rounded" id="dash-rec-banner"
-                        style="background: rgba(34,197,94,0.08); border-left: 4px solid #22c55e;">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <div class="small text-muted text-uppercase fw-bold mb-1"><i
-                                        class="fas fa-robot me-1"></i> AI Protocol Recommendation</div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="fs-4 fw-bold" id="dash-rec-protocol"
-                                        style="color:#22c55e;">TIMING</span>
-                                    <span class="badge bg-success bg-opacity-25 text-success"
-                                        id="dash-rec-reason">Lowest composite risk</span>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <div class="text-muted small">Updated: <span id="dash-rec-time">--:--:--</span></div>
-                            </div>
-                        </div>
-                    </div>
+        // --- Core Functions ---
+        async function updateDashboard() {
+            try {
+                const url = userAccount ? `/api/stats?wallet=${userAccount}` : '/api/stats';
+                const response = await fetch(url);
+                const data = await response.json();
 
-                    <div class="row g-3">
-                        <!-- Radar Chart -->
-                        <div class="col-lg-4">
-                            <div class="p-3 rounded" style="background: rgba(255,255,255,0.03);">
-                                <h6 class="text-center text-muted small text-uppercase fw-bold mb-2"><i
-                                        class="fas fa-satellite-dish me-1"></i>Capability Matrix</h6>
-                                <div style="position:relative; height:260px;"><canvas id="dashRadarChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Bar Chart -->
-                        <div class="col-lg-4">
-                            <div class="p-3 rounded" style="background: rgba(255,255,255,0.03);">
-                                <h6 class="text-center text-muted small text-uppercase fw-bold mb-2"><i
-                                        class="fas fa-chart-bar me-1"></i>Latency vs Throughput</h6>
-                                <div style="position:relative; height:260px;"><canvas id="dashBarChart"></canvas></div>
-                            </div>
-                        </div>
-                        <!-- Detection Risk Gauges -->
-                        <div class="col-lg-4">
-                            <div class="p-3 rounded" style="background: rgba(255,255,255,0.03);">
-                                <h6 class="text-center text-muted small text-uppercase fw-bold mb-2"><i
-                                        class="fas fa-exclamation-triangle me-1"></i>Detection Risk</h6>
-                                <div class="d-flex justify-content-around align-items-center" style="height:260px;">
-                                    <div class="text-center">
-                                        <div class="position-relative mx-auto" style="width:90px; height:90px;">
-                                            <canvas id="dashGaugeTiming" width="90" height="90"></canvas>
-                                            <div class="position-absolute top-50 start-50 translate-middle">
-                                                <span class="fw-bold" id="dash-risk-timing">25</span>
-                                                <div class="text-muted" style="font-size:0.5rem;">RISK</div>
-                                            </div>
-                                        </div>
-                                        <div class="small text-muted mt-1">Timing</div>
-                                        <span class="badge bg-success" id="dash-badge-timing"
-                                            style="font-size:0.6rem;">LOW</span>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="position-relative mx-auto" style="width:90px; height:90px;">
-                                            <canvas id="dashGaugeSize" width="90" height="90"></canvas>
-                                            <div class="position-absolute top-50 start-50 translate-middle">
-                                                <span class="fw-bold" id="dash-risk-size">55</span>
-                                                <div class="text-muted" style="font-size:0.5rem;">RISK</div>
-                                            </div>
-                                        </div>
-                                        <div class="small text-muted mt-1">Size</div>
-                                        <span class="badge bg-warning text-dark" id="dash-badge-size"
-                                            style="font-size:0.6rem;">MED</span>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="position-relative mx-auto" style="width:90px; height:90px;">
-                                            <canvas id="dashGaugeTTL" width="90" height="90"></canvas>
-                                            <div class="position-absolute top-50 start-50 translate-middle">
-                                                <span class="fw-bold" id="dash-risk-ttl">72</span>
-                                                <div class="text-muted" style="font-size:0.5rem;">RISK</div>
-                                            </div>
-                                        </div>
-                                        <div class="small text-muted mt-1">TTL</div>
-                                        <span class="badge bg-danger" id="dash-badge-ttl"
-                                            style="font-size:0.6rem;">HIGH</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Trend Line -->
-                    <div class="mt-3 p-3 rounded" style="background: rgba(255,255,255,0.03);">
-                        <h6 class="text-center text-muted small text-uppercase fw-bold mb-2"><i
-                                class="fas fa-wave-square me-1"></i>Detection Risk Trend</h6>
-                        <div style="position:relative; height:180px;"><canvas id="dashTrendChart"></canvas></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Advanced Monitoring Suite -->
-        <div class="row mb-4 h-100">
-            <!-- Red Team Security Simulator -->
-            <div class="col-lg-7">
-                <div class="card bg-dark text-white border-danger border-top-0 shadow h-100"
-                    style="border-top: 4px solid #ef4444 !important;">
-                    <div class="card-body">
-                        <h5 class="card-title d-flex justify-content-between">
-                            <span><i class="fas fa-user-secret text-danger me-2"></i>Red Team Security Simulator</span>
-                            <button class="btn btn-sm btn-danger" onclick="runSecurityScan(event)">
-                                <i class="fas fa-search me-1"></i>Run Security Scan
-                            </button>
-                        </h5>
-                        <p class="small text-muted mb-4">Analyze current steganography stream for entropy leakage and
-                            statistical detection risk.</p>
-
-                        <div class="row text-center g-3">
-                            <div class="col-md-3">
-                                <div class="p-3 rounded border border-secondary bg-black bg-opacity-25">
-                                    <div class="small text-muted mb-1">Detection Prob.</div>
-                                    <div class="fs-4 fw-bold text-danger" id="sim-detect-prob">--%</div>
-                                    <div class="progress mt-2" style="height: 4px;">
-                                        <div id="sim-detect-bar" class="progress-bar bg-danger" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="p-3 rounded border border-secondary bg-black bg-opacity-25">
-                                    <div class="small text-muted mb-1">Entropy Score</div>
-                                    <div class="fs-4 fw-bold text-info" id="sim-entropy">-.---</div>
-                                    <div class="small text-muted">Bits/Cell</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="p-3 rounded border border-secondary bg-black bg-opacity-25">
-                                    <div class="small text-muted mb-1">KS-Test (p)</div>
-                                    <div class="fs-4 fw-bold text-warning" id="sim-ks">-.---</div>
-                                    <div class="small text-muted">Stat Significance</div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="p-3 rounded border border-secondary bg-black bg-opacity-25">
-                                    <div class="small text-muted mb-1">Confidence</div>
-                                    <div class="fs-4 fw-bold text-success" id="sim-conf">--%</div>
-                                    <div class="small text-muted">Bayesian</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 p-3 rounded bg-danger bg-opacity-10 border border-danger border-opacity-25"
-                            id="sim-alert" style="display:none;">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-exclamation-triangle text-danger fs-4 me-3"></i>
-                                <div>
-                                    <div class="fw-bold text-danger">High Risk Detected!</div>
-                                    <div class="small">The current modulation pattern is statistically distinguishable
-                                        from noise. Recommendation: Switch to <b>Slow-Burn Drift</b> or use <b>AI
-                                            Optimizer</b>.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Network Intelligence (Geo-Fence & AI Optimizer) -->
-            <div class="col-lg-5">
-                <div class="card bg-dark text-white border-info border-top-0 shadow h-100"
-                    style="border-top: 4px solid #0dcaf0 !important;">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-microchip text-info me-2"></i>Network Intelligence</h5>
-
-                        <!-- AI Optimizer -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h6 class="mb-0 small text-uppercase fw-bold text-muted">AI Protocol Optimizer</h6>
-                                <div class="form-check form-switch p-0 m-0">
-                                    <input class="form-check-input ms-0" type="checkbox" id="aiOptimizerToggle"
-                                        onchange="toggleAiOptimizer()">
-                                </div>
-                            </div>
-                            <div class="p-3 rounded bg-info bg-opacity-10 border border-info border-opacity-10">
-                                <div id="optimizer-status" class="small text-muted mb-2">Optimizer Status: <span
-                                        class="text-secondary">INACTIVE</span></div>
-                                <div id="optimizer-suggestions" style="display:none;">
-                                    <div
-                                        class="d-flex justify-content-between small py-1 border-bottom border-secondary border-opacity-25">
-                                        <span>Suggested Jitter:</span>
-                                        <span class="text-info fw-bold" id="opt-jitter">--</span>
-                                    </div>
-                                    <div
-                                        class="d-flex justify-content-between small py-1 border-bottom border-secondary border-opacity-25">
-                                        <span>Noise Injection:</span>
-                                        <span class="text-info" id="opt-noise">--</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between small py-1">
-                                        <span>Efficiency:</span>
-                                        <span class="text-success" id="opt-eff">--</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Geo-Fencing -->
-                        <div>
-                            <h6 class="mb-2 small text-uppercase fw-bold text-muted">Geo-Fencing Node Control</h6>
-                            <div class="d-flex flex-wrap gap-2 mb-3">
-                                <button class="btn btn-xs btn-outline-info active geofence-tag"
-                                    onclick="toggleGeoFence(this, 'North America')">N. America</button>
-                                <button class="btn btn-xs btn-outline-info active geofence-tag"
-                                    onclick="toggleGeoFence(this, 'Europe')">Europe</button>
-                                <button class="btn btn-xs btn-outline-info active geofence-tag"
-                                    onclick="toggleGeoFence(this, 'Asia')">Asia</button>
-                            </div>
-                            <div class="p-2 rounded bg-black bg-opacity-25 border border-secondary small">
-                                <i class="fas fa-info-circle text-info me-1"></i> Restricting relay nodes to allowed
-                                regions minimizes latency and satisfies data residency laws.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Resilience & Security (Identity Layer) -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="card bg-dark text-white border-warning border-top-0 shadow"
-                        style="border-top: 4px solid #f59e0b !important;">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="card-title mb-0"><i
-                                        class="fas fa-shield-alt text-warning me-2"></i>Resilience Center</h5>
-                                <span class="badge bg-warning text-dark px-3 py-2 fw-bold"
-                                    id="resilience-global-status">
-                                    <i class="fas fa-check-circle me-1"></i>SYSTEM SECURE
-                                </span>
-                            </div>
-
-                            <div class="row g-4">
-                                <!-- Dead-Man's Switch Configuration -->
-                                <div class="col-lg-8">
-                                    <div class="p-4 rounded bg-black bg-opacity-25 border border-secondary">
-                                        <h6 class="text-uppercase small fw-bold text-muted mb-3">
-                                            <i class="fas fa-skull-crossbones me-2"></i>Dead-Man's Switch (Time-Lock
-                                            Message)
-                                        </h6>
-                                        <div class="row g-3">
-                                            <div class="col-md-5">
-                                                <label class="small text-muted mb-1">Emergency Recipient
-                                                    (Wallet)</label>
-                                                <input type="text" id="dm-recipient"
-                                                    class="form-control form-control-sm bg-dark text-info border-secondary"
-                                                    placeholder="0x...">
-                                            </div>
-                                            <div class="col-md-4">
-                                                <label class="small text-muted mb-1">Timeout Period</label>
-                                                <select id="dm-timeout"
-                                                    class="form-select form-select-sm bg-dark text-light border-secondary">
-                                                    <option value="60">1 Minute (Test Mode)</option>
-                                                    <option value="3600">1 Hour</option>
-                                                    <option value="86400">24 Hours</option>
-                                                    <option value="2592000" selected>30 Days (Production)</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3 d-flex align-items-end">
-                                                <button class="btn btn-sm btn-outline-warning w-100" id="btn-dm-setup"
-                                                    onclick="setupDeadManSwitch()">
-                                                    <i class="fas fa-power-off me-1"></i>ARM SWITCH
-                                                </button>
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="small text-muted mb-1">Encrypted Emergency Message</label>
-                                                <textarea id="dm-message" rows="2"
-                                                    class="form-control form-control-sm bg-dark text-light border-secondary"
-                                                    placeholder="Final instructions, key locations, or fallback protocols..."></textarea>
-                                            </div>
-                                        </div>
-
-                                        <!-- Status Banner -->
-                                        <div id="dm-status-banner"
-                                            class="mt-4 p-3 rounded bg-warning bg-opacity-10 border border-warning border-opacity-25"
-                                            style="display:none;">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="spinner-grow spinner-grow-sm text-warning me-3"></div>
-                                                    <div>
-                                                        <div class="fw-bold text-warning small">DEAD-MAN SWITCH ARMED
-                                                        </div>
-                                                        <div class="small text-muted" id="dm-status-text">Broadcasting
-                                                            to 0x... in 29d 23h</div>
-                                                    </div>
-                                                </div>
-                                                <button class="btn btn-xs btn-outline-light" onclick="pingDeadMan()">
-                                                    <i class="fas fa-heartbeat me-1"></i>MANUAL PING
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Auto-Kill Switch Stats -->
-                                <div class="col-lg-4">
-                                    <div class="p-4 rounded bg-black bg-opacity-25 border border-secondary h-100">
-                                        <h6 class="text-uppercase small fw-bold text-muted mb-3">
-                                            <i class="fas fa-biohazard me-2"></i>Auto-Kill Switch Status
-                                        </h6>
-                                        <div class="list-group list-group-flush bg-transparent">
-                                            <div
-                                                class="list-group-item bg-transparent text-white px-0 py-2 border-secondary border-opacity-25">
-                                                <div class="d-flex justify-content-between small">
-                                                    <span>Reputation Floor:</span>
-                                                    <span class="text-danger">30%</span>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="list-group-item bg-transparent text-white px-0 py-2 border-secondary border-opacity-25">
-                                                <div class="d-flex justify-content-between small">
-                                                    <span>Cache Wiping:</span>
-                                                    <span class="text-success">ENABLED</span>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="list-group-item bg-transparent text-white px-0 py-2 border-secondary border-opacity-25">
-                                                <div class="d-flex justify-content-between small">
-                                                    <span>Active P2P Relays:</span>
-                                                    <span class="text-info" id="resilience-active-nodes">--</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="mt-3 p-2 rounded bg-info bg-opacity-10 border border-info border-opacity-25 small">
-                                            <i class="fas fa-info-circle text-info me-1"></i> If consensus reputation
-                                            drops below 30, nodes will self-destruct and wipe local buffers instantly.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Global Blockchain Audit Log -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="card p-4 bg-dark text-white shadow">
-                        <h5 class="mb-3 d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-history text-info me-2"></i>Global Blockchain Audit Log</span>
-                            <button class="btn btn-sm btn-outline-info" onclick="updateBlockchainHistory()">
-                                <i class="fas fa-sync-alt"></i> Refresh Log
-                            </button>
-                        </h5>
-                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                            <table class="table table-dark table-hover mb-0" style="font-size: 0.85rem;">
-                                <thead class="sticky-top bg-dark">
-                                    <tr class="text-muted border-secondary">
-                                        <th>Sender</th>
-                                        <th>Recipient</th>
-                                        <th>Tx Hash</th>
-                                        <th>Block</th>
-                                        <th>Timestamp</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="blockchain-history-body">
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-muted">
-                                            <div class="spinner-border spinner-border-sm text-info me-2"></div>
-                                            Fetching global audit logs...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Personnel Management Row (Admin Only) -->
-            <div class="row mb-4" id="personnelRow" style="display: none;">
-                <div class="col-md-12">
-                    <div class="card p-4 bg-dark text-white shadow border-primary border-top-0"
-                        style="border-top: 4px solid #007bff !important;">
-                        <h5 class="mb-3 d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-users-cog text-primary me-2"></i>Personnel Management</span>
-                            <button class="btn btn-sm btn-outline-primary" onclick="updatePersonnel()">
-                                <i class="fas fa-sync-alt"></i> Refresh Personnel
-                            </button>
-                        </h5>
-
-                        <div class="row">
-                            <!-- Pending Users -->
-                            <div class="col-md-5">
-                                <h6 class="text-warning mb-3"><i class="fas fa-user-clock me-2"></i>Pending Registration
-                                </h6>
-                                <div class="table-responsive" style="max-height: 300px;">
-                                    <table class="table table-dark table-sm table-hover" style="font-size: 0.8rem;">
-                                        <thead>
-                                            <tr class="text-muted">
-                                                <th>Wallet</th>
-                                                <th>Name</th>
-                                                <th>Org</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="pending-personnel-body">
-                                            <tr>
-                                                <td colspan="4" class="text-center text-muted">No pending users</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Verified Users -->
-                            <div class="col-md-7">
-                                <h6 class="text-success mb-3"><i class="fas fa-user-check me-2"></i>Verified Personnel
-                                </h6>
-                                <div class="table-responsive" style="max-height: 300px;">
-                                    <table class="table table-dark table-sm table-hover" style="font-size: 0.8rem;">
-                                        <thead>
-                                            <tr class="text-muted">
-                                                <th>Wallet</th>
-                                                <th>Name / Org</th>
-                                                <th>Level</th>
-                                                <th>Rep</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="verified-personnel-body">
-                                            <tr>
-                                                <td colspan="6" class="text-center text-muted">No verified users</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Live System Terminal Row -->
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="terminal-header">
-                        <div>
-                            <span class="terminal-dot" style="background: #ff5f56;"></span>
-                            <span class="terminal-dot" style="background: #ffbd2e;"></span>
-                            <span class="terminal-dot" style="background: #27c93f;"></span>
-                            <span class="ms-2 text-muted small fw-bold"><i class="fas fa-terminal me-1"></i> LIVE SYSTEM
-                                CONSOLE</span>
-                        </div>
-                        <div>
-                            <span id="stream-status" class="badge bg-success small"><i class="fas fa-link me-1"></i>
-                                CONNECTED</span>
-                            <button class="btn btn-sm btn-link text-muted p-0 ms-2" onclick="clearTerminal()"><i
-                                    class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>
-                    <div id="log-container">
-                        <div class="log-entry">
-                            <span class="log-time">${new Date().toLocaleTimeString()}</span>
-                            <span class="log-category cat-info">SYSTEM</span>
-                            Initializing Live Console Link...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Verification Modal -->
-        <div class="modal fade" id="verifyUserModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-dark text-white border-primary">
-                    <div class="modal-header border-secondary">
-                        <h5 class="modal-title"><i class="fas fa-user-shield text-primary me-2"></i>Verify Personnel
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="small text-muted mb-3">Assign a clearance level to <strong id="modal-user-display"
-                                class="text-light"></strong></p>
-                        <div class="list-group">
-                            <button type="button"
-                                class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
-                                onclick="submitVerification(1)">
-                                <span class="badge bg-secondary me-2">1</span> READ_ONLY - Basic access to incoming
-                                messages
-                            </button>
-                            <button type="button"
-                                class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
-                                onclick="submitVerification(2)">
-                                <span class="badge bg-info me-2">2</span> BASIC_SENDER - Standard plaintext transmission
-                            </button>
-                            <button type="button"
-                                class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
-                                onclick="submitVerification(3)">
-                                <span class="badge bg-primary me-2">3</span> ENCRYPTED_SENDER - AES-anchored covert
-                                channels
-                            </button>
-                            <button type="button"
-                                class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
-                                onclick="submitVerification(4)">
-                                <span class="badge bg-warning text-dark me-2">4</span> TRIGGER_CREATOR - Access to
-                                global C2
-                                controls
-                            </button>
-                            <button type="button"
-                                class="list-group-item list-group-item-action bg-dark text-white border-secondary small py-2"
-                                onclick="submitVerification(5)">
-                                <span class="badge bg-danger me-2">5</span> FULL_ACCESS - Unrestricted systems operation
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bootstrap Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-        <script>
-            // --- Global Configuration & State ---
-            const ADMIN_ADDRESS = "{{ admin_address }}".toLowerCase();
-            let userAccount = null;
-            let selectedUserForVerification = null;
-            let verifyModal = null;
-
-            // --- Core Dashboard Functions ---
-            async function updateDashboard() {
-                try {
-                    const url = userAccount ? `/api/stats?wallet=${userAccount}` : '/api/stats';
-                    const response = await fetch(url);
-                    const data = await response.json();
-
+                if (data.services) {
                     updateStatus('auth', data.services.auth);
                     updateStatus('receiver', data.services.receiver);
                     updateStatus('sender', data.services.sender);
-
-                    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
-                    setEl('metric-messages', data.metrics.messages_count || 0);
-                    setEl('metric-uptime', formatUptime(data.uptime));
-                    setEl('metric-reputation', (data.metrics.avg_reputation || '---') + (data.metrics.avg_reputation ? '/100' : ''));
-                    setEl('metric-balance', data.metrics.wallet_balance !== undefined ? data.metrics.wallet_balance + ' ETH' : '---');
-                    setEl('metric-protocol', data.metrics.current_protocol || '---');
-                    setEl('metric-nodes', data.metrics.node_count !== undefined ? data.metrics.node_count : '---');
-
-                    const secEl = document.getElementById('metric-security');
-                    if (secEl) {
-                        secEl.innerText = data.metrics.user_role || 'WHITELISTING';
-                        if (data.metrics.user_role === 'ADMIN') {
-                            secEl.className = 'metric-value text-success';
-                        } else if (data.metrics.user_role === 'AUTHORIZED') {
-                            secEl.className = 'metric-value text-primary';
-                        } else {
-                            secEl.className = 'metric-value text-danger';
-                        }
-                    }
-
-                    const statusText = document.getElementById('net-status-text');
-                    const alertBar = document.getElementById('network-alert-bar');
-                    const panicBtn = document.getElementById('panicButton');
-
-                    if (data.metrics.net_status === 'SILENCED') {
-                        statusText.innerText = 'SILENCED (HIGH SECURITY)';
-                        alertBar.className = 'alert alert-danger py-1 mt-2 d-inline-block shadow-pulse';
-                        panicBtn.className = 'btn btn-success btn-lg shadow';
-                        panicBtn.innerHTML = '<i class="fas fa-undo"></i> RESTORE NETWORK';
-                    } else {
-                        statusText.innerText = 'NORMAL';
-                        alertBar.className = 'alert alert-success py-1 mt-2 d-inline-block';
-                        panicBtn.className = 'btn btn-danger btn-lg shadow';
-                        panicBtn.innerHTML = '<i class="fas fa-skull-crossbones"></i> GLOBAL PANIC';
-                    }
-
-                    if (data.logs && data.logs.length > 0) {
-                        const logContainer = document.getElementById('log-container');
-                        data.logs.forEach(log => {
-                            const entry = document.createElement('div');
-                            entry.className = 'log-entry';
-                            entry.innerHTML = `<span class="log-time">${new Date().toLocaleTimeString()}</span> ${log}`;
-                            logContainer.prepend(entry);
-                        });
-                    }
-                    updateChart(data.chart_data);
-                } catch (error) {
-                    console.error("Dashboard update failed:", error);
                 }
-            }
 
-            function updateStatus(service, isOnline) {
-                const dot = document.getElementById(`${service}-status-dot`);
-                const text = document.getElementById(`${service}-status-text`);
-                if (isOnline) {
-                    dot.className = 'status-indicator status-online';
-                    text.innerText = 'Online';
-                    text.className = 'text-success small';
-                } else {
-                    dot.className = 'status-indicator status-offline';
-                    text.innerText = 'Offline';
-                    text.className = 'text-danger small';
+                const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+                const m = data.metrics || {};
+                setEl('metric-messages', m.messages_count || 0);
+                setEl('metric-uptime', formatUptime(data.uptime || 0));
+                setEl('metric-reputation', (m.avg_reputation || '---') + (m.avg_reputation ? '/100' : ''));
+                setEl('metric-balance', (m.wallet_balance !== undefined ? m.wallet_balance : '---') + ' ETH');
+                setEl('metric-protocol', m.current_protocol || '---');
+                setEl('metric-nodes', m.node_count !== undefined ? m.node_count : '---');
+
+                const secEl = document.getElementById('metric-security');
+                if (secEl) {
+                    secEl.innerText = m.user_role || 'WHITELISTING';
+                    secEl.className = 'metric-value ' + (m.user_role === 'ADMIN' ? 'text-success' : m.user_role === 'AUTHORIZED' ? 'text-primary' : 'text-danger');
                 }
-            }
 
-            async function updateBlockchainState() {
-                try {
-                    const response = await fetch('/api/latest_block');
-                    const data = await response.json();
-                    if (data.success) {
-                        document.getElementById('currentBlock').innerText = `#${data.number}`;
-                        document.getElementById('currentBlockHash').innerText = data.hash.substring(0, 12) + '...';
-                    }
-                } catch (error) {
-                    console.error("Block state update failed:", error);
-                }
-            }
-
-            async function triggerPanic() {
-                if (!userAccount) { alert("Please connect wallet first"); return; }
-                if (confirm("⚠️ WARNING: This will trigger/restore a GLOBAL network silence. Continue?")) {
-                    try {
-                        const res = await fetch('/api/trigger_panic', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ admin_wallet: userAccount })
-                        });
-                        const data = await res.json();
-                        if (data.success) {
-                            alert("Panic state toggled! TX: " + data.tx_hash);
-                            updateDashboard();
-                        } else { alert("Panic Trigger Failed: " + data.error); }
-                    } catch (err) { alert("Request Error: " + err); }
-                }
-            }
-
-            function formatUptime(seconds) {
-                if (seconds < 60) return seconds + "s";
-                if (seconds < 3600) return Math.floor(seconds / 60) + "m";
-                return Math.floor(seconds / 3600) + "h";
-            }
-
-            // --- Wallet & RBAC ---
-            async function connectMetaMask() {
-                if (window.ethereum) {
-                    try {
-                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                        userAccount = accounts[0].toLowerCase();
-                        document.getElementById('connectWalletBtn').innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
-                        document.getElementById('connectWalletBtn').classList.replace('btn-outline-light', 'btn-success');
-                        checkAdminAccess();
-                    } catch (error) { console.error("Wallet connection failed:", error); }
-                } else { alert("MetaMask not found. Please install the extension."); }
-            }
-
-            // --- Personnel Management ---
-            async function updatePersonnel() {
-                if (userAccount !== ADMIN_ADDRESS) return;
-                try {
-                    const res = await fetch(`/api/admin/personnel?admin_wallet=${userAccount}`);
-                    const data = await res.json();
-
-                    const pb = document.getElementById('pending-personnel-body');
-                    if (pb) {
-                        pb.innerHTML = '';
-                        if (data.pending && data.pending.length > 0) {
-                            data.pending.forEach(u => {
-                                pb.innerHTML += `<tr>
-                                <td class="text-info font-monospace small">${u.address.substring(0, 10)}...</td>
-                                <td>${u.name}</td>
-                                <td>${u.organization}</td>
-                                <td><button class="btn btn-xs btn-primary py-0" style="font-size: 0.7rem;" onclick="openVerifyModal('${u.address}', '${u.name}')">Verify</button></td>
-                            </tr>`;
-                            });
-                        } else { pb.innerHTML = '<tr><td colspan="4" class="text-center text-muted small py-2">No pending requests</td></tr>'; }
-                    }
-
-                    const vb = document.getElementById('verified-personnel-body');
-                    if (vb) {
-                        vb.innerHTML = '';
-                        const levels = ["NONE", "READ", "BASIC", "ENCR", "TRIG", "FULL"];
-                        if (data.verified && data.verified.length > 0) {
-                            data.verified.forEach(u => {
-                                const activeBadge = u.isActive ? '<span class="badge bg-success" style="font-size:0.6rem;">ACTIVE</span>' : '<span class="badge bg-danger" style="font-size:0.6rem;">BLOCKED</span>';
-                                vb.innerHTML += `<tr>
-                                <td class="text-info font-monospace small">${u.address.substring(0, 10)}...</td>
-                                <td>${u.name} <br> <span class="text-muted" style="font-size:0.7rem;">${u.organization}</span></td>
-                                <td><span class="badge bg-primary" style="font-size:0.7rem;">${levels[u.level]}</span></td>
-                                <td>${u.reputation}</td>
-                                <td>${activeBadge}</td>
-                                <td><button class="btn btn-xs btn-outline-danger py-0" style="font-size: 0.7rem;" onclick="blockUser('${u.address}')" ${!u.isActive ? 'disabled' : ''}>Block</button></td>
-                            </tr>`;
-                            });
-                        } else { vb.innerHTML = '<tr><td colspan="6" class="text-center text-muted small py-2">No verified personnel</td></tr>'; }
-                    }
-                } catch (err) { console.error("Personnel Error:", err); }
-            }
-
-            function checkAdminAccess() {
-                const adminRow = document.getElementById('adminRow');
+                const statusText = document.getElementById('net-status-text');
+                const alertBar = document.getElementById('network-alert-bar');
                 const panicBtn = document.getElementById('panicButton');
-                const personnelRow = document.getElementById('personnelRow');
 
-                console.log("[RBAC] Inspecting access. User:", userAccount, "Admin:", ADMIN_ADDRESS);
-
-                if (userAccount === ADMIN_ADDRESS) {
-                    if (adminRow) adminRow.style.display = 'flex';
-                    if (panicBtn) panicBtn.style.display = 'block';
-                    if (personnelRow) personnelRow.style.display = 'flex';
-                    console.log("[RBAC] Admin Access Verified.");
-                    updatePersonnel();
+                if (m.net_status === 'SILENCED') {
+                    if (statusText) statusText.innerText = 'SILENCED';
+                    if (alertBar) alertBar.className = 'alert alert-danger py-1 mt-2 d-inline-block shadow-pulse x-small';
+                    if (panicBtn) {
+                        panicBtn.className = 'btn btn-success btn-lg shadow w-100';
+                        panicBtn.innerHTML = '<i class="fas fa-undo me-2"></i> RESTORE NETWORK';
+                    }
                 } else {
-                    if (adminRow) adminRow.style.display = 'none';
-                    if (panicBtn) panicBtn.style.display = 'none';
-                    if (personnelRow) personnelRow.style.display = 'none';
-                    console.log("[RBAC] User is not Admin.");
-                }
-            }
-
-            function openVerifyModal(addr, name) {
-                selectedUserForVerification = addr;
-                document.getElementById('modal-user-display').innerText = `${name} (${addr.substring(0, 10)}...)`;
-                if (!verifyModal) verifyModal = new bootstrap.Modal(document.getElementById('verifyUserModal'));
-                verifyModal.show();
-            }
-
-            async function submitVerification(level) {
-                if (!selectedUserForVerification) return;
-                try {
-                    const res = await fetch('/api/admin/verify_user', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ admin_wallet: userAccount, user_address: selectedUserForVerification, level: level })
-                    });
-                    const result = await res.json();
-                    if (result.success) {
-                        alert("User verified! TX: " + result.tx_hash);
-                        if (verifyModal) verifyModal.hide();
-                        updatePersonnel();
-                    } else { alert("Verification failed: " + result.error); }
-                } catch (err) { alert("Request error: " + err); }
-            }
-
-            async function blockUser(addr) {
-                if (!confirm(`Are you sure you want to deactivate ${addr}?`)) return;
-                try {
-                    const res = await fetch('/api/admin/block_user', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ admin_wallet: userAccount, user_address: addr })
-                    });
-                    const result = await res.json();
-                    if (result.success) {
-                        alert("User blocked! TX: " + result.tx_hash);
-                        updatePersonnel();
-                    } else { alert("Action failed: " + result.error); }
-                } catch (err) { alert("Request error: " + err); }
-            }
-
-            // Advanced Security Logic
-            async function authorizeSender() {
-                const wallet = document.getElementById('whitelistWallet').value;
-                if (!wallet) return;
-                try {
-                    const res = await fetch('/api/security/authorize', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ wallet: wallet })
-                    });
-                    const data = await res.json();
-                    alert(data.success ? "✅ Request Sent: " + data.message : "❌ Error: " + data.error);
-                    updateDashboard();
-                } catch (e) { console.error(e); }
-            }
-
-            async function checkClearance() {
-                const wallet = prompt("Enter wallet address to verify clearance:");
-                if (!wallet) return;
-                try {
-                    const res = await fetch('/api/registry/status/' + wallet);
-                    const data = await res.json();
-                    if (data.success) {
-                        document.getElementById('reg-org').innerText = data.organization;
-                        document.getElementById('reg-clearance').innerText = data.clearance;
-                        document.getElementById('reg-clearance').className = 'badge bg-primary';
-                        updateDashboard();
-                    } else { alert("❌ Error: " + data.error); }
-                } catch (e) { console.error(e); }
-            }
-
-            async function switchProtocol(protocol) {
-                if (!confirm(`Switch network to ${protocol.toUpperCase()} mode?`)) return;
-                try {
-                    const res = await fetch('/api/controller/protocol', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ protocol: protocol })
-                    });
-                    const data = await res.json();
-                    if (data.success) {
-                        alert("📡 Protocol switch initiated! TX: " + data.tx_hash);
-                        updateDashboard();
-                    } else { alert("❌ Error: " + data.error); }
-                } catch (e) { console.error(e); }
-            }
-
-            // --- Network Discovery & Controls ---
-            async function updateBlockchainInbox() {
-                try {
-                    const response = await fetch('http://localhost:5000/dead_drop_check');
-                    const data = await response.json();
-                    const inboxList = document.getElementById('inboxList');
-                    const status = document.getElementById('inboxStatus');
-
-                    if (data.success && inboxList) {
-                        if (status) {
-                            status.innerText = `Synced: ${new Date().toLocaleTimeString()}`;
-                            status.className = 'badge bg-success x-small';
-                        }
-
-                        if (data.messages && data.messages.length > 0) {
-                            let html = '';
-                            [...data.messages].reverse().forEach(msg => {
-                                const isLocked = msg.is_locked;
-                                html += `<div class="mb-2 p-2 border-start border-3 ${isLocked ? 'border-warning' : 'border-success'} bg-dark bg-opacity-10 rounded">
-                                <div class="d-flex justify-content-between small mb-1">
-                                    <span class="text-info fw-bold">From: ${msg.sender.substring(0, 6)}...</span>
-                                    ${isLocked ? '<span class="text-warning"><i class="fas fa-lock"></i> LOCKED</span>' : '<span class="text-success"><i class="fas fa-unlock"></i> RELEASED</span>'}
-                                </div>
-                                <div class="p-1 bg-dark bg-opacity-50 rounded font-monospace x-small" style="word-break: break-all; color: ${isLocked ? '#888' : '#eee'}">${msg.content}</div>
-                                <div class="d-flex justify-content-between mt-1" style="font-size: 0.6rem;">
-                                    <span class="text-muted">${msg.formatted_time}</span>
-                                    <span class="${isLocked ? 'text-warning' : 'text-success'}">${isLocked ? 'Schedule: ' + msg.release_date : 'Available'}</span>
-                                </div>
-                            </div>`;
-                            });
-                            inboxList.innerHTML = html;
-                        } else { inboxList.innerHTML = '<div class="text-center py-3 text-muted small">No messages found.</div>'; }
-                    } else if (status) {
-                        status.innerText = 'Sync Error';
-                        status.className = 'badge bg-danger x-small';
+                    if (statusText) statusText.innerText = 'NORMAL';
+                    if (alertBar) alertBar.className = 'alert alert-success py-1 mt-2 d-inline-block x-small';
+                    if (panicBtn) {
+                        panicBtn.className = 'btn btn-danger btn-lg shadow w-100';
+                        panicBtn.innerHTML = '<i class="fas fa-skull-crossbones me-2"></i> GLOBAL PANIC';
                     }
-                } catch (e) { console.error("Inbox error:", e); }
-            }
-
-            async function updateBlockchainHistory() {
-                const body = document.getElementById('blockchain-history-body');
-                if (!body) return;
-                try {
-                    const response = await fetch('/api/blockchain/history');
-                    const data = await response.json();
-                    if (data.success && data.history) {
-                        if (data.history.length === 0) {
-                            body.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">No message history found in recent blocks.</td></tr>';
-                            return;
-                        }
-                        let html = '';
-                        data.history.forEach(ev => {
-                            const sShort = ev.sender.substring(0, 8) + '...';
-                            const rShort = ev.recipient.substring(0, 8) + '...';
-                            const txShort = ev.tx_hash.substring(0, 10) + '...';
-                            const explorerUrl = `https://sepolia.etherscan.io/tx/${ev.tx_hash}`;
-
-                            html += `
-                            <tr>
-                                <td title="${ev.sender}"><code class="text-primary">${sShort}</code></td>
-                                <td title="${ev.recipient}"><code class="text-success">${rShort}</code></td>
-                                <td>
-                                    <a href="${explorerUrl}" target="_blank" class="text-info text-decoration-none">
-                                        <code>${txShort}</code> <i class="fas fa-external-link-alt x-small"></i>
-                                    </a>
-                                </td>
-                                <td><span class="badge bg-secondary">#${ev.block_number}</span></td>
-                                <td class="text-muted">${ev.formatted_time}</td>
-                            </tr>
-                        `;
-                        });
-                        body.innerHTML = html;
-                    } else {
-                        body.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Failed to load history</td></tr>';
-                    }
-                } catch (error) {
-                    console.error("History error:", error);
-                    body.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-danger">Network Error</td></tr>';
                 }
-            }
 
-            // --- Chart Management ---
-            let chart; // Declare chart globally or in a scope accessible by updateChart
-
-            function updateChart(newData) {
-                if (chart && newData) { // Check if chart is initialized
-                    chart.data.datasets[0].data = newData;
+                if (data.chart_data && chart) {
+                    chart.data.datasets[0].data = data.chart_data;
                     chart.update();
                 }
+            } catch (error) {
+                console.error("Dashboard update failed:", error);
             }
+        }
 
-            // --- Drift & P2P Helpers ---
-            async function updateDriftStatus() {
+        function updateStatus(service, isOnline) {
+            const dot = document.getElementById(`${service}-status-dot`);
+            const text = document.getElementById(`${service}-status-text`);
+            if (!dot || !text) return;
+            if (isOnline) {
+                dot.className = 'status-indicator status-online';
+                text.innerText = 'Online';
+                text.className = 'text-success small';
+            } else {
+                dot.className = 'status-indicator status-offline';
+                text.innerText = 'Offline';
+                text.className = 'text-danger small';
+            }
+        }
+
+        async function updateBlockchainState() {
+            try {
+                const response = await fetch('/api/latest_block');
+                const data = await response.json();
+                if (data.success) {
+                    const blockEl = document.getElementById('currentBlock');
+                    const hashEl = document.getElementById('currentBlockHash');
+                    if (blockEl) blockEl.innerText = `#${data.number}`;
+                    if (hashEl) hashEl.innerText = data.hash.substring(0, 12) + '...';
+                }
+            } catch (e) { console.error("Block sync failed:", e); }
+        }
+
+        async function updateBlockchainInbox() {
+            try {
+                const response = await fetch('/dead_drop_check');
+                const data = await response.json();
+                const inboxList = document.getElementById('inboxList');
+                const status = document.getElementById('inboxStatus');
+
+                if (data.success && inboxList) {
+                    if (status) {
+                        status.innerText = `Synced: ${new Date().toLocaleTimeString()}`;
+                        status.className = 'badge bg-success x-small';
+                    }
+
+                    if (data.messages && data.messages.length > 0) {
+                        let html = '';
+                        [...data.messages].reverse().forEach(msg => {
+                            const isLocked = msg.is_locked;
+                            html += `
+                            <div class="mb-2 p-2 border-start border-3 ${isLocked ? 'border-warning' : 'border-success'} bg-dark bg-opacity-25 rounded small">
+                                <div class="d-flex justify-content-between x-small mb-1">
+                                    <span class="text-info fw-bold">From: ${msg.sender.substring(0, 6)}...</span>
+                                    ${isLocked ? '<span class="text-warning"><i class="fas fa-lock"></i></span>' : '<span class="text-success"><i class="fas fa-unlock"></i></span>'}
+                                </div>
+                                <div class="p-1 font-monospace x-small" style="word-break: break-all; color: ${isLocked ? '#888' : '#eee'}">${msg.content}</div>
+                            </div>`;
+                        });
+                        inboxList.innerHTML = html;
+                    } else { inboxList.innerHTML = '<div class="text-center py-3 text-muted x-small">No messages on-chain.</div>'; }
+                }
+            } catch (e) { console.error("Inbox Sync Error:", e); }
+        }
+
+        async function triggerPanic() {
+            if (!userAccount) { alert("Please connect wallet first"); return; }
+            if (confirm("⚠️ Trigger Global Network Silence?")) {
                 try {
-                    const response = await fetch('http://localhost:5000/api/drift_status');
-                    const data = await response.json();
-                    const module = document.getElementById('driftModule');
-                    if (!module) return;
-                    if (data.active) {
-                        module.classList.remove('d-none');
-                        document.getElementById('driftPercent').innerText = Math.round(data.progress) + '%';
-                        document.getElementById('driftProgressBar').style.width = data.progress + '%';
-                        document.getElementById('driftBits').innerText = `${data.current_bit}/${data.total_bits} bits`;
-                    } else if (data.progress === 100) {
-                        // Keep visible briefly when done
-                        setTimeout(() => module.classList.add('d-none'), 10000);
-                    } else {
-                        module.classList.add('d-none');
-                    }
-                } catch (e) { console.error("Drift status error:", e); }
+                    const res = await fetch('/api/trigger_panic', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ admin_wallet: userAccount })
+                    });
+                    const data = await res.json();
+                    if (data.success) alert("Panic State Toggled!");
+                    else alert("Panic Failed: " + data.error);
+                    updateDashboard();
+                } catch (err) { alert("Network Error"); }
             }
+        }
 
-            function createHopRow() {
-                const container = document.getElementById('hopsContainer');
-                if (!container) return;
-                const placeholder = document.getElementById('p2pPlaceholder');
-                if (placeholder) placeholder.remove();
-                const hopRow = document.createElement('div');
-                hopRow.className = 'hop-row border-start border-2 border-info ps-2 mb-2 position-relative';
-                hopRow.innerHTML = `
-                <div class="row g-1 align-items-end">
-                    <div class="col-4">
-                        <input type="text" name="hop_ip[]" class="form-control form-control-xs" placeholder="IP" style="font-size: 0.7rem;" required>
-                    </div>
-                    <div class="col-3">
-                        <select name="hop_channel[]" class="form-select form-select-xs" style="font-size: 0.7rem;">
-                            <option value="timing">Timing</option>
-                            <option value="size">Size</option>
-                            <option value="ttl">TTL</option>
-                        </select>
-                    </div>
-                    <div class="col-4">
-                        <input type="password" name="hop_secret[]" class="form-control form-control-xs" placeholder="Key" style="font-size: 0.7rem;" required>
-                    </div>
-                    <div class="col-1">
-                        <button type="button" class="btn btn-link btn-sm text-danger p-0 remove-hop"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-            `;
-                container.appendChild(hopRow);
+        async function connectMetaMask() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0].toLowerCase();
+                    const btn = document.getElementById('connectWalletBtn');
+                    btn.innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                    btn.classList.replace('btn-outline-light', 'btn-success');
+                    updateDashboard();
+                } catch (error) { console.error("Connection failed:", error); }
+            } else { alert("MetaMask not found!"); }
+        }
 
-                hopRow.querySelector('.remove-hop').addEventListener('click', function () {
-                    hopRow.remove();
-                    if (container.querySelectorAll('.hop-row').length === 0) {
-                        container.innerHTML = '<div class="small text-muted mb-0" id="p2pPlaceholder" style="font-size: 0.7rem;">Direct route active.</div>';
+        async function updateNetworkNodes() {
+            try {
+                const parent = document.getElementById('mermaid-parent');
+                const res = await fetch('/api/network/nodes');
+                const data = await res.json();
+                if (!data.success) return;
+
+                const nodes = data.nodes || [];
+                let graphDef = 'graph LR\n    S((Sender)) -- encrypted --> M[Mesh Registry]\n';
+
+                nodes.forEach((node, i) => {
+                    const nodeId = `N${i}`;
+                    graphDef += `    M -- ${node.channels[0] || 'relay'} --> ${nodeId}["${node.ip}"]\n`;
+                    if (node.is_active) graphDef += `    style ${nodeId} fill:#17a2b8,color:#fff,stroke:#0dcaf0\n`;
+                });
+
+                graphDef += nodes.length > 0 ? `    N0 -- deliver --> RC((Recipient))\n` : '    M -- search --> RC((Recipient))\n';
+                graphDef += '    style S fill:#007bff,color:#fff\n    style RC fill:#28a745,color:#fff\n    style M fill:#6f42c1,color:#fff';
+
+                if (parent) {
+                    parent.innerHTML = `<pre class="mermaid">${graphDef}</pre>`;
+                    if (window.mermaid) window.mermaid.init(undefined, parent.querySelectorAll('.mermaid'));
+                }
+            } catch (e) { console.error("Topology update failed:", e); }
+        }
+
+        function clearTerminal() {
+            const el = document.getElementById('log-container');
+            if (el) el.innerHTML = '';
+        }
+
+        function initTerminalStream() {
+            const eventSource = new EventSource('/api/logs/stream');
+            const logContainer = document.getElementById('log-container');
+            const status = document.getElementById('stream-status');
+
+            eventSource.onmessage = function (e) {
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.innerHTML = `<span class="log-time">${new Date().toLocaleTimeString()}</span> ${e.data}`;
+                if (logContainer) {
+                    logContainer.appendChild(logEntry);
+                    logContainer.scrollTop = logContainer.scrollHeight;
+                }
+            };
+            eventSource.onerror = function () {
+                if (status) {
+                    status.className = 'badge bg-danger small';
+                    status.innerHTML = '<i class="fas fa-unlink me-1"></i> DISCONNECTED';
+                }
+                eventSource.close();
+                setTimeout(initTerminalStream, 5000);
+            };
+        }
+
+        function formatUptime(s) {
+            if (s < 60) return s + 's';
+            if (s < 3600) return Math.floor(s / 60) + 'm';
+            return Math.floor(s / 3600) + 'h';
+        }
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['10m', '8m', '6m', '4m', '2m', 'Now'],
+                    datasets: [{
+                        label: 'Messages',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            if (window.mermaid) window.mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+            // Initial Sync
+            updateDashboard();
+            updateBlockchainState();
+            updateBlockchainInbox();
+            updateNetworkNodes();
+            initTerminalStream();
+
+            // Refresh Intervals
+            setInterval(updateDashboard, 5000);
+            setInterval(updateBlockchainState, 15000);
+            setInterval(updateBlockchainInbox, 10000);
+            setInterval(updateNetworkNodes, 30000);
+
+            // Auto-wallet check
+            if (window.ethereum) {
+                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                    if (accounts.length > 0) {
+                        userAccount = accounts[0].toLowerCase();
+                        const btn = document.getElementById('connectWalletBtn');
+                        btn.innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
+                        btn.classList.replace('btn-outline-light', 'btn-success');
+                        updateDashboard();
                     }
                 });
-                return hopRow;
+                window.ethereum.on('accountsChanged', () => location.reload());
             }
-
-            // --- Initialization & Lifecycle ---
-            document.addEventListener('DOMContentLoaded', () => {
-                // Initialize Chart
-                const ctx = document.getElementById('activityChart').getContext('2d');
-                chart = new Chart(ctx, { // Assign to the globally declared chart variable
-                    type: 'line',
-                    data: {
-                        labels: ['10m', '8m', '6m', '4m', '2m', 'Now'],
-                        datasets: [{
-                            label: 'Messages',
-                            data: [0, 0, 0, 0, 0, 0],
-                            borderColor: '#2a5298',
-                            tension: 0.4,
-                            fill: true,
-                            backgroundColor: 'rgba(42, 82, 152, 0.1)'
-                        }]
-                    },
-                    options: { responsive: true }
-                });
-
-                // Event Listeners
-                const addHopBtn = document.getElementById('addHopBtn');
-                if (addHopBtn) addHopBtn.addEventListener('click', createHopRow);
-
-                const fetchNodesBtn = document.getElementById('fetchNodesBtn');
-                if (fetchNodesBtn) {
-                    fetchNodesBtn.addEventListener('click', async function () {
-                        const btn = this;
-                        const originalText = btn.innerHTML;
-                        const nodesContainer = document.getElementById('verifiedNodes');
-                        const nodesList = document.getElementById('nodesList');
-
-                        try {
-                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching...';
-                            btn.disabled = true;
-
-                            const response = await fetch('http://localhost:5000/api/verified_nodes');
-                            const data = await response.json();
-
-                            if (data.success && data.nodes.length > 0) {
-                                nodesList.innerHTML = '';
-                                data.nodes.forEach(node => {
-                                    const badge = document.createElement('span');
-                                    badge.className = 'badge bg-light text-dark border p-1 cursor-pointer me-1';
-                                    badge.style.fontSize = '0.65rem';
-                                    badge.style.cursor = 'pointer';
-                                    badge.innerHTML = `<i class="fas fa-shield-alt text-success"></i> ${node.ip}`;
-                                    badge.onclick = () => {
-                                        const row = createHopRow();
-                                        row.querySelector('input[name="hop_ip[]"]').value = node.ip;
-                                        row.querySelector('select[name="hop_channel[]"]').value = node.channels[0] || 'timing';
-                                    };
-                                    nodesList.appendChild(badge);
-                                });
-                                if (nodesContainer) nodesContainer.classList.remove('d-none');
-                            } else {
-                                alert("No nodes found on-chain. Nodes must register first.");
-                            }
-                        } catch (error) {
-                            console.error("Discovery error:", error);
-                            alert("Discovery failed. Ensure App (Port 5000) is running.");
-                        } finally {
-                            btn.innerHTML = originalText;
-                            btn.disabled = false;
-                        }
-                    });
-                }
-
-                // AJAX Form Submission Logic
-                document.querySelectorAll('form').forEach(form => {
-                    form.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-                        const formData = new FormData(form);
-                        const action = form.getAttribute('action');
-                        const submitBtn = form.querySelector('button[type="submit"]');
-                        const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
-
-                        try {
-                            if (submitBtn) {
-                                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> TRANSMITTING...';
-                                submitBtn.disabled = true;
-                            }
-
-                            const response = await fetch(action, {
-                                method: 'POST',
-                                body: formData
-                            });
-
-                            if (response.ok) {
-                                alert("🚀 Transmission Successful! Check the logs below for details.");
-                                updateDashboard(); // Refresh stats
-                            } else {
-                                alert("❌ Transmission Failed. Ensure the main steganography app (Port 5000) is running.");
-                            }
-                        } catch (error) {
-                            console.error("Transmission error:", error);
-                            alert("⚠️ Error connecting to transmission node. Check console for details.");
-                        } finally {
-                            if (submitBtn) {
-                                submitBtn.innerHTML = originalBtnText;
-                                submitBtn.disabled = false;
-                            }
-                        }
-                    });
-                });
-
-                // ===================== PROTOCOL ANALYTICS (Dashboard) =====================
-                let dashRadar = null, dashBar = null, dashTrend = null;
-
-                function drawDashGauge(canvasId, value, maxVal = 100) {
-                    const canvas = document.getElementById(canvasId);
-                    if (!canvas) return;
-                    const ctx = canvas.getContext('2d');
-                    const w = canvas.width, h = canvas.height;
-                    const cx = w / 2, cy = h / 2, r = 34;
-                    ctx.clearRect(0, 0, w, h);
-                    ctx.beginPath(); ctx.arc(cx, cy, r, 0.75 * Math.PI, 2.25 * Math.PI);
-                    ctx.strokeStyle = '#374151'; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.stroke();
-                    const ratio = Math.min(value / maxVal, 1);
-                    const endAngle = 0.75 * Math.PI + ratio * 1.5 * Math.PI;
-                    let color = '#22c55e';
-                    if (value > 60) color = '#ef4444'; else if (value > 35) color = '#f59e0b';
-                    ctx.beginPath(); ctx.arc(cx, cy, r, 0.75 * Math.PI, endAngle);
-                    ctx.strokeStyle = color; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.stroke();
-                }
-
-                function initDashAnalyticsCharts() {
-                    dashRadar = new Chart(document.getElementById('dashRadarChart'), {
-                        type: 'radar',
-                        data: {
-                            labels: ['Stealth', 'Speed', 'Throughput'],
-                            datasets: [
-                                { label: 'TIMING', data: [75, 30, 22], backgroundColor: 'rgba(34,197,94,0.2)', borderColor: '#22c55e', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#22c55e' },
-                                { label: 'SIZE', data: [45, 55, 60], backgroundColor: 'rgba(59,130,246,0.2)', borderColor: '#3b82f6', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#3b82f6' },
-                                { label: 'TTL', data: [28, 82, 100], backgroundColor: 'rgba(249,115,22,0.2)', borderColor: '#f97316', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#f97316' },
-                            ]
-                        },
-                        options: {
-                            responsive: true, maintainAspectRatio: false,
-                            scales: { r: { beginAtZero: true, max: 100, grid: { color: 'rgba(255,255,255,0.08)' }, angleLines: { color: 'rgba(255,255,255,0.08)' }, pointLabels: { color: '#9ca3af', font: { size: 10 } }, ticks: { display: false } } },
-                            plugins: { legend: { labels: { color: '#d1d5db', font: { size: 10 }, usePointStyle: true } } }
-                        }
-                    });
-
-                    dashBar = new Chart(document.getElementById('dashBarChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['TIMING', 'SIZE', 'TTL'],
-                            datasets: [
-                                { label: 'Latency (ms)', data: [120, 80, 45], backgroundColor: ['rgba(34,197,94,0.6)', 'rgba(59,130,246,0.6)', 'rgba(249,115,22,0.6)'], borderRadius: 4 },
-                                { label: 'Throughput (bps)', data: [45, 120, 200], backgroundColor: ['rgba(34,197,94,0.2)', 'rgba(59,130,246,0.2)', 'rgba(249,115,22,0.2)'], borderColor: ['#22c55e', '#3b82f6', '#f97316'], borderWidth: 2, borderRadius: 4 },
-                            ]
-                        },
-                        options: {
-                            responsive: true, maintainAspectRatio: false,
-                            scales: { x: { ticks: { color: '#9ca3af', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } } },
-                            plugins: { legend: { labels: { color: '#d1d5db', font: { size: 10 } } } }
-                        }
-                    });
-
-                    dashTrend = new Chart(document.getElementById('dashTrendChart'), {
-                        type: 'line',
-                        data: {
-                            labels: Array.from({ length: 10 }, (_, i) => `T-${9 - i}`),
-                            datasets: [
-                                { label: 'Timing', data: Array(10).fill(25), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
-                                { label: 'Size', data: Array(10).fill(55), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
-                                { label: 'TTL', data: Array(10).fill(72), borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
-                            ]
-                        },
-                        options: {
-                            responsive: true, maintainAspectRatio: false,
-                            scales: { x: { ticks: { color: '#6b7280' }, grid: { display: false } }, y: { min: 0, max: 100, ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' } } },
-                            plugins: { legend: { labels: { color: '#d1d5db', font: { size: 10 }, usePointStyle: true } } }
-                        }
-                    });
-
-                    drawDashGauge('dashGaugeTiming', 25);
-                    drawDashGauge('dashGaugeSize', 55);
-                    drawDashGauge('dashGaugeTTL', 72);
-                }
-
-                async function fetchDashAnalytics() {
-                    try {
-                        const res = await fetch('/api/protocol/analytics?live=true');
-                        const data = await res.json();
-                        if (!data.success) return;
-                        const p = data.protocols;
-
-                        if (dashRadar) {
-                            dashRadar.data.datasets[0].data = [100 - p.timing.detection_risk, Math.max(0, 100 - p.timing.latency_ms / 1.5), p.timing.throughput_bps / 2.5];
-                            dashRadar.data.datasets[1].data = [100 - p.size.detection_risk, Math.max(0, 100 - p.size.latency_ms / 1.5), p.size.throughput_bps / 2.5];
-                            dashRadar.data.datasets[2].data = [100 - p.ttl.detection_risk, Math.max(0, 100 - p.ttl.latency_ms / 1.5), p.ttl.throughput_bps / 2.5];
-                            dashRadar.update('none');
-                        }
-                        if (dashBar) {
-                            dashBar.data.datasets[0].data = [p.timing.latency_ms, p.size.latency_ms, p.ttl.latency_ms];
-                            dashBar.data.datasets[1].data = [p.timing.throughput_bps, p.size.throughput_bps, p.ttl.throughput_bps];
-                            dashBar.update('none');
-                        }
-
-                        ['timing', 'size', 'ttl'].forEach(ch => {
-                            const risk = p[ch].detection_risk;
-                            const gId = ch === 'timing' ? 'dashGaugeTiming' : ch === 'size' ? 'dashGaugeSize' : 'dashGaugeTTL';
-                            drawDashGauge(gId, risk);
-                            document.getElementById(`dash-risk-${ch}`).textContent = Math.round(risk);
-                            const badge = document.getElementById(`dash-badge-${ch}`);
-                            if (risk <= 30) { badge.textContent = 'LOW'; badge.className = 'badge bg-success'; badge.style.fontSize = '0.6rem'; }
-                            else if (risk <= 60) { badge.textContent = 'MED'; badge.className = 'badge bg-warning text-dark'; badge.style.fontSize = '0.6rem'; }
-                            else { badge.textContent = 'HIGH'; badge.className = 'badge bg-danger'; badge.style.fontSize = '0.6rem'; }
-                        });
-
-                        if (dashTrend && data.history) {
-                            dashTrend.data.datasets[0].data = data.history.map(h => h.timing.risk);
-                            dashTrend.data.datasets[1].data = data.history.map(h => h.size.risk);
-                            dashTrend.data.datasets[2].data = data.history.map(h => h.ttl.risk);
-                            dashTrend.update('none');
-                        }
-
-                        document.getElementById('dash-rec-protocol').textContent = data.recommendation;
-                        document.getElementById('dash-rec-time').textContent = data.timestamp;
-                        const recColors = { TIMING: '#22c55e', SIZE: '#3b82f6', TTL: '#f97316' };
-                        document.getElementById('dash-rec-protocol').style.color = recColors[data.recommendation] || '#22c55e';
-                        document.getElementById('dash-rec-banner').style.borderLeftColor = recColors[data.recommendation] || '#22c55e';
-                        const scoreText = Object.entries(data.scores).map(([k, v]) => `${k.toUpperCase()}: ${(v * 100).toFixed(0)}%`).join(' | ');
-                        document.getElementById('dash-rec-reason').textContent = `Scores: ${scoreText}`;
-                    } catch (e) { console.error('Dashboard analytics error:', e); }
-                }
-                window.fetchDashAnalytics = fetchDashAnalytics;
-
-                // Initial Load
-                updateDashboard();
-                updateBlockchainState();
-                updateBlockchainHistory();
-                updateBlockchainInbox();
-                updateDriftStatus();
-                updateNetworkNodes();
-                initDashAnalyticsCharts();
-                fetchDashAnalytics();
-
-                // Intervals
-                setInterval(updateDashboard, 5000);
-                setInterval(updateBlockchainState, 15000);
-                setInterval(updateBlockchainHistory, 30000);
-                setInterval(updateBlockchainInbox, 10000);
-                setInterval(updateDriftStatus, 5000);
-                setInterval(updateNetworkNodes, 10000);
-                setInterval(fetchDashAnalytics, 8000);
-                setInterval(() => {
-                    if (userAccount === ADMIN_ADDRESS) updatePersonnel();
-                }, 15000);
-
-                // Initialize Live Terminal Streaming
-                function initTerminalStream() {
-                    const logContainer = document.getElementById('log-container');
-                    const streamStatus = document.getElementById('stream-status');
-                    const eventSource = new EventSource('/api/logs/stream');
-
-                    eventSource.onmessage = function (event) {
-                        const logEntry = document.createElement('div');
-                        logEntry.className = 'log-entry';
-
-                        const now = new Date().toLocaleTimeString();
-
-                        // Parse message if it contains category
-                        let msg = event.data;
-                        let category = "INFO";
-
-                        if (msg.startsWith('[')) {
-                            const match = msg.match(/^\[(.*?)\] (.*)/);
-                            if (match) {
-                                category = match[1] || "INFO";
-                                msg = match[2];
-                            }
-                        }
-
-                        logEntry.innerHTML = `
-                        <span class="log-time">${now}</span>
-                        <span class="log-category cat-${category.toLowerCase()}">${category}</span>
-                        <span class="log-msg">${msg}</span>
-                    `;
-
-                        logContainer.appendChild(logEntry);
-                        logContainer.scrollTop = logContainer.scrollHeight;
-
-                        // ===================== P2P CIRCUIT EXPLORER =====================
-                        async function updateNetworkNodes() {
-                            try {
-                                const response = await fetch('/api/network/nodes');
-                                const data = await response.json();
-                                if (!data.success) return;
-
-                                const nodes = data.nodes || [];
-                                const tbody = document.getElementById('p2p-nodes-body');
-                                const countBadge = document.getElementById('node-count-badge');
-
-                                if (countBadge) countBadge.innerText = `${nodes.length} Nodes`;
-                                if (!tbody) return;
-
-                                if (nodes.length === 0) {
-                                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No nodes discovered on mesh</td></tr>';
-                                    return;
-                                }
-
-                                tbody.innerHTML = nodes.map(node => {
-                                    const lastSeen = new Date(node.last_seen * 1000).toLocaleTimeString();
-                                    const statusClass = node.is_active ? 'bg-success' : 'bg-danger';
-                                    const channels = (node.channels || []).map(c => `<span class="badge bg-secondary me-1">${c.toUpperCase()}</span>`).join('');
-
-                                    return `
-                            <tr>
-                                <td><span class="badge ${statusClass}">${node.is_active ? 'ACTIVE' : 'OFFLINE'}</span></td>
-                                <td class="text-info font-monospace" title="${node.wallet}">${node.wallet.substring(0, 10)}...</td>
-                                <td class="text-light">${node.ip}</td>
-                                <td>${channels}</td>
-                                <td>
-                                    <div class="progress" style="height: 10px; width: 80px;">
-                                        <div class="progress-bar bg-info" style="width: ${node.reputation}%"></div>
-                                    </div>
-                                    <small class="text-muted">${node.reputation}</small>
-                                </td>
-                                <td class="small text-muted">${lastSeen}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-link text-info p-0" 
-                                            onclick="alert('Node Identity\\nPublic Key: ${node.public_key}\\nLast Seen: ${lastSeen}\\nReputation: ${node.reputation}')">
-                                        <i class="fas fa-id-card"></i> View
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                                }).join('');
-
-                                // Update Topology Map
-                                updateTopologyMap(nodes);
-                            } catch (e) {
-                                console.error("Error updating network nodes:", e);
-                            }
-                        }
-
-                        async function updateTopologyMap(nodes) {
-                            const parent = document.getElementById('mermaid-parent');
-                            if (!parent) return;
-
-                            let graphDef = 'graph LR\n';
-                            graphDef += '    S((Sender)) -- encrypted --> M[Mesh Registry]\n';
-
-                            if (nodes.length > 0) {
-                                nodes.forEach((node, i) => {
-                                    const nodeId = `N${i}`;
-                                    const label = node.ip || `Node-${i}`;
-                                    graphDef += `    M -- ${node.channels[0] || 'relay'} --> ${nodeId}["${label}"]\n`;
-                                    if (node.is_active) {
-                                        graphDef += `    style ${nodeId} fill:#17a2b8,color:#fff,stroke:#0dcaf0,stroke-width:2px\n`;
-                                    } else {
-                                        graphDef += `    style ${nodeId} fill:#333,color:#666,stroke:#444\n`;
-                                    }
-                                });
-                                graphDef += `    ${nodes.length > 0 ? `N0` : 'M'} -- deliver --> RC((Recipient))\n`;
-                            } else {
-                                graphDef += '    M -- search --> RC((Recipient))\n';
-                            }
-
-                            graphDef += '    style S fill:#007bff,color:#fff\n';
-                            graphDef += '    style RC fill:#28a745,color:#fff\n';
-                            graphDef += '    style M fill:#6f42c1,color:#fff\n';
-
-                            parent.innerHTML = `<pre class="mermaid">${graphDef}</pre>`;
-
-                            // Re-initialize mermaid
-                            if (window.mermaid) {
-                                window.mermaid.init(undefined, parent.querySelectorAll('.mermaid'));
-                            }
-                        }
-
-                        window.updateNetworkNodes = updateNetworkNodes;
-
-                        // ===================== ADVANCED MONITORING =====================
-                        let aiOptimizerActive = false;
-                        let activeGeoFilters = ['North America', 'Europe', 'Asia'];
-
-                        window.runSecurityScan = async function (e) {
-                            const event = e || window.event;
-                            const btn = event ? event.target.closest('button') : document.querySelector('button[onclick*="runSecurityScan"]');
-                            const originalText = btn.innerHTML;
-                            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Scanning...';
-                            btn.disabled = true;
-
-                            try {
-                                const protocol = document.getElementById('dash-rec-protocol')?.innerText.toLowerCase() || 'timing';
-                                const response = await fetch(`/api/security/simulate_detection?protocol=${protocol}`);
-                                const data = await response.json();
-
-                                if (data.success) {
-                                    const m = data.metrics;
-                                    document.getElementById('sim-detect-prob').innerText = m.detection_probability + '%';
-                                    document.getElementById('sim-detect-bar').style.width = m.detection_probability + '%';
-                                    document.getElementById('sim-entropy').innerText = m.entropy_score.toFixed(3);
-                                    document.getElementById('sim-ks').innerText = m.ks_test_p_value.toFixed(3);
-                                    document.getElementById('sim-conf').innerText = m.bayesian_confidence + '%';
-
-                                    const alertBox = document.getElementById('sim-alert');
-                                    if (m.detection_probability > 50) {
-                                        alertBox.style.display = 'block';
-                                    } else {
-                                        alertBox.style.display = 'none';
-                                    }
-                                }
-                            } catch (e) {
-                                console.error("Scan error:", e);
-                            } finally {
-                                btn.innerHTML = originalText;
-                                btn.disabled = false;
-                            }
-                        };
-
-                        window.toggleAiOptimizer = function () {
-                            const toggle = document.getElementById('aiOptimizerToggle');
-                            const status = document.getElementById('optimizer-status');
-                            const suggestions = document.getElementById('optimizer-suggestions');
-
-                            aiOptimizerActive = toggle.checked;
-
-                            if (aiOptimizerActive) {
-                                status.innerHTML = 'Optimizer Status: <span class="text-success fw-bold">ACTIVE & MONITORING</span>';
-                                suggestions.style.display = 'block';
-                                fetchOptimization();
-                            } else {
-                                status.innerHTML = 'Optimizer Status: <span class="text-secondary">INACTIVE</span>';
-                                suggestions.style.display = 'none';
-                            }
-                        };
-
-                        async function fetchOptimization() {
-                            if (!aiOptimizerActive) return;
-                            try {
-                                const protocol = document.getElementById('dash-rec-protocol')?.innerText.toLowerCase() || 'timing';
-                                const response = await fetch(`/api/protocol/optimize?protocol=${protocol}`);
-                                const data = await response.json();
-
-                                if (data.success) {
-                                    const opt = data.optimization;
-                                    const s = data.suggested_parameters;
-                                    document.getElementById('opt-jitter').innerText = opt.suggested_jitter || opt.suggested_padding || opt.suggested_range;
-                                    document.getElementById('opt-noise').innerText = s.noise_injection_ratio;
-                                    document.getElementById('opt-eff').innerText = opt.efficiency;
-                                }
-                            } catch (e) { console.error("Optimization error:", e); }
-
-                            if (aiOptimizerActive) setTimeout(fetchOptimization, 5000);
-                        }
-
-                        window.toggleGeoFence = function (btn, region) {
-                            btn.classList.toggle('active');
-                            if (btn.classList.contains('active')) {
-                                if (!activeGeoFilters.includes(region)) activeGeoFilters.push(region);
-                            } else {
-                                activeGeoFilters = activeGeoFilters.filter(r => r !== region);
-                            }
-                            updateNetworkNodes(); // Refresh list to apply filter
-                        };
-
-                        // Wrapped updateNetworkNodes to support filtering
-                        const originalUpdateNetworkNodes = updateNetworkNodes;
-                        window.updateNetworkNodes = async function () {
-                            // We'll let the original function run but we need it to know about the filters
-                            // Since updateNetworkNodes is defined in the same scope, we replace it
-                            try {
-                                const response = await fetch('/api/network/nodes');
-                                const data = await response.json();
-                                if (!data.success) return;
-
-                                // Filter nodes based on activeGeoFilters
-                                const allNodes = data.nodes || [];
-                                const nodes = allNodes.filter(n => activeGeoFilters.includes(n.region || 'Unknown'));
-
-                                const tbody = document.getElementById('p2p-nodes-body');
-                                const countBadge = document.getElementById('node-count-badge');
-
-                                if (countBadge) countBadge.innerText = `${nodes.length} Nodes`;
-                                if (!tbody) return;
-
-                                if (nodes.length === 0) {
-                                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No nodes found in selected regions</td></tr>';
-                                    return;
-                                }
-
-                                tbody.innerHTML = nodes.map(node => {
-                                    const lastSeen = new Date(node.last_seen * 1000).toLocaleTimeString();
-                                    const statusClass = node.is_active ? 'bg-success' : 'bg-danger';
-                                    const channels = (node.channels || []).map(c => `<span class="badge bg-secondary me-1">${c.toUpperCase()}</span>`).join('');
-
-                                    return `
-                            <tr>
-                                <td><span class="badge ${statusClass}">${node.is_active ? 'ACTIVE' : 'OFFLINE'}</span></td>
-                                <td class="text-info font-monospace" title="${node.wallet}">${node.wallet.substring(0, 10)}...</td>
-                                <td class="text-light">${node.ip} <span class="text-muted small">(${node.country || '??'})</span></td>
-                                <td>${channels}</td>
-                                <td>
-                                    <div class="progress" style="height: 10px; width: 80px;">
-                                        <div class="progress-bar bg-info" style="width: ${node.reputation}%"></div>
-                                    </div>
-                                    <small class="text-muted">${node.reputation}</small>
-                                </td>
-                                <td class="small text-muted">${lastSeen}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-link text-info p-0" 
-                                            onclick="alert('Node Identity\\nPublic Key: ${node.public_key}\\nRegion: ${node.region}\\nReputation: ${node.reputation}')">
-                                        <i class="fas fa-id-card"></i> View
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                                }).join('');
-
-                                updateTopologyMap(nodes);
-                            } catch (e) {
-                                console.error("Error updating network nodes:", e);
-                            }
-                            // ===================== RESILIENCE CENTER =====================
-                            window.setupDeadManSwitch = async function () {
-                                if (!userAccount) { alert("Please connect wallet first"); return; }
-
-                                const recipient = document.getElementById('dm-recipient').value;
-                                const timeout = document.getElementById('dm-timeout').value;
-                                const message = document.getElementById('dm-message').value;
-                                const btn = document.getElementById('btn-dm-setup');
-
-                                if (!recipient || !message) { alert("Please fill in recipient and message"); return; }
-
-                                btn.disabled = true;
-                                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ARMING...';
-
-                                try {
-                                    const response = await fetch('/api/security/deadman/setup', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                            wallet: userAccount,
-                                            recipient: recipient,
-                                            message: message,
-                                            timeout: timeout
-                                        })
-                                    });
-                                    const data = await response.json();
-                                    if (data.success) {
-                                        alert("Dead-Man Switch ARMED and Monitoring.");
-                                        updateDeadManUI();
-                                    } else {
-                                        alert("Error: " + data.error);
-                                    }
-                                } catch (e) {
-                                    console.error("Setup error:", e);
-                                } finally {
-                                    btn.disabled = false;
-                                    btn.innerHTML = '<i class="fas fa-power-off me-1"></i>ARM SWITCH';
-                                }
-                            };
-
-                            window.pingDeadMan = async function () {
-                                if (!userAccount) return;
-                                try {
-                                    const response = await fetch('/api/security/deadman/ping', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ wallet: userAccount })
-                                    });
-                                    const data = await response.json();
-                                    if (data.success) {
-                                        updateDeadManUI();
-                                    }
-                                } catch (e) { console.error("Ping error:", e); }
-                            };
-
-                            async function updateDeadManUI() {
-                                if (!userAccount) return;
-                                try {
-                                    const response = await fetch(`/api/security/deadman/status?wallet=${userAccount}`);
-                                    const data = await response.json();
-
-                                    const banner = document.getElementById('dm-status-banner');
-                                    const text = document.getElementById('dm-status-text');
-                                    const globalStatus = document.getElementById('resilience-global-status');
-
-                                    if (data.success && data.status) {
-                                        banner.style.display = 'block';
-                                        const s = data.status;
-
-                                        if (s.triggered) {
-                                            text.innerHTML = `<span class="text-danger fw-bold">TRIGGERED!</span> Message broadcast to ${s.recipient}`;
-                                            globalStatus.className = 'badge bg-danger text-white px-3 py-2 fw-bold';
-                                            globalStatus.innerHTML = '<i class="fas fa-skull me-1"></i>DEAD-MAN TRIGGERED';
-                                        } else {
-                                            const h = Math.floor(s.remaining_seconds / 3600);
-                                            const m = Math.floor((s.remaining_seconds % 3600) / 60);
-                                            const sec = s.remaining_seconds % 60;
-                                            text.innerText = `Broadcasting to ${s.recipient} in ${h}h ${m}m ${sec}s`;
-
-                                            globalStatus.className = 'badge bg-warning text-dark px-3 py-2 fw-bold';
-                                            globalStatus.innerHTML = '<i class="fas fa-shield-alt me-1"></i>SWITCH ARMED';
-                                        }
-                                    } else {
-                                        banner.style.display = 'none';
-                                    }
-
-                                    // Also update node count in resilience tab
-                                    const nodesRes = await fetch('/api/network/nodes');
-                                    const nodesData = await nodesRes.json();
-                                    if (nodesData.success) {
-                                        document.getElementById('resilience-active-nodes').innerText = (nodesData.nodes || []).length;
-                                    }
-                                } catch (e) { console.error("Status update error:", e); }
-                            }
-
-                            // Auto-ping and status refresh loop
-                            setInterval(updateDeadManUI, 5000);
-                            setInterval(pingDeadMan, 60000); // Heartbeat every minute
-
-                            window.updateNetworkNodes = updateNetworkNodes;
-                            // ===================== END P2P EXPLORER =====================
-
-                            // Keep only last 100 entries for performance
-                            if (logContainer.children.length > 100) {
-                                logContainer.removeChild(logContainer.firstChild);
-                            }
-                        };
-
-                        eventSource.onerror = function () {
-                            if (streamStatus) {
-                                streamStatus.className = 'badge bg-danger small';
-                                streamStatus.innerHTML = '<i class="fas fa-unlink me-1"></i> DISCONNECTED';
-                            }
-                            setTimeout(initTerminalStream, 5000); // Retry after 5s
-                            eventSource.close();
-                        };
-                    }
-
-                    window.clearTerminal = function () {
-                        const logContainer = document.getElementById('log-container');
-                        if (logContainer) logContainer.innerHTML = '';
-                    };
-
-                    initTerminalStream();
-
-                    // Auto-wallet check
-                    if (window.ethereum) {
-                        window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
-                            if (accounts.length > 0) {
-                                userAccount = accounts[0].toLowerCase();
-                                const connectWalletBtn = document.getElementById('connectWalletBtn');
-                                if (connectWalletBtn) {
-                                    connectWalletBtn.innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
-                                    connectWalletBtn.classList.replace('btn-outline-light', 'btn-success');
-                                }
-                                checkAdminAccess();
-                            }
-                        });
-
-                        window.ethereum.on('accountsChanged', (accounts) => {
-                            location.reload();
-                        });
-                    }
-                });
-        </script>
+        });
+    </script>
 </body>
 
 </html>

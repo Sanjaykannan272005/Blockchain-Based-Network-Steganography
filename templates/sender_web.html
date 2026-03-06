@@ -329,7 +329,8 @@
                 </div>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <button id="connectWalletBtn" class="btn btn-outline-light btn-sm" onclick="connectMetaMask()">
+                <button id="connectWalletBtn" class="btn btn-outline-light btn-sm rounded-pill px-3"
+                    onclick="connectMetaMask()">
                     <i class="fas fa-wallet me-2"></i>Connect Wallet
                 </button>
                 <div class="stat-card" style="min-width:160px;">
@@ -337,7 +338,8 @@
                             style="font-size:0.65rem;">ETH</small></div>
                     <div class="stat-label">💰 Wallet Balance</div>
                 </div>
-                <a href="http://localhost:5000" class="back-btn"><i class="fas fa-arrow-left me-2"></i>Dashboard</a>
+                <a href="http://${window.location.hostname}:5000" class="back-btn"><i
+                        class="fas fa-arrow-left me-2"></i>Dashboard</a>
             </div>
         </div>
     </div>
@@ -499,218 +501,182 @@
                             <small class="text-muted">Leave blank for immediate</small>
                         </div>
                     </div>
-
-                    <!-- Transmission Button -->
-                    <button class="btn w-100 py-3 fw-bold" id="hybridSendBtn"
-                        style="background:linear-gradient(135deg, #f59e0b, #2a5298); border:none; color:white; border-radius:12px; font-size:1.05rem;"
+                    <button type="button" class="btn btn-blockchain w-100" id="hybridSendBtn"
                         onclick="sendHybridDrop()">
-                        <i class="fas fa-rocket me-2"></i>Launch Hybrid Dead Drop
-                        <span class="badge bg-dark ms-2" style="font-size:0.7rem;">⛓️ On-Chain + 🌐 Network Stego</span>
+                        <i class="fas fa-random me-2"></i>Launch Hybrid Transmission
                     </button>
+                    <div id="bc-result" class="result-box"></div>
 
-                    <!-- Status Cards (shown after send) -->
-                    <div id="bc-result" class="result-box mt-3"></div>
-                    <div id="bc-status-cards" class="row g-2 mt-3" style="display:none!important;">
-                        <div class="col-6">
-                            <div class="p-3 rounded text-center" style="background:#111827; border:1px solid #374151;">
-                                <div style="font-size:1.5rem;" id="bc-chain-icon">⏳</div>
-                                <div class="small fw-bold mt-1">Blockchain</div>
-                                <div class="x-small text-muted" id="bc-chain-msg">Pending...</div>
+                    <!-- Progress Visualization -->
+                    <div id="bc-status-cards" class="row g-2 mt-4" style="display:none!important;">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark border border-secondary rounded text-center">
+                                <div id="bc-chain-icon" class="fs-3 mb-1">⏳</div>
+                                <div class="small fw-bold">Blockchain Drop</div>
+                                <div id="bc-chain-msg" class="text-muted" style="font-size:0.65rem;">Pushing to
+                                    Sepolia...
+                                </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="p-3 rounded text-center" style="background:#111827; border:1px solid #374151;">
-                                <div style="font-size:1.5rem;" id="bc-stego-icon">⏳</div>
-                                <div class="small fw-bold mt-1">Network Stego</div>
-                                <div class="x-small text-muted" id="bc-stego-msg">Pending...</div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark border border-secondary rounded text-center">
+                                <div id="bc-stego-icon" class="fs-3 mb-1">⏳</div>
+                                <div class="small fw-bold">Network Modulation</div>
+                                <div id="bc-stego-msg" class="text-muted" style="font-size:0.65rem;">Encoding packets...
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Inbox -->
-                    <hr class="border-secondary my-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="text-muted mb-0">📥 Dead Drop Inbox (Your Address)</h6>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="loadInbox()"><i
-                                class="fas fa-sync-alt me-1"></i>Refresh</button>
-                    </div>
-                    <div id="bc-inbox" style="max-height:300px; overflow-y:auto;">
-                        <div class="text-center text-muted py-3">Click Refresh to load messages</div>
+                    <div class="mt-4">
+                        <div class="section-title small text-muted text-uppercase mb-2"><i class="fas fa-history"></i>
+                            Recent Drops</div>
+                        <div id="bc-inbox" style="height: 200px; overflow-y: auto;">
+                            <!-- Inbox populated via loadInbox() -->
+                        </div>
                     </div>
                 </div>
             </div>
 
-
-            <!-- ===================== P2P Onion Routing ===================== -->
+            <!-- ===================== P2P Onion Circuit ===================== -->
             <div class="tab-pane fade" id="pane-p2p">
                 <div class="card p-4">
-                    <div class="section-title"><i class="fas fa-project-diagram text-info"></i> P2P Onion Circuit
-                        Builder</div>
-                    <div class="mb-3 p-3 rounded"
-                        style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3);">
-                        <small class="text-info"><i class="fas fa-info-circle me-2"></i>Messages are wrapped in multiple
-                            encryption layers. Each hop peels a layer, preventing traffic analysis.</small>
+                    <div class="section-title d-flex justify-content-between">
+                        <span><i class="fas fa-project-diagram text-primary"></i> Multi-Hop Onion Circuit</span>
+                        <span id="discovered-count" class="badge bg-primary">0</span>
                     </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <div class="field-label">Target Host</div>
-                            <input type="text" class="form-control" id="p2p-target" placeholder="127.0.0.1">
+                    <div class="p-3 mb-3 rounded"
+                        style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3);">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="small fw-bold text-primary">Mesh Discovery</div>
+                            <button class="btn btn-xs btn-primary py-0" style="font-size:0.65rem;"
+                                onclick="discoverNodes()">Discover
+                                Nodes</button>
                         </div>
-                        <div class="col-md-8">
-                            <div class="field-label">Secret Message</div>
-                            <input type="text" class="form-control" id="p2p-message" placeholder="Hidden content...">
+                        <div id="nodeChips" class="d-flex flex-wrap gap-2">
+                            <!-- Populated with node IP chips -->
                         </div>
                     </div>
-
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="text-muted mb-0">Relay Hops (Circuit)</h6>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-outline-info" onclick="discoverNodes()"><i
-                                    class="fas fa-search me-1"></i>Discover Nodes</button>
-                            <button class="btn btn-sm btn-outline-success" onclick="addHop()"><i
-                                    class="fas fa-plus me-1"></i>Add Hop</button>
-                        </div>
+                    <div id="nodesFoundBanner" class="alert alert-info py-2 small d-none">
+                        <i class="fas fa-info-circle me-2"></i>Click a discovered node above to add it as a relay.
                     </div>
-
-                    <div id="nodesFoundBanner" class="d-none mb-3 p-2 rounded"
-                        style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); font-size:0.8rem;">
-                        <i class="fas fa-satellite text-success me-2"></i> Found <span id="discovered-count">0</span>
-                        verified nodes on chain. Click a node to add as hop.
-                        <div id="nodeChips" class="d-flex flex-wrap gap-1 mt-2"></div>
+                    <div class="mb-3">
+                        <div class="field-label">Target Recipient IP</div>
+                        <input type="text" class="form-control" id="p2p-target" placeholder="Recipient IP">
                     </div>
-
+                    <div class="field-label">Circuit Configuration</div>
                     <div id="hops-container">
-                        <div class="text-center text-muted py-3" id="no-hops-msg"><small>No hops added. Will transmit
-                                directly to target.</small></div>
+                        <div class="text-center py-3 text-muted border border-dashed rounded mb-2" id="no-hops-msg">
+                            <i class="fas fa-link-slash d-block mb-1"></i>
+                            No relays added. Direct transmission mode.
+                        </div>
                     </div>
-
-                    <button class="btn btn-transmit w-100 mt-3" onclick="sendP2P()">
-                        <i class="fas fa-shield-alt me-2"></i>Send via Onion Circuit
+                    <button class="btn btn-sm btn-outline-primary mb-3" onclick="addHop()">
+                        <i class="fas fa-plus me-1"></i> Add Dynamic Relay
+                    </button>
+                    <div class="mb-3">
+                        <div class="field-label">Onion Layer Content</div>
+                        <textarea class="form-control" id="p2p-message" rows="3"
+                            placeholder="Message to be multi-hop encrypted..."></textarea>
+                    </div>
+                    <button class="btn btn-transmit w-100" onclick="sendP2P()">
+                        <i class="fas fa-route me-2"></i> Dispatch Multi-Hop Onion
                     </button>
                     <div id="p2p-result" class="result-box"></div>
                 </div>
             </div>
 
-            <!-- ===================== Protocol Analytics ===================== -->
+            <!-- ===================== Analytics ===================== -->
             <div class="tab-pane fade" id="pane-analytics">
-                <!-- Recommendation Banner -->
-                <div class="card p-3 mb-4" id="recommendation-banner" style="border-left: 4px solid #22c55e;">
-                    <div class="d-flex align-items-center justify-content-between">
+                <div class="card p-4">
+                    <div class="section-title"><i class="fas fa-chart-line text-success"></i> Real-Time Protocol
+                        Intelligence</div>
+
+                    <div id="recommendation-banner"
+                        class="mb-4 p-3 rounded d-flex align-items-center justify-content-between"
+                        style="background:rgba(255,255,255,0.03); border-left: 5px solid #22c55e;">
                         <div>
-                            <div class="text-muted small text-uppercase fw-bold mb-1"><i class="fas fa-robot me-1"></i>
-                                AI Protocol Recommendation</div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fs-4 fw-bold text-success" id="rec-protocol">TIMING</span>
-                                <span class="badge bg-success bg-opacity-25 text-success" id="rec-reason">Lowest
-                                    composite risk</span>
-                            </div>
+                            <div class="small text-muted text-uppercase fw-bold mb-1">AI Recommendation</div>
+                            <div class="h4 mb-0 fw-bold" id="rec-protocol">ANALYZING...</div>
+                            <div class="small text-muted mt-1" id="rec-reason">Evaluating mesh conditions...</div>
                         </div>
                         <div class="text-end">
-                            <div class="text-muted small">Updated: <span id="rec-time">--:--:--</span></div>
-                            <button class="btn btn-sm btn-outline-info mt-1" onclick="fetchAnalytics()">
-                                <i class="fas fa-sync-alt me-1"></i>Refresh
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-4">
-                    <!-- Radar Chart -->
-                    <div class="col-lg-6">
-                        <div class="card p-4 h-100">
-                            <h6 class="mb-3 text-center text-muted fw-bold text-uppercase" style="letter-spacing:1px;">
-                                <i class="fas fa-satellite-dish me-2"></i>Channel Capability Matrix
-                            </h6>
-                            <div style="position:relative; height:320px;">
-                                <canvas id="radarChart"></canvas>
+                            <div class="badge bg-dark border border-secondary" id="rec-time">--:--:--</div>
+                            <div class="mt-1 d-flex gap-1 justify-content-end">
+                                <span class="badge bg-success" style="font-size:0.6rem;">STEALTH</span>
+                                <span class="badge bg-info" style="font-size:0.6rem;">LIVE</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Bar Chart -->
-                    <div class="col-lg-6">
-                        <div class="card p-4 h-100">
-                            <h6 class="mb-3 text-center text-muted fw-bold text-uppercase" style="letter-spacing:1px;">
-                                <i class="fas fa-chart-bar me-2"></i>Latency vs Throughput
-                            </h6>
-                            <div style="position:relative; height:320px;">
-                                <canvas id="barChart"></canvas>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary h-100">
+                                <div class="field-label mb-3">Detection Risk Profiler</div>
+                                <div style="height: 300px;"><canvas id="radarChart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark rounded border border-secondary h-100">
+                                <div class="field-label mb-3">Throughput vs Latency</div>
+                                <div style="height: 300px;"><canvas id="barChart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="p-3 bg-dark rounded border border-secondary">
+                                <div class="field-label mb-3">Live Risk Vectors (Last 10 Actions)</div>
+                                <div style="height: 200px;"><canvas id="trendChart"></canvas></div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Detection Risk Gauges -->
-                <div class="row g-4 mt-2">
-                    <div class="col-md-4">
-                        <div class="card p-4 text-center" id="gauge-timing">
-                            <div class="text-muted small text-uppercase fw-bold mb-2"><i class="fas fa-clock me-1"></i>
-                                Timing Channel</div>
-                            <div class="position-relative mx-auto" style="width:130px; height:130px;">
-                                <canvas id="gaugeTimingCanvas" width="130" height="130"></canvas>
-                                <div class="position-absolute top-50 start-50 translate-middle">
-                                    <span class="fs-3 fw-bold" id="risk-timing-val">25</span>
-                                    <div class="text-muted" style="font-size:0.6rem;">RISK</div>
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-4">
+                            <div class="stat-card p-3">
+                                <div class="gauge-container position-relative mb-2">
+                                    <canvas id="gaugeTimingCanvas" width="120" height="80"></canvas>
+                                    <div class="position-absolute bottom-0 start-50 translate-middle-x fw-bold"
+                                        id="risk-timing-val">0</div>
+                                </div>
+                                <div class="small fw-bold">TIMING MODULATION</div>
+                                <div class="mt-1"><span class="badge bg-success" id="risk-timing-badge"
+                                        style="font-size:0.6rem;">LOW RISK</span></div>
+                                <div class="d-flex justify-content-between mt-2 x-small text-muted">
+                                    <span>Lat: <b class="text-light" id="timing-lat">0</b>ms</span>
+                                    <span>Thr: <b class="text-light" id="timing-thr">0</b>bps</span>
                                 </div>
                             </div>
-                            <div class="mt-2">
-                                <span class="badge" id="risk-timing-badge">LOW RISK</span>
-                            </div>
-                            <div class="small text-muted mt-1">
-                                <span id="timing-lat">120</span>ms &middot; <span id="timing-thr">45</span>bps
-                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-4 text-center" id="gauge-size">
-                            <div class="text-muted small text-uppercase fw-bold mb-2"><i class="fas fa-cube me-1"></i>
-                                Size Channel</div>
-                            <div class="position-relative mx-auto" style="width:130px; height:130px;">
-                                <canvas id="gaugeSizeCanvas" width="130" height="130"></canvas>
-                                <div class="position-absolute top-50 start-50 translate-middle">
-                                    <span class="fs-3 fw-bold" id="risk-size-val">55</span>
-                                    <div class="text-muted" style="font-size:0.6rem;">RISK</div>
+                        <div class="col-md-4">
+                            <div class="stat-card p-3">
+                                <div class="gauge-container position-relative mb-2">
+                                    <canvas id="gaugeSizeCanvas" width="120" height="80"></canvas>
+                                    <div class="position-absolute bottom-0 start-50 translate-middle-x fw-bold"
+                                        id="risk-size-val">0</div>
+                                </div>
+                                <div class="small fw-bold">PACKET SIZE MOD</div>
+                                <div class="mt-1"><span class="badge bg-warning text-dark" id="risk-size-badge"
+                                        style="font-size:0.6rem;">MED RISK</span></div>
+                                <div class="d-flex justify-content-between mt-2 x-small text-muted">
+                                    <span>Lat: <b class="text-light" id="size-lat">0</b>ms</span>
+                                    <span>Thr: <b class="text-light" id="size-thr">0</b>bps</span>
                                 </div>
                             </div>
-                            <div class="mt-2">
-                                <span class="badge" id="risk-size-badge">MEDIUM RISK</span>
-                            </div>
-                            <div class="small text-muted mt-1">
-                                <span id="size-lat">80</span>ms &middot; <span id="size-thr">120</span>bps
-                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card p-4 text-center" id="gauge-ttl">
-                            <div class="text-muted small text-uppercase fw-bold mb-2"><i
-                                    class="fas fa-hourglass-half me-1"></i> TTL Channel</div>
-                            <div class="position-relative mx-auto" style="width:130px; height:130px;">
-                                <canvas id="gaugeTTLCanvas" width="130" height="130"></canvas>
-                                <div class="position-absolute top-50 start-50 translate-middle">
-                                    <span class="fs-3 fw-bold" id="risk-ttl-val">72</span>
-                                    <div class="text-muted" style="font-size:0.6rem;">RISK</div>
+                        <div class="col-md-4">
+                            <div class="stat-card p-3">
+                                <div class="gauge-container position-relative mb-2">
+                                    <canvas id="gaugeTTLCanvas" width="120" height="80"></canvas>
+                                    <div class="position-absolute bottom-0 start-50 translate-middle-x fw-bold"
+                                        id="risk-ttl-val">0</div>
                                 </div>
-                            </div>
-                            <div class="mt-2">
-                                <span class="badge" id="risk-ttl-badge">HIGH RISK</span>
-                            </div>
-                            <div class="small text-muted mt-1">
-                                <span id="ttl-lat">45</span>ms &middot; <span id="ttl-thr">200</span>bps
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Detection Risk Trend Line -->
-                <div class="row g-4 mt-2">
-                    <div class="col-12">
-                        <div class="card p-4">
-                            <h6 class="mb-3 text-center text-muted fw-bold text-uppercase" style="letter-spacing:1px;">
-                                <i class="fas fa-wave-square me-2"></i>Detection Risk Trend
-                            </h6>
-                            <div style="position:relative; height:220px;">
-                                <canvas id="trendChart"></canvas>
+                                <div class="small fw-bold">TTL FIELD ENCODING</div>
+                                <div class="mt-1"><span class="badge bg-danger" id="risk-ttl-badge"
+                                        style="font-size:0.6rem;">HIGH RISK</span></div>
+                                <div class="d-flex justify-content-between mt-2 x-small text-muted">
+                                    <span>Lat: <b class="text-light" id="ttl-lat">0</b>ms</span>
+                                    <span>Thr: <b class="text-light" id="ttl-thr">0</b>bps</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -719,81 +685,72 @@
 
             <!-- ===================== Security & Access ===================== -->
             <div class="tab-pane fade" id="pane-security">
-                <div class="row g-4">
-                    <!-- Whitelist -->
-                    <div class="col-md-6">
-                        <div class="card p-4 h-100">
-                            <div class="section-title"><i class="fas fa-list-check text-success"></i> Sender Whitelist
+                <div class="card p-4">
+                    <div class="section-title"><i class="fas fa-shield-alt text-danger"></i> Administrator Control
+                        Center</div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark border border-secondary rounded">
+                                <div class="field-label mb-3">Temporary Transmission Authorization</div>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control form-control-sm mb-2" id="sec-wallet"
+                                        placeholder="Wallet Address (0x...)">
+                                    <select class="form-select form-select-sm mb-2" id="sec-duration">
+                                        <option value="300">5 Minutes</option>
+                                        <option value="3600">1 Hour</option>
+                                        <option value="86400">24 Hours</option>
+                                    </select>
+                                    <input type="text" class="form-control form-control-sm" id="sec-reason"
+                                        placeholder="Clearance Reason">
+                                </div>
+                                <button class="btn btn-sm btn-danger w-100" onclick="authorizeSenderWallet()">Authorize
+                                    Device</button>
+                                <div id="sec-result" class="mt-2 small"></div>
                             </div>
-                            <div class="field-label">Wallet Address to Authorize</div>
-                            <div class="input-group mb-2">
-                                <input type="text" class="form-control" id="sec-wallet" placeholder="0x...">
-                                <button class="btn btn-outline-success"
-                                    onclick="authorizeSenderWallet()">Authorize</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-dark border border-secondary rounded">
+                                <div class="field-label mb-3">Identity Registry Lookup</div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <input type="text" class="form-control" id="id-wallet" placeholder="Wallet Hash">
+                                    <button class="btn btn-primary" onclick="checkIdentity()">Lookup</button>
+                                </div>
+                                <div id="id-result"
+                                    class="p-2 border border-secondary rounded bg-black x-small text-muted font-monospace"
+                                    style="min-height:50px;">
+                                    Registry status will appear here...
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <div class="field-label">Duration (seconds, 0 = permanent)</div>
-                                <input type="number" class="form-control" id="sec-duration" value="0">
+                        </div>
+                        <div class="col-md-12">
+                            <div class="p-3 bg-dark border border-secondary rounded">
+                                <div class="field-label mb-3">Global Network State Controls</div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button class="btn btn-sm btn-outline-info" onclick="switchProto('timing')">Enforce
+                                        Timing</button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="switchProto('size')">Enforce
+                                        Size</button>
+                                    <button class="btn btn-sm btn-outline-warning" onclick="switchProto('ttl')">Enforce
+                                        TTL</button>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                        onclick="switchProto('drift')">Infrastructure Silence</button>
+                                </div>
+                                <div id="proto-result" class="mt-2 small text-info"></div>
                             </div>
-                            <div class="mb-3">
-                                <div class="field-label">Reason</div>
-                                <input type="text" class="form-control" id="sec-reason"
-                                    placeholder="e.g., Authorized test user">
-                            </div>
-                            <div id="sec-result" class="result-box"></div>
                         </div>
                     </div>
-                    <!-- Identity Check -->
-                    <div class="col-md-6">
-                        <div class="card p-4 h-100">
-                            <div class="section-title"><i class="fas fa-id-card text-primary"></i> Identity Clearance
-                                Check</div>
-                            <div class="field-label">Wallet Address</div>
-                            <div class="input-group mb-2">
-                                <input type="text" class="form-control" id="id-wallet" placeholder="0x...">
-                                <button class="btn btn-outline-primary" onclick="checkIdentity()">Verify</button>
-                            </div>
-                            <div id="id-result" class="result-box mt-2"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Protocol Switch -->
-                <div class="card p-4 mt-4">
-                    <div class="section-title"><i class="fas fa-broadcast-tower text-warning"></i> Global Protocol
-                        Switch</div>
-                    <p class="text-muted small">Changes the active stealth encoding protocol for the entire network via
-                        a blockchain transaction.</p>
-                    <div class="d-flex gap-3">
-                        <button class="btn btn-outline-info flex-grow-1 py-3" onclick="switchProto('timing')">
-                            <div class="fs-4">⏱️</div>
-                            <div class="small fw-bold mt-1">TIMING</div>
-                        </button>
-                        <button class="btn btn-outline-info flex-grow-1 py-3" onclick="switchProto('size')">
-                            <div class="fs-4">📦</div>
-                            <div class="small fw-bold mt-1">SIZE</div>
-                        </button>
-                        <button class="btn btn-outline-info flex-grow-1 py-3" onclick="switchProto('ttl')">
-                            <div class="fs-4">⏳</div>
-                            <div class="small fw-bold mt-1">TTL</div>
-                        </button>
-                        <button class="btn btn-outline-secondary flex-grow-1 py-3" onclick="switchProto('drift')">
-                            <div class="fs-4">💨</div>
-                            <div class="small fw-bold mt-1">DRIFT</div>
-                        </button>
-                    </div>
-                    <div class="proto-result" class="result-box mt-3"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Live Terminal -->
-        <div class="terminal-header mt-4">
+        <!-- Terminal Console -->
+        <div class="terminal-header">
             <div>
                 <span class="terminal-dot" style="background: #ff5f56;"></span>
                 <span class="terminal-dot" style="background: #ffbd2e;"></span>
                 <span class="terminal-dot" style="background: #27c93f;"></span>
-                <span class="ms-2 text-muted small fw-bold"><i class="fas fa-terminal me-1"></i> TRANSMITTER
-                    CONSOLE</span>
+                <span class="ms-2 text-muted x-small fw-bold"> TRANSMITTER CORE LOGS</span>
             </div>
             <div>
                 <span id="stream-status" class="badge bg-success" style="font-size: 0.65rem;"><i
@@ -813,148 +770,34 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // --- Global Config & State ---
+        const ADMIN_ADDRESS = "{{ admin_address }}".toLowerCase();
+        let userAccount = null;
         let hopCount = 0;
+        let radarChart = null, barChart = null, trendChart = null;
+        let analyticsInterval = null;
 
+        // --- Core UI Helpers ---
         function showResult(elId, success, message) {
             const el = document.getElementById(elId);
+            if (!el) return;
             el.style.display = 'block';
             el.className = 'result-box ' + (success ? 'success' : 'error');
             el.innerHTML = (success ? '✅ ' : '❌ ') + message;
         }
 
-        async function refreshBalance() {
-            try {
-                const url = userAccount ? `/balance?wallet=${userAccount}` : '/balance';
-                const res = await fetch(url);
-                const data = await res.json();
-                if (data.balance !== undefined) {
-                    document.getElementById('wallet-balance').textContent = parseFloat(data.balance).toFixed(4);
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        async function sendNetworkStego() {
-            const method = document.getElementById('net-method').value;
-            const host = document.getElementById('net-host').value;
-            const message = document.getElementById('net-message').value;
-            const stealth = document.getElementById('net-stealth').checked;
-            const blockKey = document.getElementById('net-blockkey').checked;
-            if (!host || !message) { showResult('net-result', false, 'Please fill in all fields'); return; }
-
-            const form = new FormData();
-            form.append('method', method); form.append('target_host', host);
-            form.append('secret_data', message);
-            if (stealth) form.append('stealth_mode', 'on');
-            if (blockKey) form.append('block_key', 'on');
-
-            document.getElementById('net-result').style.display = 'block';
-            document.getElementById('net-result').className = 'result-box';
-            document.getElementById('net-result').textContent = '⏳ Transmitting...';
-
-            try {
-                const res = await fetch('http://localhost:5000/network_hide', { method: 'POST', body: form });
-                const text = await res.text();
-                if (res.ok) { showResult('net-result', true, 'Transmission sent successfully!'); }
-                else { showResult('net-result', false, 'Server error: ' + res.status); }
-            } catch (e) { showResult('net-result', false, e.message); }
-        }
-
-        async function loadInbox() {
-            document.getElementById('bc-inbox').innerHTML = '<div class="text-center text-muted py-3">Loading...</div>';
-            try {
-                const res = await fetch('http://localhost:5000/dead_drop_check');
-                const data = await res.json();
-                if (!data.success || !data.messages.length) {
-                    document.getElementById('bc-inbox').innerHTML = '<div class="text-center text-muted py-3">No messages found</div>';
-                    return;
-                }
-                document.getElementById('bc-inbox').innerHTML = data.messages.map(m => `
-                    <div class="p-3 mb-2 rounded" style="background:#111827; border:1px solid ${m.is_locked ? '#f59e0b' : '#10b981'}33;">
-                        <div class="d-flex justify-content-between">
-                            <small class="fw-bold text-light">${m.sender.slice(0, 10)}...${m.sender.slice(-6)}</small>
-                            <span class="badge ${m.is_locked ? 'bg-warning text-dark' : 'bg-success'}">${m.is_locked ? '🔒 LOCKED' : '✅ AVAILABLE'}</span>
-                        </div>
-                        <div class="small text-muted mt-1">${m.message ? m.message.slice(0, 80) + '...' : 'Encrypted'}</div>
-                    </div>`).join('');
-            } catch (e) { document.getElementById('bc-inbox').innerHTML = '<div class="text-danger small p-2">Error: ' + e.message + '</div>'; }
-        }
-
-        async function discoverNodes() {
-            try {
-                const res = await fetch('http://localhost:5000/api/verified_nodes');
-                const data = await res.json();
-                const nodes = data.nodes || [];
-                document.getElementById('discovered-count').textContent = nodes.length;
-                document.getElementById('nodeChips').innerHTML = nodes.map(n =>
-                    `<button class="btn btn-sm btn-outline-success" style="font-size:0.7rem;" onclick="addHopFromNode('${n.ip}', '${n.channels[0] || 'timing'}')">
-                        ${n.ip} (${n.channels[0] || 'timing'})
-                    </button>`).join('');
-                document.getElementById('nodesFoundBanner').classList.remove('d-none');
-            } catch (e) { alert('Error discovering nodes: ' + e.message); }
-        }
-
-        function addHopFromNode(ip, channel) { addHop(ip, channel); }
-
-        function addHop(ip = '', channel = 'timing') {
-            document.getElementById('no-hops-msg').style.display = 'none';
-            const idx = ++hopCount;
-            const div = document.createElement('div');
-            div.className = 'hop-item'; div.id = 'hop-' + idx;
-            div.innerHTML = `<span class="remove-hop" onclick="document.getElementById('hop-${idx}').remove()">✕</span>
-                <div class="field-label mb-2">Hop ${idx} Relay</div>
-                <div class="row g-2">
-                    <div class="col-5"><input type="text" class="form-control form-control-sm" id="hop-ip-${idx}" placeholder="IP Address" value="${ip}"></div>
-                    <div class="col-4">
-                        <select class="form-select form-select-sm" id="hop-ch-${idx}">
-                            <option value="timing" ${channel == 'timing' ? 'selected' : ''}>⏱️ Timing</option>
-                            <option value="size" ${channel == 'size' ? 'selected' : ''}>📦 Size</option>
-                            <option value="ttl" ${channel == 'ttl' ? 'selected' : ''}>⏳ TTL</option>
-                        </select>
-                    </div>
-                    <div class="col-3"><input type="password" class="form-control form-control-sm" id="hop-sec-${idx}" placeholder="Secret"></div>
-                </div>`;
-            document.getElementById('hops-container').appendChild(div);
-        }
-
-        async function sendP2P() {
-            const target = document.getElementById('p2p-target').value;
-            const message = document.getElementById('p2p-message').value;
-            if (!target || !message) { showResult('p2p-result', false, 'Target and message required'); return; }
-            const hops = [];
-            document.querySelectorAll('.hop-item').forEach((el, i) => {
-                const idx = el.id.replace('hop-', '');
-                hops.push({ ip: document.getElementById('hop-ip-' + idx).value, channel: document.getElementById('hop-ch-' + idx).value, secret: document.getElementById('hop-sec-' + idx).value });
-            });
-
-            const form = new FormData();
-            form.append('method', 'timing'); form.append('target_host', target);
-            form.append('secret_data', message);
-            if (hops.length) form.append('hops', JSON.stringify(hops));
-
-            showResult('p2p-result', true, 'Sending via P2P circuit...');
-            try {
-                const res = await fetch('http://localhost:5000/network_hide', { method: 'POST', body: form });
-                if (res.ok) { showResult('p2p-result', true, 'Multi-hop transmission complete! Hops: ' + hops.length); }
-                else { showResult('p2p-result', false, 'Transmission failed'); }
-            } catch (e) { showResult('p2p-result', false, e.message); }
-        }
-
-        // RBAC Context
-        const ADMIN_ADDRESS = "{{ admin_address }}".toLowerCase();
-        let userAccount = null;
-
         function updateWalletUI(address) {
             userAccount = address.toLowerCase();
-            console.log("[RBAC] Updating UI for wallet:", userAccount);
+            console.log("[RBAC] Wallet identified:", userAccount);
 
-            // Update Connect Button
+            // Update Header Connect Button
             const btn = document.getElementById('connectWalletBtn');
             if (btn) {
                 btn.innerHTML = `<i class="fas fa-check-circle me-2"></i>${userAccount.substring(0, 6)}...${userAccount.substring(38)}`;
                 btn.classList.replace('btn-outline-light', 'btn-success');
             }
 
-            // Update Connected Wallet Display
+            // Update Main Pane Wallet Display
             const walletDisplay = document.getElementById('connected-wallet');
             if (walletDisplay) {
                 walletDisplay.textContent = userAccount;
@@ -979,77 +822,52 @@
 
         function checkAdminAccess() {
             const securityTab = document.getElementById('securityTab');
+            if (!securityTab) return;
             if (userAccount === ADMIN_ADDRESS) {
                 securityTab.style.display = 'block';
-                console.log("[RBAC] Admin access granted to security management.");
+                console.log("[RBAC] Admin authorization detected.");
             } else {
                 securityTab.style.display = 'none';
-                console.log("[RBAC] Restricted access: User is not the administrator.");
             }
         }
 
-        // Auto-check on load
-        if (window.ethereum) {
-            window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
-                if (accounts.length > 0) {
-                    updateWalletUI(accounts[0]);
+        async function refreshBalance() {
+            try {
+                const url = userAccount ? `/balance?wallet=${userAccount}` : '/balance';
+                const res = await fetch(url);
+                const data = await res.json();
+                const balEl = document.getElementById('wallet-balance');
+                if (balEl && data.balance !== undefined) {
+                    balEl.textContent = parseFloat(data.balance).toFixed(4);
                 }
-            });
-
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length > 0) {
-                    updateWalletUI(accounts[0]);
-                } else {
-                    location.reload();
-                }
-            });
+            } catch (e) { console.error("Balance refresh error:", e); }
         }
 
-        async function authorizeSenderWallet() { // Renamed to avoid collision or confusion
-            const wallet = document.getElementById('sec-wallet').value;
-            const duration = document.getElementById('sec-duration').value;
-            const reason = document.getElementById('sec-reason').value;
-            if (!wallet) { showResult('sec-result', false, 'Wallet address required'); return; }
-            try {
-                const res = await fetch('http://localhost:5000/api/security/authorize', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        wallet: wallet,
-                        duration: parseInt(duration),
-                        reason: reason,
-                        admin_wallet: userAccount // Pass current wallet for backend check
-                    })
-                });
-                const data = await res.json();
-                showResult('sec-result', data.success, data.success ? data.message : data.error);
-            } catch (e) { showResult('sec-result', false, e.message); }
-        }
+        // --- Action Functions ---
+        async function sendNetworkStego() {
+            const method = document.getElementById('net-method').value;
+            const host = document.getElementById('net-host').value;
+            const message = document.getElementById('net-message').value;
+            const stealth = document.getElementById('net-stealth').checked;
+            const blockKey = document.getElementById('net-blockkey').checked;
+            if (!host || !message) { showResult('net-result', false, 'Please fill in all fields'); return; }
 
-        async function checkIdentity() {
-            const wallet = document.getElementById('id-wallet').value;
-            if (!wallet) { showResult('id-result', false, 'Wallet address required'); return; }
-            try {
-                const res = await fetch('http://localhost:5000/api/registry/status/' + wallet);
-                const data = await res.json();
-                if (data.success) {
-                    showResult('id-result', true, `Org: ${data.organization} | Clearance: ${data.clearance} | Level: ${data.level}`);
-                } else { showResult('id-result', false, data.error); }
-            } catch (e) { showResult('id-result', false, e.message); }
-        }
+            const form = new FormData();
+            form.append('method', method); form.append('target_host', host);
+            form.append('secret_data', message);
+            if (stealth) form.append('stealth_mode', 'on');
+            if (blockKey) form.append('block_key', 'on');
 
-        async function switchProto(proto) {
-            if (!confirm('Switch global network protocol to ' + proto.toUpperCase() + '?')) return;
+            const resDiv = document.getElementById('net-result');
+            resDiv.style.display = 'block';
+            resDiv.className = 'result-box';
+            resDiv.textContent = '⏳ Transmitting...';
+
             try {
-                const res = await fetch('http://localhost:5000/api/controller/protocol', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        protocol: proto,
-                        admin_wallet: userAccount // Pass current wallet for backend check
-                    })
-                });
-                const data = await res.json();
-                showResult('proto-result', data.success, data.success ? 'Protocol switched! TX: ' + data.tx_hash : data.error);
-            } catch (e) { showResult('proto-result', false, e.message); }
+                const res = await fetch('/network_hide', { method: 'POST', body: form });
+                if (res.ok) { showResult('net-result', true, 'Transmission sent successfully!'); }
+                else { showResult('net-result', false, 'Server error: ' + res.status); }
+            } catch (e) { showResult('net-result', false, e.message); }
         }
 
         async function sendHybridDrop() {
@@ -1061,83 +879,247 @@
             const releaseTime = document.getElementById('bc-release').value;
 
             if (!targetIp || !wallet || !message) {
-                showResult('bc-result', false, 'Please fill in Target IP, Recipient Wallet, and Message.');
+                showResult('bc-result', false, 'Target IP, Recipient Wallet, and Message are required.');
                 return;
             }
 
-            // Show sending state
             const btn = document.getElementById('hybridSendBtn');
             const origHtml = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Launching Hybrid Drop...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Launching Hybrid...';
+
             document.getElementById('bc-result').style.display = 'none';
             document.getElementById('bc-status-cards').style.cssText = 'display:flex!important;';
-            document.getElementById('bc-chain-icon').textContent = '⏳';
-            document.getElementById('bc-chain-msg').textContent = 'Sending to blockchain...';
-            document.getElementById('bc-stego-icon').textContent = '⏳';
-            document.getElementById('bc-stego-msg').textContent = 'Launching stego sender...';
 
             try {
-                const res = await fetch('http://localhost:5000/dead_drop_send_hybrid', {
+                const res = await fetch('/dead_drop_send_hybrid', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        target_ip: targetIp,
-                        recipient_wallet: wallet,
-                        message: message,
-                        channel: channel,
-                        block_key: blockKey,
-                        release_time: releaseTime || ''
+                        target_ip: targetIp, recipient_wallet: wallet,
+                        message: message, channel: channel,
+                        block_key: blockKey, release_time: releaseTime || ''
                     })
                 });
 
                 const data = await res.json();
-
                 if (data.success) {
-                    // Blockchain Status
-                    if (data.blockchain.success) {
-                        document.getElementById('bc-chain-icon').textContent = '✅';
-                        document.getElementById('bc-chain-msg').textContent = 'TX: ' + (data.blockchain.tx_hash || '').slice(0, 16) + '...';
-                        document.getElementById('bc-chain-icon').parentElement.style.borderColor = '#10b981';
-                    } else {
-                        document.getElementById('bc-chain-icon').textContent = '⚠️';
-                        document.getElementById('bc-chain-msg').textContent = data.blockchain.error || 'Failed';
-                        document.getElementById('bc-chain-icon').parentElement.style.borderColor = '#f59e0b';
-                    }
-                    // Network Stego Status
-                    if (data.network_stego.launched) {
-                        document.getElementById('bc-stego-icon').textContent = '🚀';
-                        document.getElementById('bc-stego-msg').textContent = channel.toUpperCase() + ' packets → ' + targetIp;
-                        document.getElementById('bc-stego-icon').parentElement.style.borderColor = '#3b82f6';
-                    } else {
-                        document.getElementById('bc-stego-icon').textContent = '❌';
-                        document.getElementById('bc-stego-msg').textContent = data.network_stego.error || 'Failed to launch';
-                        document.getElementById('bc-stego-icon').parentElement.style.borderColor = '#ef4444';
-                    }
-                    showResult('bc-result', true,
-                        `Hybrid Drop Launched!\n` +
-                        `📍 Msg Hash: ${data.msg_hash}\n` +
-                        `🔑 Key Ref: ${data.key_ref}\n` +
-                        `📡 Channel: ${data.channel.toUpperCase()} → ${data.target_ip}`
-                    );
+                    document.getElementById('bc-chain-icon').textContent = data.blockchain.success ? '✅' : '⚠️';
+                    document.getElementById('bc-stego-icon').textContent = data.network_stego.launched ? '🚀' : '❌';
+                    showResult('bc-result', true, 'Hybrid Drop Initiated! Check status indicators.');
+                    loadInbox();
                 } else {
-                    document.getElementById('bc-chain-icon').textContent = '❌';
-                    document.getElementById('bc-chain-msg').textContent = data.error || 'Error';
-                    document.getElementById('bc-stego-icon').textContent = '❌';
-                    document.getElementById('bc-stego-msg').textContent = 'Not attempted';
                     showResult('bc-result', false, data.error || 'Hybrid drop failed');
                 }
-            } catch (e) {
-                showResult('bc-result', false, 'Request error: ' + e.message);
-                document.getElementById('bc-chain-icon').textContent = '❌';
-                document.getElementById('bc-stego-icon').textContent = '❌';
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = origHtml;
+            } catch (e) { showResult('bc-result', false, 'Request error: ' + e.message); }
+            finally { btn.disabled = false; btn.innerHTML = origHtml; }
+        }
+
+        async function loadInbox() {
+            const container = document.getElementById('bc-inbox');
+            if (!container) return;
+            container.innerHTML = '<div class="text-center text-muted py-3">Syncing...</div>';
+            try {
+                const res = await fetch('/dead_drop_check');
+                const data = await res.json();
+                if (!data.success || !data.messages.length) {
+                    container.innerHTML = '<div class="text-center text-muted py-3">No drops found on-chain</div>';
+                    return;
+                }
+                container.innerHTML = data.messages.map(m => `
+                    <div class="p-3 mb-2 rounded" style="background:#111827; border:1px solid ${m.is_locked ? '#f59e0b' : '#10b981'}33;">
+                        <div class="d-flex justify-content-between">
+                            <small class="fw-bold text-light">${m.sender.slice(0, 10)}...${m.sender.slice(-6)}</small>
+                            <span class="badge ${m.is_locked ? 'bg-warning text-dark' : 'bg-success'}">${m.is_locked ? '🔒 LOCKED' : '✅ AVAILABLE'}</span>
+                        </div>
+                        <div class="small text-muted mt-1">${m.message ? m.message.slice(0, 80) + '...' : 'Encrypted Content'}</div>
+                    </div>`).join('');
+            } catch (e) { container.innerHTML = '<div class="text-danger small p-2">Sync Error</div>'; }
+        }
+
+        async function discoverNodes() {
+            try {
+                const res = await fetch('/api/verified_nodes');
+                const data = await res.json();
+                const nodes = data.nodes || [];
+                const discoverCount = document.getElementById('discovered-count');
+                const nodeChips = document.getElementById('nodeChips');
+
+                if (discoverCount) discoverCount.textContent = nodes.length;
+                if (nodeChips) {
+                    nodeChips.innerHTML = nodes.map(n =>
+                        `<button class="btn btn-sm btn-outline-success" style="font-size:0.7rem;" onclick="addHop('${n.ip}', '${n.channels[0] || 'timing'}')">
+                            ${n.ip} (${n.channels[0] || 'timing'})
+                        </button>`).join('');
+                }
+                document.getElementById('nodesFoundBanner')?.classList.remove('d-none');
+            } catch (e) { console.error("Discovery error:", e); }
+        }
+
+        function addHop(ip = '', channel = 'timing') {
+            const noHopsMsg = document.getElementById('no-hops-msg');
+            if (noHopsMsg) noHopsMsg.style.display = 'none';
+            const idx = ++hopCount;
+            const div = document.createElement('div');
+            div.className = 'hop-item'; div.id = 'hop-' + idx;
+            div.innerHTML = `<span class="remove-hop" onclick="removeHop(${idx})">✕</span>
+                <div class="field-label mb-2">Relay Path ${idx}</div>
+                <div class="row g-2">
+                    <div class="col-5"><input type="text" class="form-control form-control-sm" id="hop-ip-${idx}" placeholder="IP" value="${ip}"></div>
+                    <div class="col-4">
+                        <select class="form-select form-select-sm" id="hop-ch-${idx}">
+                            <option value="timing" ${channel == 'timing' ? 'selected' : ''}>⏱️ Timing</option>
+                            <option value="size" ${channel == 'size' ? 'selected' : ''}>📦 Size</option>
+                            <option value="ttl" ${channel == 'ttl' ? 'selected' : ''}>⏳ TTL</option>
+                        </select>
+                    </div>
+                    <div class="col-3"><input type="password" class="form-control form-control-sm" id="hop-sec-${idx}" placeholder="Secret"></div>
+                </div>`;
+            document.getElementById('hops-container').appendChild(div);
+        }
+
+        function removeHop(idx) {
+            const el = document.getElementById('hop-' + idx);
+            if (el) el.remove();
+            if (document.querySelectorAll('.hop-item').length === 0) {
+                document.getElementById('no-hops-msg').style.display = 'block';
             }
         }
 
-        // Initialize Live Terminal Streaming
+        async function sendP2P() {
+            const target = document.getElementById('p2p-target').value;
+            const message = document.getElementById('p2p-message').value;
+            if (!target || !message) { showResult('p2p-result', false, 'Target and message required'); return; }
+            const hops = [];
+            document.querySelectorAll('.hop-item').forEach((el) => {
+                const idx = el.id.replace('hop-', '');
+                hops.push({
+                    ip: document.getElementById('hop-ip-' + idx).value,
+                    channel: document.getElementById('hop-ch-' + idx).value,
+                    secret: document.getElementById('hop-sec-' + idx).value
+                });
+            });
+
+            const form = new FormData();
+            form.append('method', 'timing'); form.append('target_host', target);
+            form.append('secret_data', message);
+            if (hops.length) form.append('hops', JSON.stringify(hops));
+
+            showResult('p2p-result', true, 'Transmitting through onion circuit...');
+            try {
+                const res = await fetch('/network_hide', { method: 'POST', body: form });
+                if (res.ok) { showResult('p2p-result', true, 'Onion circuit delivery success!'); }
+                else { showResult('p2p-result', false, 'Circuit failure'); }
+            } catch (e) { showResult('p2p-result', false, e.message); }
+        }
+
+        // --- Analytics Helpers ---
+        function drawGauge(canvasId, value, maxVal = 100) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const cx = w / 2, cy = h / 2, r = 30;
+            ctx.clearRect(0, 0, w, h);
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0.75 * Math.PI, 2.25 * Math.PI);
+            ctx.strokeStyle = '#374151'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.stroke();
+            const ratio = Math.min(value / maxVal, 1);
+            const endAngle = 0.75 * Math.PI + ratio * 1.5 * Math.PI;
+            let color = '#22c55e';
+            if (value > 60) color = '#ef4444'; else if (value > 35) color = '#f59e0b';
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0.75 * Math.PI, endAngle);
+            ctx.strokeStyle = color; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.stroke();
+        }
+
+        function initCharts() {
+            const radarCtx = document.getElementById('radarChart')?.getContext('2d');
+            if (radarCtx) {
+                radarChart = new Chart(radarCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Stealth', 'Speed', 'Throughput'],
+                        datasets: [
+                            { label: 'TIMING', data: [75, 30, 22], backgroundColor: 'rgba(34,197,94,0.1)', borderColor: '#22c55e', borderWidth: 2 },
+                            { label: 'SIZE', data: [45, 55, 60], backgroundColor: 'rgba(59,130,246,0.1)', borderColor: '#3b82f6', borderWidth: 2 },
+                            { label: 'TTL', data: [28, 82, 100], backgroundColor: 'rgba(249,115,22,0.1)', borderColor: '#f97316', borderWidth: 2 },
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { r: { beginAtZero: true, max: 100, ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.1)' } } },
+                        plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } }
+                    }
+                });
+            }
+
+            const barCtx = document.getElementById('barChart')?.getContext('2d');
+            if (barCtx) {
+                barChart = new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['TIMING', 'SIZE', 'TTL'],
+                        datasets: [
+                            { label: 'Latency', data: [120, 80, 45], backgroundColor: '#22c55e' },
+                            { label: 'Throughput', data: [45, 120, 200], backgroundColor: '#3b82f6' }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } } },
+                        plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } }
+                    }
+                });
+            }
+
+            const trendCtx = document.getElementById('trendChart')?.getContext('2d');
+            if (trendCtx) {
+                trendChart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                        datasets: [
+                            { label: 'Timing', data: [20, 22, 21, 25, 24, 26, 23, 25, 24, 25], borderColor: '#22c55e', tension: 0.4 },
+                            { label: 'Size', data: [50, 52, 55, 53, 58, 55, 54, 56, 55, 55], borderColor: '#3b82f6', tension: 0.4 },
+                            { label: 'TTL', data: [70, 72, 75, 71, 74, 73, 72, 75, 74, 72], borderColor: '#f97316', tension: 0.4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
+
+        async function fetchAnalytics() {
+            try {
+                const res = await fetch('/api/protocol/analytics?live=true');
+                const data = await res.json();
+                if (!data.success) return;
+                const p = data.protocols;
+
+                if (radarChart) {
+                    radarChart.data.datasets[0].data = [100 - p.timing.detection_risk, Math.max(0, 100 - p.timing.latency_ms / 1.5), p.timing.throughput_bps / 2.5];
+                    radarChart.data.datasets[1].data = [100 - p.size.detection_risk, Math.max(0, 100 - p.size.latency_ms / 1.5), p.size.throughput_bps / 2.5];
+                    radarChart.data.datasets[2].data = [100 - p.ttl.detection_risk, Math.max(0, 100 - p.ttl.latency_ms / 1.5), p.ttl.throughput_bps / 2.5];
+                    radarChart.update();
+                }
+
+                if (barChart) {
+                    barChart.data.datasets[0].data = [p.timing.latency_ms, p.size.latency_ms, p.ttl.latency_ms];
+                    barChart.data.datasets[1].data = [p.timing.throughput_bps, p.size.throughput_bps, p.ttl.throughput_bps];
+                    barChart.update();
+                }
+
+                ['timing', 'size', 'ttl'].forEach(ch => {
+                    const risk = p[ch].detection_risk;
+                    drawGauge(`gauge${ch.charAt(0).toUpperCase() + ch.slice(1)}Canvas`, risk);
+                    document.getElementById(`risk-${ch}-val`).textContent = Math.round(risk);
+                });
+
+                document.getElementById('rec-protocol').textContent = data.recommendation;
+                document.getElementById('rec-time').textContent = data.timestamp;
+            } catch (e) { console.error("Analytics fetch failed:", e); }
+        }
+
+        // --- Terminal Streaming ---
         function initTerminalStream() {
             const logContainer = document.getElementById('log-container');
             const streamStatus = document.getElementById('stream-status');
@@ -1146,34 +1128,12 @@
             eventSource.onmessage = function (event) {
                 const logEntry = document.createElement('div');
                 logEntry.className = 'log-entry';
-
-                const now = new Date().toLocaleTimeString();
-
-                let msg = event.data;
-                let category = "INFO";
-
-                if (msg.startsWith('[')) {
-                    const match = msg.match(/^\[(.*?)\] (.*)/);
-                    if (match) {
-                        category = match[1] || "INFO";
-                        msg = match[2];
-                    }
-                }
-
-                logEntry.innerHTML = `
-                    <span class="log-time">${now}</span>
-                    <span class="log-category cat-${category.toLowerCase()}">${category}</span>
-                    <span class="log-msg">${msg}</span>
-                `;
-
-                logContainer.appendChild(logEntry);
-                logContainer.scrollTop = logContainer.scrollHeight;
-
-                if (logContainer.children.length > 50) {
-                    logContainer.removeChild(logContainer.firstChild);
+                logEntry.innerHTML = `<span class="log-time">${new Date().toLocaleTimeString()}</span> ${event.data}`;
+                if (logContainer) {
+                    logContainer.appendChild(logEntry);
+                    logContainer.scrollTop = logContainer.scrollHeight;
                 }
             };
-
             eventSource.onerror = function () {
                 if (streamStatus) {
                     streamStatus.className = 'badge bg-danger';
@@ -1185,225 +1145,48 @@
         }
 
         function clearTerminal() {
-            document.getElementById('log-container').innerHTML = '';
+            const el = document.getElementById('log-container');
+            if (el) el.innerHTML = '';
         }
 
-        // ===================== PROTOCOL ANALYTICS =====================
-        let radarChart = null, barChart = null, trendChart = null;
-
-        const CHART_COLORS = {
-            timing: { bg: 'rgba(34, 197, 94, 0.2)', border: '#22c55e' },
-            size: { bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6' },
-            ttl: { bg: 'rgba(249, 115, 22, 0.2)', border: '#f97316' },
-        };
-
-        const CHART_DEFAULTS = {
-            color: '#9ca3af',
-            font: { family: 'Inter' },
-        };
-
-        function drawGauge(canvasId, value, maxVal = 100) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width, h = canvas.height;
-            const cx = w / 2, cy = h / 2, r = 50;
-
-            ctx.clearRect(0, 0, w, h);
-
-            // Background arc
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0.75 * Math.PI, 2.25 * Math.PI);
-            ctx.strokeStyle = '#374151';
-            ctx.lineWidth = 12;
-            ctx.lineCap = 'round';
-            ctx.stroke();
-
-            // Value arc
-            const ratio = Math.min(value / maxVal, 1);
-            const endAngle = 0.75 * Math.PI + ratio * 1.5 * Math.PI;
-            let color = '#22c55e'; // green
-            if (value > 60) color = '#ef4444'; // red
-            else if (value > 35) color = '#f59e0b'; // yellow
-
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0.75 * Math.PI, endAngle);
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 12;
-            ctx.lineCap = 'round';
-            ctx.stroke();
-        }
-
-        function getRiskLabel(value) {
-            if (value <= 30) return { text: 'LOW RISK', class: 'bg-success' };
-            if (value <= 60) return { text: 'MEDIUM RISK', class: 'bg-warning text-dark' };
-            return { text: 'HIGH RISK', class: 'bg-danger' };
-        }
-
-        function initCharts() {
-            const radarCtx = document.getElementById('radarChart');
-            if (!radarCtx) return;
-
-            // Radar Chart
-            radarChart = new Chart(radarCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['Stealth\n(inv. Risk)', 'Speed\n(inv. Latency)', 'Throughput'],
-                    datasets: [
-                        { label: 'TIMING', data: [75, 30, 22], ...CHART_COLORS.timing, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#22c55e' },
-                        { label: 'SIZE', data: [45, 55, 60], ...CHART_COLORS.size, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#3b82f6' },
-                        { label: 'TTL', data: [28, 82, 100], ...CHART_COLORS.ttl, borderWidth: 2, pointRadius: 4, pointBackgroundColor: '#f97316' },
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            beginAtZero: true, max: 100,
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            angleLines: { color: 'rgba(255,255,255,0.08)' },
-                            pointLabels: { color: '#9ca3af', font: { size: 11, family: 'Inter' } },
-                            ticks: { display: false }
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#d1d5db', font: { family: 'Inter' }, usePointStyle: true, pointStyle: 'circle' } }
-                    }
-                }
-            });
-
-            // Bar Chart
-            barChart = new Chart(document.getElementById('barChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['TIMING', 'SIZE', 'TTL'],
-                    datasets: [
-                        { label: 'Latency (ms)', data: [120, 80, 45], backgroundColor: ['rgba(34,197,94,0.6)', 'rgba(59,130,246,0.6)', 'rgba(249,115,22,0.6)'], borderRadius: 6 },
-                        { label: 'Throughput (bps)', data: [45, 120, 200], backgroundColor: ['rgba(34,197,94,0.25)', 'rgba(59,130,246,0.25)', 'rgba(249,115,22,0.25)'], borderColor: ['#22c55e', '#3b82f6', '#f97316'], borderWidth: 2, borderRadius: 6 },
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: {
-                        x: { ticks: { color: '#9ca3af', font: { family: 'Inter' } }, grid: { display: false } },
-                        y: { ticks: { color: '#6b7280', font: { family: 'Inter' } }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#d1d5db', font: { family: 'Inter' } } }
-                    }
-                }
-            });
-
-            // Trend Chart
-            trendChart = new Chart(document.getElementById('trendChart'), {
-                type: 'line',
-                data: {
-                    labels: Array.from({ length: 10 }, (_, i) => `T-${9 - i}`),
-                    datasets: [
-                        { label: 'Timing Risk', data: Array(10).fill(25), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
-                        { label: 'Size Risk', data: Array(10).fill(55), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
-                        { label: 'TTL Risk', data: Array(10).fill(72), borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', tension: 0.4, fill: true, pointRadius: 2 },
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: {
-                        x: { ticks: { color: '#6b7280' }, grid: { display: false } },
-                        y: { min: 0, max: 100, ticks: { color: '#6b7280' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                    },
-                    plugins: {
-                        legend: { labels: { color: '#d1d5db', font: { family: 'Inter' }, usePointStyle: true } }
-                    }
-                }
-            });
-
-            // Initial gauges
-            drawGauge('gaugeTimingCanvas', 25);
-            drawGauge('gaugeSizeCanvas', 55);
-            drawGauge('gaugeTTLCanvas', 72);
-        }
-
-        async function fetchAnalytics() {
-            try {
-                const res = await fetch('http://localhost:5000/api/protocol/analytics?live=true');
-                const data = await res.json();
-                if (!data.success) return;
-
-                const p = data.protocols;
-
-                // Normalize for radar: stealth = 100 - risk, speed = 100 - (lat/1.5), thr = (thr/2.5)*100
-                if (radarChart) {
-                    radarChart.data.datasets[0].data = [100 - p.timing.detection_risk, Math.max(0, 100 - p.timing.latency_ms / 1.5), (p.timing.throughput_bps / 2.5)];
-                    radarChart.data.datasets[1].data = [100 - p.size.detection_risk, Math.max(0, 100 - p.size.latency_ms / 1.5), (p.size.throughput_bps / 2.5)];
-                    radarChart.data.datasets[2].data = [100 - p.ttl.detection_risk, Math.max(0, 100 - p.ttl.latency_ms / 1.5), (p.ttl.throughput_bps / 2.5)];
-                    radarChart.update('none');
-                }
-
-                // Bar chart
-                if (barChart) {
-                    barChart.data.datasets[0].data = [p.timing.latency_ms, p.size.latency_ms, p.ttl.latency_ms];
-                    barChart.data.datasets[1].data = [p.timing.throughput_bps, p.size.throughput_bps, p.ttl.throughput_bps];
-                    barChart.update('none');
-                }
-
-                // Gauges
-                ['timing', 'size', 'ttl'].forEach(ch => {
-                    const risk = p[ch].detection_risk;
-                    const canvasId = ch === 'ttl' ? 'gaugeTTLCanvas' : `gauge${ch.charAt(0).toUpperCase() + ch.slice(1)}Canvas`;
-                    drawGauge(canvasId, risk);
-                    document.getElementById(`risk-${ch}-val`).textContent = Math.round(risk);
-                    const label = getRiskLabel(risk);
-                    const badge = document.getElementById(`risk-${ch}-badge`);
-                    badge.textContent = label.text;
-                    badge.className = `badge ${label.class}`;
-                    document.getElementById(`${ch}-lat`).textContent = Math.round(p[ch].latency_ms);
-                    document.getElementById(`${ch}-thr`).textContent = Math.round(p[ch].throughput_bps);
-                });
-
-                // Trend chart from history
-                if (trendChart && data.history) {
-                    trendChart.data.datasets[0].data = data.history.map(h => h.timing.risk);
-                    trendChart.data.datasets[1].data = data.history.map(h => h.size.risk);
-                    trendChart.data.datasets[2].data = data.history.map(h => h.ttl.risk);
-                    trendChart.update('none');
-                }
-
-                // Recommendation
-                document.getElementById('rec-protocol').textContent = data.recommendation;
-                document.getElementById('rec-time').textContent = data.timestamp;
-                const recColors = { TIMING: '#22c55e', SIZE: '#3b82f6', TTL: '#f97316' };
-                document.getElementById('rec-protocol').style.color = recColors[data.recommendation] || '#22c55e';
-                document.getElementById('recommendation-banner').style.borderLeftColor = recColors[data.recommendation] || '#22c55e';
-
-                // Score detail
-                const scoreText = Object.entries(data.scores).map(([k, v]) => `${k.toUpperCase()}: ${(v * 100).toFixed(0)}%`).join(' | ');
-                document.getElementById('rec-reason').textContent = `Scores: ${scoreText}`;
-
-            } catch (e) {
-                console.error('Analytics fetch error:', e);
-            }
-        }
-
-        // Auto-refresh analytics every 8 seconds
-        let analyticsInterval = null;
-        document.getElementById('tab-analytics')?.addEventListener('shown.bs.tab', () => {
-            if (!radarChart) initCharts();
-            fetchAnalytics();
-            if (!analyticsInterval) analyticsInterval = setInterval(fetchAnalytics, 8000);
-        });
-        document.querySelectorAll('#senderTabs .nav-link').forEach(tab => {
-            if (tab.id !== 'tab-analytics') {
-                tab.addEventListener('shown.bs.tab', () => {
-                    if (analyticsInterval) { clearInterval(analyticsInterval); analyticsInterval = null; }
-                });
-            }
-        });
-
-        window.addEventListener('load', () => {
-            refreshBalance();
+        // --- Lifecycle ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial Data
+            loadInbox();
+            discoverNodes();
             initTerminalStream();
-        });
 
+            // Auto-check Wallet
+            if (window.ethereum) {
+                window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+                    if (accounts.length > 0) updateWalletUI(accounts[0]);
+                });
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length > 0) updateWalletUI(accounts[0]);
+                    else location.reload();
+                });
+            }
+
+            // Tab Switching Listeners
+            const analyticsTab = document.getElementById('tab-analytics');
+            if (analyticsTab) {
+                analyticsTab.addEventListener('shown.bs.tab', () => {
+                    if (!radarChart) initCharts();
+                    fetchAnalytics();
+                    if (!analyticsInterval) analyticsInterval = setInterval(fetchAnalytics, 8000);
+                });
+                document.querySelectorAll('#senderTabs .nav-link').forEach(tab => {
+                    if (tab.id !== 'tab-analytics') {
+                        tab.addEventListener('shown.bs.tab', () => {
+                            if (analyticsInterval) { clearInterval(analyticsInterval); analyticsInterval = null; }
+                        });
+                    }
+                });
+            }
+
+            // Periodic Refresh
+            setInterval(refreshBalance, 30000);
+        });
     </script>
 </body>
 
