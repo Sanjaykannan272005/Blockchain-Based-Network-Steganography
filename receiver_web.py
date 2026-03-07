@@ -96,28 +96,43 @@ def extract_stego():
     channel = data.get('channel', 'timing')
     duration = int(data.get('duration', 30))
     use_stealth = data.get('stealth', False)
+    selected_iface = data.get('iface')
     
     def run_extraction():
-        add_log(f"Starting {channel.upper()} extraction (Duration: {duration}s)...")
-        cmd = [sys.executable, 'network_receiver.py']
+        add_log(f"Starting {channel.upper()} extraction (Duration: {duration}s) on {selected_iface or 'Auto-detected'} interface...")
+        cmd = [sys.executable, '-u', 'network_receiver.py']
         cmd.append(channel if channel and channel != 'auto' else 'timing')
         cmd.append(str(duration))
         if use_stealth: cmd.append("--stealth")
+        if selected_iface:
+            cmd.extend(["--iface", selected_iface])
         
+        # Stealth mode needs extra time for Scapy cleanup on Windows
+        proc_timeout = duration + 60 if use_stealth else duration + 20
+        
+        env = os.environ.copy()
+        env['PYTHONUTF8'] = '1'
+
         try:
-            # Note: Scapy needs sudo/admin, which this process should have
-            result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=duration + 10)
-            if result.returncode == 0:
-                output = result.stdout
-                add_log(f"Extraction complete.")
-                # Check for message with or without emoji to be safe
-                if "MESSAGE RECEIVED:" in output:
-                    msg = output.split("MESSAGE RECEIVED:")[1].strip().split('\n')[0].strip()
-                    add_log(f"Extracted: {msg}")
-                else:
-                    add_log("No message found in traffic.")
+            result = subprocess.run(
+                cmd, capture_output=True, text=True,
+                encoding='utf-8', errors='replace',
+                timeout=proc_timeout, env=env
+            )
+            combined = result.stdout + result.stderr
+            add_log(f"Extraction complete.")
+            if "MESSAGE RECEIVED:" in combined:
+                msg = combined.split("MESSAGE RECEIVED:")[1].strip().split('\n')[0].strip()
+                add_log(f"[SUCCESS] Message extracted: {msg}")
+            elif result.returncode != 0:
+                err = (result.stderr or '').strip().splitlines()
+                # Show last meaningful error line
+                last_err = next((l for l in reversed(err) if l.strip()), 'Unknown error')
+                add_log(f"Extraction failed: {last_err}")
             else:
-                add_log(f"Extraction failed: {result.stderr or 'Check permissions'}")
+                add_log("No message found in traffic.")
+        except subprocess.TimeoutExpired:
+            add_log(f"Extraction timed out after {proc_timeout}s -- no covert traffic detected.")
         except Exception as e:
             add_log(f"Error: {str(e)}")
 

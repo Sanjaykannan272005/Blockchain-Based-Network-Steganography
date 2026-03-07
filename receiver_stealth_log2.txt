@@ -1,0 +1,20 @@
+[WARN] kyber-py library not found. System will fallback to classical security.
+======================================================================
+BLOCKCHAIN-CONTROLLED NETWORK STEGANOGRAPHY - RECEIVER
+======================================================================
+
+[CONFIG] Configuration:
+   Channel: timing
+   Duration: 30 seconds
+
+[STEP 1] Getting decryption key from blockchain...
+C:\Users\Tamil\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\web3\__init__.py:2: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+ Retrieving Latest Block Hash...
+[SUCCESS] Default key derived from blockchain
+
+[STEP 2] Capturing network packets...
+[STEALTH 2.0 ACTIVE] Using Adaptive Bayesian Decoding...
+Listening for STEALTH TIMING channel (duration: 30s)...
+
+[ERROR] No valid data extracted (extracted 0 chars)

@@ -462,7 +462,7 @@
                             html += `
                             <div class="mb-2 p-2 border-start border-3 ${isLocked ? 'border-warning' : 'border-success'} bg-dark bg-opacity-25 rounded small">
                                 <div class="d-flex justify-content-between x-small mb-1">
-                                    <span class="text-info fw-bold">From: ${msg.sender.substring(0, 6)}...</span>
+                                    <span class="text-info fw-bold">From: ${(msg.sender || '').substring(0, 6)}...</span>
                                     ${isLocked ? '<span class="text-warning"><i class="fas fa-lock"></i></span>' : '<span class="text-success"><i class="fas fa-unlock"></i></span>'}
                                 </div>
                                 <div class="p-1 font-monospace x-small" style="word-break: break-all; color: ${isLocked ? '#888' : '#eee'}">${msg.content}</div>

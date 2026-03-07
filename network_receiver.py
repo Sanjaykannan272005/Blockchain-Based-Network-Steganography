@@ -18,6 +18,7 @@ from Crypto.Cipher import AES
 import base64
 import sys
 import os
+import socket
 from quantum_utils import QuantumUtils
 
 # Blockchain key derivation (same as sender)
@@ -92,11 +93,14 @@ def receive_via_timing(duration=60):
             if last_time is not None:
                 delay = current_time - last_time
                 
-                # Decode timing
-                if 0.08 < delay < 0.12:  # ~0.1s = 0
+                # Widened windows to handle Windows scheduler jitter
+                # Bit 0: ~0.1s delay  (sender sleeps 0.1s)
+                # Bit 1: ~0.2s delay  (sender sleeps 0.2s)
+                if 0.04 < delay < 0.15:   # 40ms - 150ms = bit 0
                     binary_data += '0'
-                elif 0.18 < delay < 0.22:  # ~0.2s = 1
+                elif 0.15 < delay < 0.35: # 150ms - 350ms = bit 1
                     binary_data += '1'
+                # else: ignore noise packets
                 
                 if len(binary_data) % 80 == 0 and len(binary_data) > 0:
                     print(f"   Received: {len(binary_data)} bits")
@@ -104,7 +108,7 @@ def receive_via_timing(duration=60):
             last_time = current_time
     
     # Capture packets
-    sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0)
+    sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0, iface=IFACE)
     
     print(f" Captured {packet_count} packets, extracted {len(binary_data)} bits")
     
@@ -130,17 +134,19 @@ def receive_via_size(duration=60):
             size = len(packet[Raw].load)
             packet_count += 1
             
-            # Decode size
-            if 90 < size < 110:  # ~100 bytes = 0
+            # Widened SIZE decode windows (stealth uses Gaussian around 400/600 bytes)
+            # Bit 0: 64-450 bytes
+            # Bit 1: 450-1500 bytes
+            if 64 <= size < 450:
                 binary_data += '0'
-            elif 190 < size < 210:  # ~200 bytes = 1
+            elif 450 <= size <= 1500:
                 binary_data += '1'
             
             if len(binary_data) % 80 == 0 and len(binary_data) > 0:
                 print(f"   Received: {len(binary_data)} bits")
     
     # Capture packets
-    sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0)
+    sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0, iface=IFACE)
     
     print(f" Captured {packet_count} packets, extracted {len(binary_data)} bits")
     
@@ -176,7 +182,7 @@ def receive_via_ttl(duration=60):
                 print(f"   Received: {len(binary_data)} bits")
     
     # Capture packets
-    sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0)
+    sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0, iface=IFACE)
     
     print(f" Captured {packet_count} packets, extracted {len(binary_data)} bits")
     
@@ -205,9 +211,33 @@ def main():
     CHANNEL = sys.argv[1]
     DURATION = int(sys.argv[2]) if len(sys.argv) > 2 else 60
     
+    # Handle optional interface
+    IFACE = None
+    if "--iface" in sys.argv:
+        try:
+            idx = sys.argv.index("--iface")
+            IFACE = sys.argv[idx + 1]
+        except:
+            pass
+            
+    # Auto-detect on Windows if not provided
+    if not IFACE and os.name == 'nt':
+        try:
+            from scapy.all import get_working_ifaces
+            # Match 10.210.59.20 specifically or any non-loopback
+            ifaces = get_working_ifaces()
+            for i in ifaces:
+                if i.ip == '10.210.59.20' or (not i.ip.startswith('127.') and not i.ip.startswith('169.254')):
+                    IFACE = i.name
+                    break
+        except:
+            pass
+
     print(f"\n[CONFIG] Configuration:")
     print(f"   Channel: {CHANNEL}")
     print(f"   Duration: {DURATION} seconds")
+    if IFACE:
+        print(f"   Interface: {IFACE}")
     
     # Step 1: Get key from blockchain
     print(f"\n[STEP 1] Getting decryption key from blockchain...")
@@ -239,7 +269,7 @@ def main():
                         if len(binary_list) % 20 == 0:
                             print(f"   Received: {len(binary_list)} stealth bits")
                     last_time[0] = current_time
-                sniff(filter="icmp", prn=stealth_handler, timeout=DURATION, store=0)
+                sniff(filter="icmp", prn=stealth_handler, timeout=DURATION, store=0, iface=IFACE)
                 binary_data = "".join(binary_list)
                 encrypted = "".join([chr(int(binary_data[i:i+8], 2)) for i in range(0, (len(binary_data)//8)*8, 8)])
             else:
@@ -256,7 +286,7 @@ def main():
                         binary_list.append(bit)
                         if len(binary_list) % 20 == 0:
                             print(f"   Received: {len(binary_list)} stealth bits")
-                sniff(filter="icmp", prn=stealth_handler, timeout=DURATION, store=0)
+                sniff(filter="icmp", prn=stealth_handler, timeout=DURATION, store=0, iface=IFACE)
                 binary_data = "".join(binary_list)
                 encrypted = "".join([chr(int(binary_data[i:i+8], 2)) for i in range(0, (len(binary_data)//8)*8, 8)])
             else:
@@ -290,7 +320,7 @@ def main():
                         print(f"   Accumulated: {len(binary_list)} drift bits")
                 last_time[0] = current_time
             
-            sniff(filter="icmp", prn=drift_handler, timeout=DURATION, store=0)
+            sniff(filter="icmp", prn=drift_handler, timeout=DURATION, store=0, iface=IFACE)
             binary_data = "".join(binary_list)
             encrypted = "".join([chr(int(binary_data[i:i+8], 2)) for i in range(0, (len(binary_data)//8)*8, 8)])
         else:
@@ -313,7 +343,7 @@ def main():
                 parts = encrypted.split(":", 2)
                 pqa_c_b64 = parts[1]
                 encrypted = parts[2]
-                print(f"️ [PQA MODE DETECTED] Extracting quantum ciphertext...")
+                print(f"[PQA MODE DETECTED] Extracting quantum ciphertext...")
                 
                 # Load local PQA keys
                 pk, sk = QuantumUtils.load_local_keys()
@@ -323,13 +353,13 @@ def main():
                     if ss:
                         # Derive Hybrid Key
                         key = QuantumUtils.get_hybrid_key(ss, key)
-                        print(f" Hybrid Key derived from Kyber shared secret")
+                        print(f"Hybrid Key derived from Kyber shared secret")
                     else:
-                        print(f" PQA Decapsulation failed (Key Mismatch?)")
+                        print(f"PQA Decapsulation failed (Key Mismatch?)")
                 else:
-                    print(f" Local PQA Secret Key not found (quantum_keys.json)")
+                    print(f"Local PQA Secret Key not found (quantum_keys.json)")
             except Exception as e:
-                print(f"️ PQA Error: {e}")
+                print(f"PQA Error: {e}")
 
         message = decrypt_message(encrypted, key)
         
