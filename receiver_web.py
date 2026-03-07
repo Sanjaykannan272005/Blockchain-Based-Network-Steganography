@@ -52,6 +52,10 @@ def index():
     admin_addr = config.get('owner_address', config.get('wallet_address', '')).lower()
     return render_template('receiver_web.html', wallet=config.get('wallet_address'), admin_address=admin_addr)
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
 @app.route('/api/receiver/status')
 def get_status():
     """Get status of the local node and network"""
@@ -95,8 +99,9 @@ def extract_stego():
     
     def run_extraction():
         add_log(f"Starting {channel.upper()} extraction (Duration: {duration}s)...")
-        # Command: python network_receiver.py <channel> <duration> [--stealth]
-        cmd = [sys.executable, 'network_receiver.py', channel, str(duration)]
+        cmd = [sys.executable, 'network_receiver.py']
+        cmd.append(channel if channel and channel != 'auto' else 'timing')
+        cmd.append(str(duration))
         if use_stealth: cmd.append("--stealth")
         
         try:
