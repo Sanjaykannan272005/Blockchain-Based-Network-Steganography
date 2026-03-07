@@ -128,7 +128,7 @@ def get_blockchain_inbox():
         
     try:
         blockchain.load_dead_drop_contract(config['dead_drop_contract'])
-        res = blockchain.get_deaddrop_messages(config['wallet_address'])
+        res = blockchain.get_from_deaddrop(config['wallet_address'])
         if res.get('success'):
             return jsonify({'success': True, 'messages': res['messages']})
         else:
@@ -177,5 +177,5 @@ def get_logs():
     return jsonify({'logs': capture_logs})
 
 if __name__ == '__main__':
-    print(f"🚀 Enhanced Receiver API active on http://localhost:5001")
+    print(f"Enhanced Receiver API active on http://localhost:5001")
     app.run(host='0.0.0.0', port=5001, debug=False)

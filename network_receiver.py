@@ -38,10 +38,10 @@ def get_blockchain_key(block_number=None):
         blockchain = BlockchainKeyExchange(rpc_url=rpc_url)
         
         if block_number:
-            print(f"🔗 Retrieving Hash for Block #{block_number}...")
+            print(f" Retrieving Hash for Block #{block_number}...")
             res = blockchain.get_block_hash(block_number)
         else:
-            print(f"🔗 Retrieving Latest Block Hash...")
+            print(f" Retrieving Latest Block Hash...")
             res = blockchain.get_latest_block_data()
             block_number = res.get('number')
             
@@ -50,7 +50,7 @@ def get_blockchain_key(block_number=None):
             key = hashlib.sha256(block_hash.encode()).digest()
             return key, block_hash[:20], block_number
     except Exception as e:
-        print(f"⚠️ Blockchain Error: {e}. Falling back to simulation.")
+        print(f"️ Blockchain Error: {e}. Falling back to simulation.")
 
     # Fallback to simulation (same as before)
     block_time = int(time.time() / 60) * 60  # Round to minute
@@ -75,7 +75,7 @@ def decrypt_message(encrypted_data, key):
 # Receive via TIMING channel
 def receive_via_timing(duration=60):
     """Extract data from packet timing delays"""
-    print(f"👂 Listening for TIMING channel (duration: {duration}s)...")
+    print(f" Listening for TIMING channel (duration: {duration}s)...")
     print(f"   Waiting for packets...")
     
     last_time = None
@@ -106,7 +106,7 @@ def receive_via_timing(duration=60):
     # Capture packets
     sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0)
     
-    print(f"✅ Captured {packet_count} packets, extracted {len(binary_data)} bits")
+    print(f" Captured {packet_count} packets, extracted {len(binary_data)} bits")
     
     # Convert binary to text
     chars = [binary_data[i:i+8] for i in range(0, len(binary_data), 8)]
@@ -117,7 +117,7 @@ def receive_via_timing(duration=60):
 # Receive via SIZE channel
 def receive_via_size(duration=60):
     """Extract data from packet sizes"""
-    print(f"👂 Listening for SIZE channel (duration: {duration}s)...")
+    print(f" Listening for SIZE channel (duration: {duration}s)...")
     print(f"   Waiting for packets...")
     
     binary_data = ""
@@ -142,7 +142,7 @@ def receive_via_size(duration=60):
     # Capture packets
     sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0)
     
-    print(f"✅ Captured {packet_count} packets, extracted {len(binary_data)} bits")
+    print(f" Captured {packet_count} packets, extracted {len(binary_data)} bits")
     
     # Convert binary to text
     chars = [binary_data[i:i+8] for i in range(0, len(binary_data), 8)]
@@ -153,7 +153,7 @@ def receive_via_size(duration=60):
 # Receive via TTL channel
 def receive_via_ttl(duration=60):
     """Extract data from TTL field"""
-    print(f"👂 Listening for TTL channel (duration: {duration}s)...")
+    print(f" Listening for TTL channel (duration: {duration}s)...")
     print(f"   Waiting for packets...")
     
     binary_data = ""
@@ -178,7 +178,7 @@ def receive_via_ttl(duration=60):
     # Capture packets
     sniff(filter="icmp", prn=packet_handler, timeout=duration, store=0)
     
-    print(f"✅ Captured {packet_count} packets, extracted {len(binary_data)} bits")
+    print(f" Captured {packet_count} packets, extracted {len(binary_data)} bits")
     
     # Convert binary to text
     chars = [binary_data[i:i+8] for i in range(0, len(binary_data), 8)]
@@ -313,7 +313,7 @@ def main():
                 parts = encrypted.split(":", 2)
                 pqa_c_b64 = parts[1]
                 encrypted = parts[2]
-                print(f"🛡️ [PQA MODE DETECTED] Extracting quantum ciphertext...")
+                print(f"️ [PQA MODE DETECTED] Extracting quantum ciphertext...")
                 
                 # Load local PQA keys
                 pk, sk = QuantumUtils.load_local_keys()
@@ -323,13 +323,13 @@ def main():
                     if ss:
                         # Derive Hybrid Key
                         key = QuantumUtils.get_hybrid_key(ss, key)
-                        print(f"✅ Hybrid Key derived from Kyber shared secret")
+                        print(f" Hybrid Key derived from Kyber shared secret")
                     else:
-                        print(f"❌ PQA Decapsulation failed (Key Mismatch?)")
+                        print(f" PQA Decapsulation failed (Key Mismatch?)")
                 else:
-                    print(f"❌ Local PQA Secret Key not found (quantum_keys.json)")
+                    print(f" Local PQA Secret Key not found (quantum_keys.json)")
             except Exception as e:
-                print(f"⚠️ PQA Error: {e}")
+                print(f"️ PQA Error: {e}")
 
         message = decrypt_message(encrypted, key)
         
@@ -346,12 +346,12 @@ def main():
             print(f"   - Incomplete data received")
         
     except PermissionError:
-        print(f"\n❌ ERROR: Permission denied")
+        print(f"\n ERROR: Permission denied")
         print(f"   Run as administrator/root:")
         print(f"   Windows: Run terminal as Administrator")
         print(f"   Linux: sudo python network_receiver.py ...")
     except Exception as e:
-        print(f"\n❌ ERROR: {e}")
+        print(f"\n ERROR: {e}")
 
 if __name__ == "__main__":
     main()

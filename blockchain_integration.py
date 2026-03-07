@@ -130,7 +130,7 @@ class BlockchainKeyExchange:
             tx = func.build_transaction({
                 'from': account.address,
                 'nonce': nonce,
-                'gas': 200000,
+                'gas': 1000000,
                 'gasPrice': gas_price
             })
             signed_tx = self.w3.eth.account.sign_transaction(tx, private_key)

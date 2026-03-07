@@ -37,10 +37,10 @@ def get_blockchain_key(block_number=None):
         blockchain = BlockchainKeyExchange(rpc_url=rpc_url)
         
         if block_number:
-            print(f"🔗 Fetching Hash for Block #{block_number}...")
+            print(f" Fetching Hash for Block #{block_number}...")
             res = blockchain.get_block_hash(block_number)
         else:
-            print(f"🔗 Fetching Latest Block Hash...")
+            print(f" Fetching Latest Block Hash...")
             res = blockchain.get_latest_block_data()
             block_number = res.get('number')
             
@@ -49,7 +49,7 @@ def get_blockchain_key(block_number=None):
             key = hashlib.sha256(block_hash.encode()).digest()
             return key, block_hash[:20], block_number
     except Exception as e:
-        print(f"⚠️ Blockchain Error: {e}. Falling back to simulation.")
+        print(f"️ Blockchain Error: {e}. Falling back to simulation.")
 
     # Fallback to simulation (same as before)
     block_time = int(time.time() / 60) * 60  # Round to minute
@@ -70,12 +70,12 @@ def encrypt_message(message, key):
 # Send via TIMING channel
 def send_via_timing(encrypted_data, target_ip):
     """Hide data in packet timing delays"""
-    print(f"🚀 Sending via TIMING channel to {target_ip}")
+    print(f" Sending via TIMING channel to {target_ip}")
     
     # Convert to binary
     binary = ''.join(format(ord(c), '08b') for c in encrypted_data)
     
-    print(f"📊 Sending {len(binary)} bits ({len(encrypted_data)} chars)")
+    print(f" Sending {len(binary)} bits ({len(encrypted_data)} chars)")
     
     # Send packets with timing delays
     for i, bit in enumerate(binary):
@@ -92,17 +92,17 @@ def send_via_timing(encrypted_data, target_ip):
         if (i + 1) % 80 == 0:
             print(f"  Progress: {i+1}/{len(binary)} bits")
     
-    print(f"✅ Sent {len(binary)} bits via timing channel")
+    print(f" Sent {len(binary)} bits via timing channel")
 
 # Send via SIZE channel
 def send_via_size(encrypted_data, target_ip):
     """Hide data in packet sizes"""
-    print(f"🚀 Sending via SIZE channel to {target_ip}")
+    print(f" Sending via SIZE channel to {target_ip}")
     
     # Convert to binary
     binary = ''.join(format(ord(c), '08b') for c in encrypted_data)
     
-    print(f"📊 Sending {len(binary)} bits ({len(encrypted_data)} chars)")
+    print(f" Sending {len(binary)} bits ({len(encrypted_data)} chars)")
     
     # Send packets with different sizes
     for i, bit in enumerate(binary):
@@ -117,17 +117,17 @@ def send_via_size(encrypted_data, target_ip):
         if (i + 1) % 80 == 0:
             print(f"  Progress: {i+1}/{len(binary)} bits")
     
-    print(f"✅ Sent {len(binary)} bits via size channel")
+    print(f" Sent {len(binary)} bits via size channel")
 
 # Send via TTL channel
 def send_via_ttl(encrypted_data, target_ip):
     """Hide data in TTL field"""
-    print(f"🚀 Sending via TTL channel to {target_ip}")
+    print(f" Sending via TTL channel to {target_ip}")
     
     # Convert to binary
     binary = ''.join(format(ord(c), '08b') for c in encrypted_data)
     
-    print(f"📊 Sending {len(binary)} bits ({len(encrypted_data)} chars)")
+    print(f" Sending {len(binary)} bits ({len(encrypted_data)} chars)")
     
     # Send packets with different TTL values
     for i, bit in enumerate(binary):
@@ -142,7 +142,7 @@ def send_via_ttl(encrypted_data, target_ip):
         if (i + 1) % 80 == 0:
             print(f"  Progress: {i+1}/{len(binary)} bits")
     
-    print(f"✅ Sent {len(binary)} bits via TTL channel")
+    print(f" Sent {len(binary)} bits via TTL channel")
 
 # Main
 def main():
@@ -163,23 +163,23 @@ def main():
     SECRET_MESSAGE = sys.argv[2]
     CHANNEL = sys.argv[3] if len(sys.argv) > 3 else "timing"
     
-    print(f"\n📝 Configuration:")
+    print(f"\n Configuration:")
     print(f"   Target IP: {TARGET_IP}")
     print(f"   Message: {SECRET_MESSAGE}")
     print(f"   Channel: {CHANNEL}")
     
     # Step 1: Get key from blockchain
-    print(f"\n📡 Step 1: Getting encryption key from blockchain...")
+    print(f"\n Step 1: Getting encryption key from blockchain...")
     
     BLOCK_KEY_MODE = "--block-key" in sys.argv
     key, key_hash, block_num = get_blockchain_key()
-    print(f"✅ Key derived from blockchain")
+    print(f" Key derived from blockchain")
     print(f"   Key hash: {key_hash}...")
     if block_num > 0:
         print(f"   Using Block: #{block_num}")
     
     # Step 2: Encrypt message
-    print(f"\n🔒 Step 2: Encrypting message...")
+    print(f"\n Step 2: Encrypting message...")
     
     # Check for Quantum-Safe Target
     USE_QUANTUM = "--quantum" in sys.argv
@@ -206,7 +206,7 @@ def main():
             for node in nodes_res['nodes']:
                 if node['ip'] == TARGET_IP:
                     target_pk_b64 = node['public_key']
-                    print(f"🕵️ Target PQA Public Key found in Registry: {target_pk_b64[:20]}...")
+                    print(f"️ Target PQA Public Key found in Registry: {target_pk_b64[:20]}...")
                     break
         
         if target_pk_b64:
@@ -216,11 +216,11 @@ def main():
                 pqa_ciphertext = c
                 # Derive Hybrid Key
                 key = QuantumUtils.get_hybrid_key(ss, key)
-                print(f"🛡️ [HYBRID PQA ACTIVE] Key hardened with Kyber-768")
+                print(f"️ [HYBRID PQA ACTIVE] Key hardened with Kyber-768")
             except Exception as e:
-                print(f"⚠️ PQA Error: {e}. Defaulting to Classical.")
+                print(f"️ PQA Error: {e}. Defaulting to Classical.")
         else:
-            print(f"⚠️ No PQA Public Key found for {TARGET_IP}. Defaulting to Classical.")
+            print(f"️ No PQA Public Key found for {TARGET_IP}. Defaulting to Classical.")
 
     encrypted_payload = encrypt_message(SECRET_MESSAGE, key)
     
@@ -250,7 +250,7 @@ def main():
         try:
             hops_data = json.loads(HOPS_ARG)
             # hops_data: [{"ip": "...", "channel": "...", "secret": "..."}, ...]
-            print(f"🕸️ [P2P MODE] Building {len(hops_data)} onion layers...")
+            print(f"️ [P2P MODE] Building {len(hops_data)} onion layers...")
             
             hops = [(h['ip'], h['channel']) for h in hops_data]
             keys = [OnionUtils.derive_key(h['secret']) for h in hops_data]
@@ -260,25 +260,25 @@ def main():
             
             # Wrap in onion layers
             encrypted = OnionUtils.create_onion(inner_payload, hops, keys)
-            print(f"✅ Onion built: {len(encrypted)} characters")
+            print(f" Onion built: {len(encrypted)} characters")
             
             # The FIRST hop protocol is what we use initially
             TARGET_IP = hops[0][0]
             CHANNEL = hops[0][1]
-            print(f"📍 Entry Node: {TARGET_IP} using {CHANNEL}")
+            print(f" Entry Node: {TARGET_IP} using {CHANNEL}")
             
         except Exception as e:
-            print(f"❌ P2P Error: {e}")
+            print(f" P2P Error: {e}")
             return
     else:
-        print(f"🔒 Finalizing Payload...")
+        print(f" Finalizing Payload...")
         encrypted = encrypted_payload
-        print(f"✅ Payload ready")
+        print(f" Payload ready")
         print(f"   Content: {encrypted[:40]}...")
         print(f"   Length: {len(encrypted)} characters")
     
     # Step 3: Send via network
-    print(f"\n🌐 Step 3: Sending via network steganography...")
+    print(f"\n Step 3: Sending via network steganography...")
     print(f"   Channel: {CHANNEL}")
     
     # Check if Stealth 2.0 is requested
@@ -286,7 +286,7 @@ def main():
     if USE_STEALTH_2_0:
         from stealth_engine import StealthEngine
         stealth = StealthEngine()
-        print("🚀 [STEALTH 2.0 ACTIVE] Mimicking traffic DNA patterns...")
+        print(" [STEALTH 2.0 ACTIVE] Mimicking traffic DNA patterns...")
     
     try:
         # Get bits for stealth modulation
@@ -294,7 +294,7 @@ def main():
         
         if CHANNEL == "timing":
             if USE_STEALTH_2_0:
-                print(f"🚀 Sending via STEALTH TIMING channel to {TARGET_IP}")
+                print(f" Sending via STEALTH TIMING channel to {TARGET_IP}")
                 for i, bit in enumerate(binary):
                     packet = IP(dst=TARGET_IP)/ICMP(seq=i)
                     send(packet, verbose=0)
@@ -307,7 +307,7 @@ def main():
                 
         elif CHANNEL == "size":
             if USE_STEALTH_2_0:
-                print(f"🚀 Sending via STEALTH SIZE channel to {TARGET_IP}")
+                print(f" Sending via STEALTH SIZE channel to {TARGET_IP}")
                 for i, bit in enumerate(binary):
                     size = stealth.get_stealth_size(bit)
                     payload = "X" * (size - 28) # Adjust for IP/ICMP headers
@@ -324,7 +324,7 @@ def main():
             from infrastructure_drift import InfrastructureDrift
             # In drift mode, we use the InfrastructureDrift engine to manage intervals
             drift_engine = InfrastructureDrift(encrypted, base_interval=10) # 10s for demo
-            print(f"🚀 [INFRASTRUCTURE SILENCE] Starting slow-burn transmission...")
+            print(f" [INFRASTRUCTURE SILENCE] Starting slow-burn transmission...")
             
             while True:
                 delay = drift_engine.get_next_delay()
@@ -333,23 +333,23 @@ def main():
                 packet = IP(dst=TARGET_IP)/ICMP(type=8, code=0, seq=drift_engine.state['current_index'])
                 send(packet, verbose=0)
                 
-                print(f"📡 Bit {drift_engine.state['current_index']} modulated. Next in {delay:.2f}s")
-                print(f"📊 Progress: {drift_engine.get_progress():.2f}%")
+                print(f" Bit {drift_engine.state['current_index']} modulated. Next in {delay:.2f}s")
+                print(f" Progress: {drift_engine.get_progress():.2f}%")
                 time.sleep(delay)
         else:
-            print(f"❌ Unknown channel: {CHANNEL}")
+            print(f" Unknown channel: {CHANNEL}")
             return
         
-        print(f"\n✅ MESSAGE SENT SUCCESSFULLY!")
-        print(f"📝 Receiver should run: python network_receiver.py {CHANNEL}")
+        print(f"\n MESSAGE SENT SUCCESSFULLY!")
+        print(f" Receiver should run: python network_receiver.py {CHANNEL}")
         
     except PermissionError:
-        print(f"\n❌ ERROR: Permission denied")
+        print(f"\n ERROR: Permission denied")
         print(f"   Run as administrator/root:")
         print(f"   Windows: Run terminal as Administrator")
         print(f"   Linux: sudo python network_sender.py ...")
     except Exception as e:
-        print(f"\n❌ ERROR: {e}")
+        print(f"\n ERROR: {e}")
 
 if __name__ == "__main__":
     main()

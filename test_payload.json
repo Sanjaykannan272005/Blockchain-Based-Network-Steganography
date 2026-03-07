@@ -1,0 +1,7 @@
+{
+    "target_ip": "127.0.0.1",
+    "recipient_wallet": "0x7A2C2AF27b1E4afBBaBfcfc6e30Dd411D432AcA4",
+    "message": "FINAL_CERTIFICATION_TEST_001",
+    "channel": "timing",
+    "block_key": true
+}

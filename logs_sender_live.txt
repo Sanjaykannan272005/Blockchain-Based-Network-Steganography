@@ -1,0 +1,26 @@
+C:\Users\Tamil\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\web3\__init__.py:2: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Sender Web Interface
+Open: http://localhost:5003
+ * Serving Flask app 'sender_web'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5003
+ * Running on http://10.210.59.20:5003
+Press CTRL+C to quit
+ * Restarting with stat
+C:\Users\Tamil\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\web3\__init__.py:2: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Sender Web Interface
+Open: http://localhost:5003
+ * Debugger is active!
+ * Debugger PIN: 130-239-932
+ * Detected change in 'E:\\Projects\\steganography\\check_tx_receipt.py', reloading
+ * Restarting with stat
+C:\Users\Tamil\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\web3\__init__.py:2: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+Sender Web Interface
+Open: http://localhost:5003
+ * Debugger is active!
+ * Debugger PIN: 130-239-932

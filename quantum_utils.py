@@ -11,7 +11,7 @@ except ImportError:
     try:
         from kyber import Kyber768
     except ImportError:
-        print("❌ kyber-py library not found. System will fallback to classical security.")
+        print("[WARN] kyber-py library not found. System will fallback to classical security.")
         Kyber768 = None
 
 class QuantumUtils:

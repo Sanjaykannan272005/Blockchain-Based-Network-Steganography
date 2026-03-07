@@ -12,6 +12,7 @@ import json
 import socket
 import os
 from blockchain_integration import BlockchainKeyExchange
+import requests
 from log_streamer import streamer
 
 app = Flask(__name__)
@@ -116,6 +117,49 @@ def get_balance():
     try:
         balance = w3.eth.get_balance(w3.to_checksum_address(target_wallet))
         return jsonify({'balance': w3.from_wei(balance, 'ether')})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/verified_nodes')
+def proxy_nodes():
+    try:
+        res = requests.get('http://localhost:5000/api/verified_nodes', timeout=5)
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Dashboard offline', 'nodes': []})
+
+@app.route('/api/protocol/analytics')
+def proxy_analytics():
+    try:
+        live = request.args.get('live', 'false')
+        res = requests.get(f'http://localhost:5000/api/protocol/analytics?live={live}', timeout=5)
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Dashboard offline'})
+
+@app.route('/network_hide', methods=['POST'])
+def network_hide_proxy():
+    # Allow local templates to call /network_hide which is actually in app.py
+    try:
+        # Forward form data
+        res = requests.post('http://localhost:5000/network_hide', data=request.form, timeout=10)
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/dead_drop_check')
+def proxy_dead_drop_check():
+    try:
+        res = requests.get('http://localhost:5000/dead_drop_check', timeout=5)
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Dashboard offline'})
+
+@app.route('/dead_drop_send_hybrid', methods=['POST'])
+def proxy_dead_drop_send_hybrid():
+    try:
+        res = requests.post('http://localhost:5000/dead_drop_send_hybrid', json=request.json, timeout=10)
+        return jsonify(res.json())
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
