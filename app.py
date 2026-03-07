@@ -115,6 +115,34 @@ def dashboard():
     streamer.emit("Dashboard access by potential admin/user")
     return render_template('dashboard.html', admin_address=admin_addr)
 
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
+@app.route('/api/ping')
+def ping_check():
+    host = request.args.get('host')
+    if not host:
+        return jsonify({'success': False, 'error': 'No host specified'})
+    
+    import subprocess
+    import platform
+    import time
+    
+    # Try ping (ICMP)
+    param = '-n' if platform.system().lower() == 'windows' else '-c'
+    start = time.time()
+    try:
+        # Use a single packet check
+        res = subprocess.run(['ping', param, '1', host], capture_output=True, timeout=2)
+        latency = (time.time() - start) * 1000
+        if res.returncode == 0:
+            return jsonify({'success': True, 'latency': latency})
+        else:
+            return jsonify({'success': False, 'error': 'Host unreachable (ICMP blocked or offline)'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/api/logs/stream')
 def stream_logs():
     return Response(streamer.generate(), mimetype='text/event-stream')
@@ -129,8 +157,11 @@ def get_stats():
     current_protocol = "TIMING"
     user_role = "GUEST"
     
-    # Check for connected wallet from request params
+    # Check for connected wallet and node IPs from request params
     target_wallet = request.args.get('wallet', config.get('wallet_address')).lower()
+    receiver_ip = request.args.get('receiver_ip', '127.0.0.1')
+    auth_ip = request.args.get('auth_ip', '127.0.0.1')
+    sender_ip = request.args.get('sender_ip', '127.0.0.1')
     admin_addr = config.get('owner_address', config.get('wallet_address', '')).lower()
     
     # Real blockchain data
@@ -183,12 +214,11 @@ def get_stats():
             except: pass
 
     # Real service port checks
-    import socket as _sock
-    def _port_open(port):
+    def _port_open(host, port):
         s = _sock.socket()
         s.settimeout(0.3)
         try:
-            s.connect(('127.0.0.1', port))
+            s.connect((host, port))
             s.close()
             return True
         except:
@@ -196,9 +226,9 @@ def get_stats():
 
     return jsonify({
         'services': {
-            'auth': _port_open(5002),
-            'receiver': _port_open(5001),
-            'sender': _port_open(5003)
+            'auth': _port_open(auth_ip, 5002),
+            'receiver': _port_open(receiver_ip, 5001),
+            'sender': _port_open(sender_ip, 5003)
         },
         'metrics': {
             'messages_count': len(dashboard_logs),

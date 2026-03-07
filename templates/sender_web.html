@@ -401,8 +401,14 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="field-label">Target Host IP</div>
-                                <input type="text" class="form-control" id="net-host" name="target_host"
-                                    placeholder="127.0.0.1" required>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="net-host" name="target_host"
+                                        placeholder="127.0.0.1" required>
+                                    <button class="btn btn-sm btn-outline-info" type="button"
+                                        onclick="checkConnectivity(this)">
+                                        <i class="fas fa-signal"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="field-label">Options</div>
@@ -844,6 +850,43 @@
         }
 
         // --- Action Functions ---
+        async function checkConnectivity(btn) {
+            const host = document.getElementById('net-host').value;
+            if (!host) {
+                alert("Enter a target IP first");
+                return;
+            }
+
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/ping?host=${host}`);
+                const data = await res.json();
+                if (data.success) {
+                    btn.classList.replace('btn-outline-info', 'btn-success');
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    alert(`✅ Connection Verified: ${data.latency.toFixed(2)}ms latency. Receiver is reachable.`);
+                } else {
+                    btn.classList.replace('btn-outline-info', 'btn-danger');
+                    btn.innerHTML = '<i class="fas fa-times"></i>';
+                    alert(`❌ Connection Failed: ${data.error}. Check firewall and IP.`);
+                }
+            } catch (e) {
+                alert("Error checking connectivity: " + e.message);
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            } finally {
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                    btn.classList.remove('btn-success', 'btn-danger');
+                    btn.classList.add('btn-outline-info');
+                }, 5000);
+            }
+        }
+
         async function sendNetworkStego() {
             const method = document.getElementById('net-method').value;
             const host = document.getElementById('net-host').value;

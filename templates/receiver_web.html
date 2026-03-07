@@ -317,9 +317,16 @@
                                     <option value="drift">💨 Infrastructure Silence (Drift)</option>
                                 </select>
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label small fw-bold">Capture Duration (seconds)</label>
                                 <input type="number" class="form-control" id="duration" value="30">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold">Network Interface (e.g. eth0, wlan0)</label>
+                                <input type="text" class="form-control" id="iface"
+                                    placeholder="Auto-detect (if Windows)" value="">
+                                <div class="x-small text-muted mt-1">Ubuntu users: Use <code>ip addr</code> to find your
+                                    interface name.</div>
                             </div>
                             <div class="form-check form-switch mb-4">
                                 <input class="form-check-input" type="checkbox" id="stealth-mode">
@@ -467,10 +474,11 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Capturing...';
 
             try {
+                const iface = document.getElementById('iface').value;
                 const res = await fetch('/api/receiver/extract', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ channel, duration, stealth })
+                    body: JSON.stringify({ channel, duration, stealth, iface })
                 });
                 const data = await res.json();
                 if (data.success) {

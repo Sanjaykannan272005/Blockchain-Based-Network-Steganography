@@ -177,6 +177,33 @@
     </nav>
 
     <div class="container">
+        <!-- Node Settings Bar -->
+        <div class="card p-3 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <h5 class="fw-bold mb-0">Stealth Network Control Center</h5>
+                    <p class="text-muted x-small mb-0">Hybrid Quantum-Resilient Steganography System</p>
+                </div>
+                <div class="col-md-7 text-end">
+                    <div class="d-inline-flex gap-2">
+                        <div class="input-group input-group-sm" style="width: 170px;">
+                            <span class="input-group-text bg-dark border-secondary text-muted x-small">Receiver
+                                IP</span>
+                            <input type="text" id="receiver_ip"
+                                class="form-control bg-dark border-secondary text-white x-small" value="127.0.0.1">
+                        </div>
+                        <div class="input-group input-group-sm" style="width: 170px;">
+                            <span class="input-group-text bg-dark border-secondary text-muted x-small">Auth IP</span>
+                            <input type="text" id="auth_ip"
+                                class="form-control bg-dark border-secondary text-white x-small" value="127.0.0.1">
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="updateDashboard()"><i
+                                class="fas fa-sync-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Service Status Row -->
         <div class="row mb-4">
             <div class="col-md-4">
@@ -187,7 +214,7 @@
                             <span id="auth-status-text" class="text-muted">Checking...</span>
                         </div>
                         <div id="auth-status-dot" class="status-indicator status-offline"></div>
-                        <a href="http://${window.location.hostname}:5002" target="_blank"
+                        <a id="auth-ui-link" href="http://127.0.0.1:5002" target="_blank"
                             class="btn btn-sm btn-outline-primary">Open UI</a>
                     </div>
                 </div>
@@ -200,7 +227,7 @@
                             <span id="receiver-status-text" class="text-muted">Checking...</span>
                         </div>
                         <div id="receiver-status-dot" class="status-indicator status-offline"></div>
-                        <a href="http://${window.location.hostname}:5001" target="_blank"
+                        <a id="receiver-ui-link" href="http://127.0.0.1:5001" target="_blank"
                             class="btn btn-sm btn-outline-primary">Open UI</a>
                     </div>
                 </div>
@@ -213,7 +240,7 @@
                             <span id="sender-status-text" class="text-muted">Checking...</span>
                         </div>
                         <div id="sender-status-dot" class="status-indicator status-offline"></div>
-                        <a href="http://${window.location.hostname}:5003" target="_blank"
+                        <a id="sender-ui-link" href="http://127.0.0.1:5003" target="_blank"
                             class="btn btn-sm btn-outline-primary">Open UI</a>
                     </div>
                 </div>
@@ -360,7 +387,16 @@
         // --- Core Functions ---
         async function updateDashboard() {
             try {
-                const url = userAccount ? `/api/stats?wallet=${userAccount}` : '/api/stats';
+                const r_ip = document.getElementById('receiver_ip').value || '127.0.0.1';
+                const a_ip = document.getElementById('auth_ip').value || '127.0.0.1';
+
+                // Update links
+                document.getElementById('receiver-ui-link').href = `http://${r_ip}:5001`;
+                document.getElementById('auth-ui-link').href = `http://${a_ip}:5002`;
+
+                let url = `/api/stats?receiver_ip=${r_ip}&auth_ip=${a_ip}`;
+                if (userAccount) url += '&wallet=' + userAccount;
+
                 const response = await fetch(url);
                 const data = await response.json();
 
